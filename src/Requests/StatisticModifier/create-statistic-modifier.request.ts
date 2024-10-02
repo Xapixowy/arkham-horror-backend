@@ -1,7 +1,7 @@
-import { StatisticModifier } from '../Types/statistic-modifier.type';
+import { StatisticModifier } from '@Types/statistic-modifier.type';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
-export class StatisticModifierDto implements StatisticModifier {
+export class CreateStatisticModifierRequest implements StatisticModifier {
   @IsString()
   @IsNotEmpty()
   modifier: string;

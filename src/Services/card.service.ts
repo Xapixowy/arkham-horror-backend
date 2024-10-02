@@ -1,41 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { CardDto } from '../Dtos/Card/card.dto';
-import { ErrorEnum } from '../Enums/error.enum';
+import { CreateCardRequest } from '@Requests/Card/create-card.request';
+import { ErrorEnum } from '@Enums/error.enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Card } from '@Entities/card.entity';
+import { DataSource, Repository } from 'typeorm';
+import { CardDto } from '@DTOs/Card/card.dto';
 
 @Injectable()
 export class CardService {
-  private cards: CardDto[] = [];
+  constructor(
+    @InjectRepository(Card)
+    private cardRepository: Repository<Card>,
+    private dataSource: DataSource,
+  ) {}
 
-  getAll(): CardDto[] {
-    return this.cards;
+  async findAll(): Promise<CardDto[]> {
+    const cards = await this.cardRepository.find();
+    return cards.map((card) => CardDto.fromEntity(card));
   }
 
-  get(id: number): CardDto {
-    const existingCard = this.cards[id];
+  async findOne(id: number): Promise<CardDto | null> {
+    const existingCard = this.cardRepository.findOneBy({ id });
     if (!existingCard) {
       throw new Error(ErrorEnum.NOT_FOUND);
     }
-    return this.cards[id];
+    return CardDto.fromEntity(await existingCard);
   }
 
-  add(card: CardDto): void {
-    this.cards.push(card);
+  async add(cardRequest: CreateCardRequest): Promise<void> {
+    const card = this.cardRepository.create(cardRequest);
+    return this.dataSource.transaction(async (manager) => {
+      await manager.save(card);
+    });
   }
 
-  edit(id: number, card: CardDto): void {
-    const existingCard = this.cards[id];
-    if (!existingCard) {
-      throw new Error(ErrorEnum.NOT_FOUND);
-    }
-    this.cards[id] = card;
+  async edit(id: number, cardRequest: CreateCardRequest): Promise<void> {
+    return await this.dataSource.transaction(async (manager) => {
+      const existingCard = await manager.findOneBy(Card, { id });
+      if (!existingCard) {
+        throw new Error(ErrorEnum.NOT_FOUND);
+      }
+      manager.merge(Card, existingCard, cardRequest);
+      await manager.save(Card, existingCard);
+    });
   }
 
-  remove(id: number): CardDto {
-    const existingCard = this.cards[id];
-    if (!existingCard) {
-      throw new Error(ErrorEnum.NOT_FOUND);
-    }
-    this.cards.splice(id, 1);
-    return existingCard;
+  async remove(id: number): Promise<void> {
+    return this.dataSource.transaction(async (manager) => {
+      const existingCard = await manager.findOneBy(Card, { id });
+      if (!existingCard) {
+        throw new Error(ErrorEnum.NOT_FOUND);
+      }
+      await manager.remove(Card, existingCard);
+    });
   }
 }

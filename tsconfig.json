@@ -16,6 +16,38 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@Controllers/*": [
+        "./src/Controllers/*"
+      ],
+      "@DTOs/*": [
+        "./src/DTOs/*"
+      ],
+      "@Entities/*": [
+        "./src/Entities/*"
+      ],
+      "@Enums/*": [
+        "./src/Enums/*"
+      ],
+      "@Exceptions/*": [
+        "./src/Exceptions/*"
+      ],
+      "@Helpers/*": [
+        "./src/Helpers/*"
+      ],
+      "@Modules/*": [
+        "./src/Modules/*"
+      ],
+      "@Requests/*": [
+        "./src/Requests/*"
+      ],
+      "@Services/*": [
+        "./src/Services/*"
+      ],
+      "@Types/*": [
+        "./src/Types/*"
+      ]
+    }
   }
 }

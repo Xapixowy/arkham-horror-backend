@@ -9,10 +9,11 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CardService } from '../Services/card.service';
-import { CardDto } from '../Dtos/Card/card.dto';
-import { ResponseHelper } from '../Helpers/response.helper';
-import { Response } from '../Types/response.type';
+import { CardService } from '@Services/card.service';
+import { CardDto } from '@DTOs/Card/card.dto';
+import { ResponseHelper } from '@Helpers/response.helper';
+import { Response } from '@Types/response.type';
+import { CreateCardRequest } from '@Requests/Card/create-card.request';
 
 @Controller('cards')
 export class CardController {
@@ -21,7 +22,7 @@ export class CardController {
   @Get()
   index(): Response<CardDto[]> {
     try {
-      return ResponseHelper.buildResponse(this.cardService.getAll());
+      return ResponseHelper.buildResponse(this.cardService.findAll());
     } catch (error) {
       ResponseHelper.handleError(error.message);
     }
@@ -30,7 +31,7 @@ export class CardController {
   @Get(':id')
   show(@Param('id') id: string): Response<CardDto> {
     try {
-      return ResponseHelper.buildResponse(this.cardService.get(+id));
+      return ResponseHelper.buildResponse(this.cardService.findOne(+id));
     } catch (error) {
       ResponseHelper.handleError(error.message);
     }
@@ -38,7 +39,7 @@ export class CardController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() card: CardDto): void {
+  create(@Body() card: CreateCardRequest): void {
     try {
       this.cardService.add(card);
     } catch (error) {
@@ -48,7 +49,7 @@ export class CardController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  update(@Param('id') id: string, @Body() editedCard: CardDto): void {
+  update(@Param('id') id: string, @Body() editedCard: CreateCardRequest): void {
     try {
       this.cardService.edit(+id, editedCard);
     } catch (error) {
