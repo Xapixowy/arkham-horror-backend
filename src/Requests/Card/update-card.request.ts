@@ -2,7 +2,6 @@ import {
   IsArray,
   IsEnum,
   IsInt,
-  IsNotEmpty,
   IsOptional,
   IsString,
   Max,
@@ -15,24 +14,25 @@ import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 import { Type } from 'class-transformer';
 import { CreateStatisticModifierRequest } from '@Requests/StatisticModifier/create-statistic-modifier.request';
 
-export class CreateCardRequest {
+export class UpdateCardRequest {
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
+  @IsOptional()
   description: string;
 
   @IsEnum(LanguageEnum)
-  @IsNotEmpty()
+  @IsOptional()
   locale: string;
 
   @IsEnum(CardTypeEnum)
-  @IsNotEmpty()
+  @IsOptional()
   type: string;
 
   @IsEnum(CardSubtypeEnum)
-  @IsNotEmpty()
+  @IsOptional()
   subtype: string;
 
   @IsArray()

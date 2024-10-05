@@ -18,13 +18,13 @@ export class Card {
 
   @Column({
     type: 'varchar',
-    length: 63,
+    length: 64,
   })
   type: string;
 
   @Column({
     type: 'varchar',
-    length: 63,
+    length: 64,
     nullable: true,
   })
   subtype: string;

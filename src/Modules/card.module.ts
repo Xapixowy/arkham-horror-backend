@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CardController } from '../Controllers/card.controller';
-import { CardService } from '../Services/card.service';
+import { CardController } from '@Controllers/card.controller';
+import { CardService } from '@Services/card.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Card } from '../Entities/card.entity';
+import { Card } from '@Entities/card.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Card])],

@@ -14,55 +14,40 @@ import { CardDto } from '@DTOs/Card/card.dto';
 import { ResponseHelper } from '@Helpers/response.helper';
 import { Response } from '@Types/response.type';
 import { CreateCardRequest } from '@Requests/Card/create-card.request';
+import { UpdateCardRequest } from '@Requests/Card/update-card.request';
 
 @Controller('cards')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
   @Get()
-  index(): Response<CardDto[]> {
-    try {
-      return ResponseHelper.buildResponse(this.cardService.findAll());
-    } catch (error) {
-      ResponseHelper.handleError(error.message);
-    }
+  async index(): Promise<Response<CardDto[]>> {
+    return ResponseHelper.buildResponse(await this.cardService.findAll());
   }
 
   @Get(':id')
-  show(@Param('id') id: string): Response<CardDto> {
-    try {
-      return ResponseHelper.buildResponse(this.cardService.findOne(+id));
-    } catch (error) {
-      ResponseHelper.handleError(error.message);
-    }
+  async show(@Param('id') id: string): Promise<Response<CardDto>> {
+    return ResponseHelper.buildResponse(await this.cardService.findOne(+id));
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() card: CreateCardRequest): void {
-    try {
-      this.cardService.add(card);
-    } catch (error) {
-      ResponseHelper.handleError(error.message);
-    }
+  async create(@Body() card: CreateCardRequest): Promise<Response<CardDto>> {
+    return ResponseHelper.buildResponse(await this.cardService.add(card));
   }
 
   @Put(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  update(@Param('id') id: string, @Body() editedCard: CreateCardRequest): void {
-    try {
-      this.cardService.edit(+id, editedCard);
-    } catch (error) {
-      ResponseHelper.handleError(error);
-    }
+  async update(
+    @Param('id') id: string,
+    @Body() editedCard: UpdateCardRequest,
+  ): Promise<Response<CardDto>> {
+    return ResponseHelper.buildResponse(
+      await this.cardService.edit(+id, editedCard),
+    );
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Response<CardDto> {
-    try {
-      return ResponseHelper.buildResponse(this.cardService.remove(+id));
-    } catch (error) {
-      ResponseHelper.handleError(error.message);
-    }
+  async delete(@Param('id') id: string): Promise<Response<CardDto>> {
+    return ResponseHelper.buildResponse(await this.cardService.remove(+id));
   }
 }

@@ -39,6 +39,12 @@
       "@Modules/*": [
         "./src/Modules/*"
       ],
+      "@Providers/*": [
+        "./src/Providers/*"
+      ],
+      "@Repositories/*": [
+        "./src/Repositories/*"
+      ],
       "@Requests/*": [
         "./src/Requests/*"
       ],
@@ -47,7 +53,7 @@
       ],
       "@Types/*": [
         "./src/Types/*"
-      ]
+      ],
     }
   }
 }
