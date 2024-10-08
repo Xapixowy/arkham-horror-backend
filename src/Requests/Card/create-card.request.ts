@@ -2,14 +2,13 @@ import {
   IsArray,
   IsEnum,
   IsInt,
-  IsNotEmpty,
   IsOptional,
   IsString,
   Max,
   Min,
   ValidateNested,
 } from 'class-validator';
-import { LanguageEnum } from '@Enums/language.enum';
+import { Language } from '@Enums/language';
 import { CardTypeEnum } from '@Enums/Card/card-type.enum';
 import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 import { Type } from 'class-transformer';
@@ -17,22 +16,18 @@ import { CreateStatisticModifierRequest } from '@Requests/StatisticModifier/crea
 
 export class CreateCardRequest {
   @IsString()
-  @IsNotEmpty()
   name: string;
 
   @IsString()
   description: string;
 
-  @IsEnum(LanguageEnum)
-  @IsNotEmpty()
-  locale: string;
+  @IsEnum(Language)
+  locale: Language;
 
   @IsEnum(CardTypeEnum)
-  @IsNotEmpty()
   type: string;
 
   @IsEnum(CardSubtypeEnum)
-  @IsNotEmpty()
   subtype: string;
 
   @IsArray()

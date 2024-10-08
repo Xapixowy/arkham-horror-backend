@@ -8,7 +8,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { LanguageEnum } from '@Enums/language.enum';
+import { Language } from '@Enums/language';
 import { CardTypeEnum } from '@Enums/Card/card-type.enum';
 import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 import { Type } from 'class-transformer';
@@ -23,9 +23,9 @@ export class UpdateCardRequest {
   @IsOptional()
   description: string;
 
-  @IsEnum(LanguageEnum)
+  @IsEnum(Language)
   @IsOptional()
-  locale: string;
+  locale: Language;
 
   @IsEnum(CardTypeEnum)
   @IsOptional()

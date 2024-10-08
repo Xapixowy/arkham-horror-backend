@@ -3,7 +3,7 @@ import { CreateCardRequest } from '@Requests/Card/create-card.request';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from '@Entities/card.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CardDto } from '@DTOs/Card/card.dto';
+import { CardDto } from '@DTOs/card.dto';
 import { NotFoundException } from '@Exceptions/not-found.exception';
 
 @Injectable()

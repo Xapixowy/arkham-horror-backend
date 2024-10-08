@@ -1,4 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
+import { Language } from '@Enums/language';
 
 @Entity()
 export class Card {
@@ -33,7 +35,7 @@ export class Card {
     type: 'json',
     nullable: true,
   })
-  statistic_modifiers: object;
+  statistic_modifiers: StatisticModifier[];
 
   @Column({
     type: 'integer',
@@ -51,5 +53,5 @@ export class Card {
     type: 'varchar',
     length: 2,
   })
-  locale: string;
+  locale: Language;
 }

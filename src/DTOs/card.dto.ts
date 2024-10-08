@@ -1,4 +1,6 @@
 import { Card } from '@Entities/card.entity';
+import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
+import { Language } from '@Enums/language';
 
 export class CardDto {
   constructor(
@@ -7,10 +9,10 @@ export class CardDto {
     public description: string,
     public type: string,
     public subtype: string,
-    public statisticModifiers: object,
+    public statisticModifiers: StatisticModifier[],
     public handUsage: number,
     public image_path: string,
-    public locale: string,
+    public locale: Language,
   ) {}
 
   static fromEntity(card: Card): CardDto {

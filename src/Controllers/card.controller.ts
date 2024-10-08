@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { CardService } from '@Services/card.service';
-import { CardDto } from '@DTOs/Card/card.dto';
+import { CardDto } from '@DTOs/card.dto';
 import { ResponseHelper } from '@Helpers/response.helper';
 import { Response } from '@Types/response.type';
 import { CreateCardRequest } from '@Requests/Card/create-card.request';
