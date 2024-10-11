@@ -1,13 +1,14 @@
+import { ErrorEnum } from '@Enums/error.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ResponseHelper } from '@Helpers/response.helper';
-import { ErrorEnum } from '@Enums/error.enum';
 
-export class SomethingWrongException extends HttpException {
+export class FileMissingException extends HttpException {
   constructor() {
     super(
       ResponseHelper.buildExceptionResponse(
-        ErrorEnum.SOMETHING_WRONG,
+        ErrorEnum.FILE_MISSING,
         HttpStatus.BAD_REQUEST,
+        ['file must be a file'],
       ),
       HttpStatus.BAD_REQUEST,
     );

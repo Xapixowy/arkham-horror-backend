@@ -1,12 +1,12 @@
+import { ErrorEnum } from '@Enums/error.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ResponseHelper } from '@Helpers/response.helper';
-import { ErrorEnum } from '@Enums/error.enum';
 
-export class SomethingWrongException extends HttpException {
+export class FileMaximumSizeExceededException extends HttpException {
   constructor() {
     super(
       ResponseHelper.buildExceptionResponse(
-        ErrorEnum.SOMETHING_WRONG,
+        ErrorEnum.FILE_MAXIMUM_SIZE_EXCEEDED,
         HttpStatus.BAD_REQUEST,
       ),
       HttpStatus.BAD_REQUEST,

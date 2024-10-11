@@ -54,6 +54,9 @@
       "@Types/*": [
         "./src/Types/*"
       ],
+      "@Interceptors/*": [
+        "./src/Interceptors/*"
+      ]
     }
   }
 }

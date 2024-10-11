@@ -12,7 +12,7 @@ import {
 import { CardService } from '@Services/card.service';
 import { CardDto } from '@DTOs/card.dto';
 import { ResponseHelper } from '@Helpers/response.helper';
-import { Response } from '@Types/response.type';
+import { DataResponse } from '@Types/data-response.type';
 import { CreateCardRequest } from '@Requests/Card/create-card.request';
 import { UpdateCardRequest } from '@Requests/Card/update-card.request';
 
@@ -21,18 +21,20 @@ export class CardController {
   constructor(private readonly cardService: CardService) {}
 
   @Get()
-  async index(): Promise<Response<CardDto[]>> {
+  async index(): Promise<DataResponse<CardDto[]>> {
     return ResponseHelper.buildResponse(await this.cardService.findAll());
   }
 
   @Get(':id')
-  async show(@Param('id') id: string): Promise<Response<CardDto>> {
+  async show(@Param('id') id: string): Promise<DataResponse<CardDto>> {
     return ResponseHelper.buildResponse(await this.cardService.findOne(+id));
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() card: CreateCardRequest): Promise<Response<CardDto>> {
+  async create(
+    @Body() card: CreateCardRequest,
+  ): Promise<DataResponse<CardDto>> {
     return ResponseHelper.buildResponse(await this.cardService.add(card));
   }
 
@@ -40,14 +42,14 @@ export class CardController {
   async update(
     @Param('id') id: string,
     @Body() editedCard: UpdateCardRequest,
-  ): Promise<Response<CardDto>> {
+  ): Promise<DataResponse<CardDto>> {
     return ResponseHelper.buildResponse(
       await this.cardService.edit(+id, editedCard),
     );
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<Response<CardDto>> {
+  async delete(@Param('id') id: string): Promise<DataResponse<CardDto>> {
     return ResponseHelper.buildResponse(await this.cardService.remove(+id));
   }
 }
