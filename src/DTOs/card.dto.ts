@@ -11,7 +11,8 @@ export class CardDto {
     public subtype: string,
     public statisticModifiers: StatisticModifier[],
     public handUsage: number,
-    public image_path: string,
+    public front_image_path: string,
+    public back_image_path: string,
     public locale: Language,
   ) {}
 
@@ -24,7 +25,8 @@ export class CardDto {
       card.subtype,
       card.statistic_modifiers,
       card.hand_usage,
-      card.image_path,
+      card.front_image_path,
+      card.back_image_path,
       card.locale,
     );
   }

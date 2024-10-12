@@ -5,10 +5,8 @@ import { DataSource, Repository } from 'typeorm';
 import { CharacterDto } from '@DTOs/character.dto';
 import { CreateCharacterRequest } from '@Requests/Character/create-character.request';
 import { UpdateCharacterRequest } from '@Requests/Character/update-character.request';
-import { FileMissingException } from '@Exceptions/File/file-missing.exception';
-import { FileWrongFileTypeException } from '@Exceptions/File/file-wrong-file-type.exception';
-import { FileMaximumSizeExceededException } from '@Exceptions/File/file-maximum-size-exceeded.exception';
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
+import { FileDeleteFailedException } from '@Exceptions/File/file-delete-failed.exception';
 
 @Injectable()
 export class CharacterService {
@@ -66,20 +64,20 @@ export class CharacterService {
     });
   }
 
-  async setPhoto(
-    id: number,
-    file?: Express.Multer.File,
-  ): Promise<CharacterDto> {
-    this.validateFile(file);
-
+  async setPhoto(id: number, file: Express.Multer.File): Promise<CharacterDto> {
     return this.dataSource.transaction(async (manager) => {
       const existingCharacter = await manager.findOneBy(Character, { id });
       if (!existingCharacter) {
         throw new NotFoundException();
       }
-      existingCharacter.image_path = FileUploadHelper.localToRemotePath(
-        file.path,
+
+      const savedFilePath = FileUploadHelper.saveFile(
+        file,
+        FileUploadHelper.generateDestinationPath(`characters/${id}`, true),
       );
+
+      existingCharacter.image_path =
+        FileUploadHelper.localToRemotePath(savedFilePath);
 
       return CharacterDto.fromEntity(
         await manager.save(Character, existingCharacter),
@@ -87,20 +85,28 @@ export class CharacterService {
     });
   }
 
-  private validateFile(file: Express.Multer.File) {
-    const allowedMimeTypes = ['image/jpeg', 'image/png'];
-    const maximumSize = 5 * 1024 * 1024; // 5MB
+  async deletePhoto(id: number): Promise<CharacterDto> {
+    return this.dataSource.transaction(async (manager) => {
+      const existingCharacter = await manager.findOneBy(Character, { id });
+      if (!existingCharacter) {
+        throw new NotFoundException();
+      }
 
-    if (!file) {
-      throw new FileMissingException();
-    }
+      if (existingCharacter.image_path) {
+        const isFileDeleted = FileUploadHelper.deleteFile(
+          FileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
+        );
 
-    if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new FileWrongFileTypeException(allowedMimeTypes);
-    }
+        if (!isFileDeleted) {
+          throw new FileDeleteFailedException();
+        }
 
-    if (file.size > maximumSize) {
-      throw new FileMaximumSizeExceededException();
-    }
+        existingCharacter.image_path = null;
+      }
+
+      return CharacterDto.fromEntity(
+        await manager.save(Character, existingCharacter),
+      );
+    });
   }
 }

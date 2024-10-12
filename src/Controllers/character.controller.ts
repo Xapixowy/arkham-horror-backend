@@ -17,8 +17,6 @@ import { ResponseHelper } from '@Helpers/response.helper';
 import { DataResponse } from '@Types/data-response.type';
 import { CreateCharacterRequest } from '@Requests/Character/create-character.request';
 import { UpdateCharacterRequest } from '@Requests/Character/update-character.request';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
 
@@ -71,28 +69,28 @@ export class CharacterController {
   }
 
   @Post(':id/photo')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        filename: (req, file, cb) =>
-          cb(null, FileUploadHelper.generateFileName(file.originalname)),
-        destination: (req, file, cb) =>
-          cb(
-            null,
-            FileUploadHelper.generateDestinationPath(
-              `characters/${req.params.id}`,
-              true,
-            ),
-          ),
-      }),
-    }),
-  )
-  async photo(
+  @UseInterceptors(FileUploadHelper.generateFileInterceptor())
+  async setPhoto(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      FileUploadHelper.generateParseFilePipe(
+        5 * 1024 * 1024, // 5MB
+        /image\/(jpeg|png)/,
+      ),
+    )
+    file: Express.Multer.File,
   ): Promise<DataResponse<CharacterDto>> {
     return ResponseHelper.buildResponse(
       await this.characterService.setPhoto(+id, file),
+    );
+  }
+
+  @Delete(':id/photo')
+  async deletePhoto(
+    @Param('id') id: string,
+  ): Promise<DataResponse<CharacterDto>> {
+    return ResponseHelper.buildResponse(
+      await this.characterService.deletePhoto(+id),
     );
   }
 }

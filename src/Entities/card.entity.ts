@@ -47,7 +47,13 @@ export class Card {
     type: 'text',
     nullable: true,
   })
-  image_path: string;
+  front_image_path: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  back_image_path: string;
 
   @Column({
     type: 'varchar',
