@@ -1,7 +1,16 @@
 import { registerAs } from '@nestjs/config';
 
-export const validationPipeConfig = registerAs('validationPipe', () => ({
-  transform: true,
-  forbidNonWhitelisted: true,
-  whitelist: true,
-}));
+export type ValidationPipeConfig = {
+  transform: boolean;
+  forbidNonWhitelisted: boolean;
+  whitelist: boolean;
+};
+
+export const validationPipeConfig = registerAs(
+  'validationPipe',
+  (): ValidationPipeConfig => ({
+    transform: true,
+    forbidNonWhitelisted: true,
+    whitelist: true,
+  }),
+);

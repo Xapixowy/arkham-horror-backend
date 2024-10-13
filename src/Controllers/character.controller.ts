@@ -17,24 +17,27 @@ import { ResponseHelper } from '@Helpers/response.helper';
 import { DataResponse } from '@Types/data-response.type';
 import { CreateCharacterRequest } from '@Requests/Character/create-character.request';
 import { UpdateCharacterRequest } from '@Requests/Character/update-character.request';
-import { ConfigService } from '@nestjs/config';
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
+import { Roles } from '@Decorators/roles.decorator';
+import { UserRole } from '@Enums/User/user-role.enum';
 
 @Controller('characters')
 export class CharacterController {
   uploadsPath: string;
 
   constructor(
-    private readonly characterService: CharacterService,
-    private readonly configService: ConfigService,
+    private characterService: CharacterService,
+    private fileUploadHelper: FileUploadHelper,
   ) {}
 
   @Get()
+  @Roles(UserRole.USER, UserRole.ADMIN)
   async index(): Promise<DataResponse<CharacterDto[]>> {
     return ResponseHelper.buildResponse(await this.characterService.findAll());
   }
 
   @Get(':id')
+  @Roles(UserRole.USER, UserRole.ADMIN)
   async show(@Param('id') id: string): Promise<DataResponse<CharacterDto>> {
     return ResponseHelper.buildResponse(
       await this.characterService.findOne(+id),
@@ -42,6 +45,7 @@ export class CharacterController {
   }
 
   @Post()
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() character: CreateCharacterRequest,
@@ -52,6 +56,7 @@ export class CharacterController {
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMIN)
   async update(
     @Param('id') id: string,
     @Body() editedCharacter: UpdateCharacterRequest,
@@ -62,6 +67,7 @@ export class CharacterController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   async delete(@Param('id') id: string): Promise<DataResponse<CharacterDto>> {
     return ResponseHelper.buildResponse(
       await this.characterService.remove(+id),
@@ -69,6 +75,7 @@ export class CharacterController {
   }
 
   @Post(':id/photo')
+  @Roles(UserRole.ADMIN)
   @UseInterceptors(FileUploadHelper.generateFileInterceptor())
   async setPhoto(
     @Param('id') id: string,
@@ -86,6 +93,7 @@ export class CharacterController {
   }
 
   @Delete(':id/photo')
+  @Roles(UserRole.ADMIN)
   async deletePhoto(
     @Param('id') id: string,
   ): Promise<DataResponse<CharacterDto>> {

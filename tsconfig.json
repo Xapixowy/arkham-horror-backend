@@ -56,6 +56,12 @@
       ],
       "@Interceptors/*": [
         "./src/Interceptors/*"
+      ],
+      "@Guards/*": [
+        "./src/Guards/*"
+      ],
+      "@Decorators/*": [
+        "./src/Decorators/*"
       ]
     }
   }

@@ -14,6 +14,7 @@ export class CardService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
     private dataSource: DataSource,
+    private fileUploadHelper: FileUploadHelper,
   ) {}
 
   async findAll(): Promise<CardDto[]> {
@@ -64,13 +65,13 @@ export class CardService {
         throw new NotFoundException();
       }
 
-      const savedFilePath = FileUploadHelper.saveFile(
+      const savedFilePath = this.fileUploadHelper.saveFile(
         file,
-        FileUploadHelper.generateDestinationPath(`cards/${id}`, true),
+        this.fileUploadHelper.generateDestinationPath(`cards/${id}`, true),
       );
 
       existingCard.front_image_path =
-        FileUploadHelper.localToRemotePath(savedFilePath);
+        this.fileUploadHelper.localToRemotePath(savedFilePath);
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
@@ -84,8 +85,10 @@ export class CardService {
       }
 
       if (existingCard.front_image_path) {
-        const isFileDeleted = FileUploadHelper.deleteFile(
-          FileUploadHelper.remoteToLocalPath(existingCard.front_image_path),
+        const isFileDeleted = this.fileUploadHelper.deleteFile(
+          this.fileUploadHelper.remoteToLocalPath(
+            existingCard.front_image_path,
+          ),
         );
 
         if (!isFileDeleted) {
@@ -106,13 +109,13 @@ export class CardService {
         throw new NotFoundException();
       }
 
-      const savedFilePath = FileUploadHelper.saveFile(
+      const savedFilePath = this.fileUploadHelper.saveFile(
         file,
-        FileUploadHelper.generateDestinationPath(`cards/${id}`, true),
+        this.fileUploadHelper.generateDestinationPath(`cards/${id}`, true),
       );
 
       existingCard.back_image_path =
-        FileUploadHelper.localToRemotePath(savedFilePath);
+        this.fileUploadHelper.localToRemotePath(savedFilePath);
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
@@ -126,8 +129,8 @@ export class CardService {
       }
 
       if (existingCard.back_image_path) {
-        const isFileDeleted = FileUploadHelper.deleteFile(
-          FileUploadHelper.remoteToLocalPath(existingCard.back_image_path),
+        const isFileDeleted = this.fileUploadHelper.deleteFile(
+          this.fileUploadHelper.remoteToLocalPath(existingCard.back_image_path),
         );
 
         if (!isFileDeleted) {

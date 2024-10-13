@@ -1,16 +1,20 @@
-import { FILE_UPLOAD_CONFIG } from './file-upload.config';
 import { registerAs } from '@nestjs/config';
 
-export const SERVE_STATIC_MODULE_CONFIG = {
-  rootPath: FILE_UPLOAD_CONFIG.uploadsPath,
-  serveRoot: '/public',
+export type ServeStaticModuleConfig = {
+  serveRoot: string;
   serveStaticOptions: {
-    cacheControl: true,
-    maxAge: 60000, // 60 seconds
-  },
+    cacheControl: boolean;
+    maxAge: number;
+  };
 };
 
 export const serveStaticModuleConfig = registerAs(
   'serveStaticModule',
-  () => SERVE_STATIC_MODULE_CONFIG,
+  (): ServeStaticModuleConfig => ({
+    serveRoot: '/public',
+    serveStaticOptions: {
+      cacheControl: true,
+      maxAge: 60000, // 60 seconds
+    },
+  }),
 );

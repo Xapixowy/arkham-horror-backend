@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Character } from '@Entities/character.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { CreateCharacterRequest } from '@Requests/Character/create-character.req
 import { UpdateCharacterRequest } from '@Requests/Character/update-character.request';
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/File/file-delete-failed.exception';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 
 @Injectable()
 export class CharacterService {
@@ -14,6 +15,7 @@ export class CharacterService {
     @InjectRepository(Character)
     private characterRepository: Repository<Character>,
     private dataSource: DataSource,
+    private fileUploadHelper: FileUploadHelper,
   ) {}
 
   async findAll(): Promise<CharacterDto[]> {
@@ -71,13 +73,13 @@ export class CharacterService {
         throw new NotFoundException();
       }
 
-      const savedFilePath = FileUploadHelper.saveFile(
+      const savedFilePath = this.fileUploadHelper.saveFile(
         file,
-        FileUploadHelper.generateDestinationPath(`characters/${id}`, true),
+        this.fileUploadHelper.generateDestinationPath(`characters/${id}`, true),
       );
 
       existingCharacter.image_path =
-        FileUploadHelper.localToRemotePath(savedFilePath);
+        this.fileUploadHelper.localToRemotePath(savedFilePath);
 
       return CharacterDto.fromEntity(
         await manager.save(Character, existingCharacter),
@@ -93,8 +95,8 @@ export class CharacterService {
       }
 
       if (existingCharacter.image_path) {
-        const isFileDeleted = FileUploadHelper.deleteFile(
-          FileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
+        const isFileDeleted = this.fileUploadHelper.deleteFile(
+          this.fileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
         );
 
         if (!isFileDeleted) {

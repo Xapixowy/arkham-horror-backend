@@ -1,11 +1,14 @@
 import { registerAs } from '@nestjs/config';
 
-export const FILE_UPLOAD_CONFIG = {
-  serverUrl: process.env.APP_URL || 'http://localhost:3000',
-  uploadsPath: `${__dirname}/../../../public`,
+export type FileUploadConfig = {
+  serverUrl: string;
+  uploadsPath: string;
 };
 
 export const fileUploadConfig = registerAs(
   'fileUploads',
-  () => FILE_UPLOAD_CONFIG,
+  (): FileUploadConfig => ({
+    serverUrl: process.env.APP_URL || 'http://localhost:3000',
+    uploadsPath: `${__dirname}/../../../public`,
+  }),
 );
