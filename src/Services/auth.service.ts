@@ -18,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
 import { RemindPasswordRequest } from '@Requests/User/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/User/reset-user-password.request';
 import { UserPasswordMissmatchException } from '@Exceptions/User/user-password-missmatch.exception';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private dataSource: DataSource,
     private configService: ConfigService,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   async register(user: RegisterUserRequest): Promise<UserDto> {
@@ -52,7 +54,11 @@ export class AuthService {
         updated_at: new Date(),
       };
 
-      // TODO: send email
+      await this.mailerService.sendMail({
+        to: newUser.email,
+        subject: 'Arkham Horror - Verify your account',
+        html: `<h1>Hello ${newUser.name}, please verify your account</h1><p>Your verification token is: ${newUser.verification_token}</p>`,
+      });
 
       return UserDto.fromEntity(
         await manager.save(this.userRepository.create(newUser)),
@@ -118,7 +124,11 @@ export class AuthService {
 
       existingUser.reset_token = crypto.randomUUID();
 
-      // TODO: send email
+      await this.mailerService.sendMail({
+        to: existingUser.email,
+        subject: 'Arkham Horror - Reset your password',
+        html: `<h1>Hello ${existingUser.name}, please reset your password</h1><p>Your reset token is: ${existingUser.reset_token}</p>`,
+      });
 
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });

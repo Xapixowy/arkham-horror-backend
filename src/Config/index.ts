@@ -5,6 +5,7 @@ import { fileUploadConfig } from './file-upload.config';
 import { serveStaticModuleConfig } from './serve-static-module.config';
 import { jwtConfig } from './jwt.config';
 import { bcryptConfig } from './bcrypt.config';
+import { mailerConfig } from './mailer.config';
 
 export const configs: ConfigFactory[] = [
   databaseConfig,
@@ -13,4 +14,5 @@ export const configs: ConfigFactory[] = [
   serveStaticModuleConfig,
   bcryptConfig,
   jwtConfig,
+  mailerConfig,
 ];

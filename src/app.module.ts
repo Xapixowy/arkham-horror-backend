@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs } from './Config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FileUploadConfig } from './Config/file-upload.config';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -29,6 +30,11 @@ import { FileUploadConfig } from './Config/file-upload.config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
         configService.get('database'),
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => configService.get('mailer'),
     }),
     RoutesModule,
   ],
