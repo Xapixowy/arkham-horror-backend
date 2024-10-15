@@ -19,6 +19,8 @@ import { RemindPasswordRequest } from '@Requests/User/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/User/reset-user-password.request';
 import { UserPasswordMissmatchException } from '@Exceptions/User/user-password-missmatch.exception';
 import { MailerService } from '@nestjs-modules/mailer';
+import { EmailService } from '@Services/email.service';
+import { EmailSendFailureException } from '@Exceptions/email-send-failure.exception';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +31,7 @@ export class AuthService {
     private configService: ConfigService,
     private jwtService: JwtService,
     private mailerService: MailerService,
+    private emailService: EmailService,
   ) {}
 
   async register(user: RegisterUserRequest): Promise<UserDto> {
@@ -42,27 +45,27 @@ export class AuthService {
         throw new UserExistsException();
       }
 
-      const newUser = {
-        ...user,
-        password: await bcrypt.hash(
-          user.password,
-          this.configService.get('bcrypt').saltRounds,
-        ),
-        role: UserRole.USER,
-        verification_token: crypto.randomUUID(),
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-
-      await this.mailerService.sendMail({
-        to: newUser.email,
-        subject: 'Arkham Horror - Verify your account',
-        html: `<h1>Hello ${newUser.name}, please verify your account</h1><p>Your verification token is: ${newUser.verification_token}</p>`,
-      });
-
-      return UserDto.fromEntity(
-        await manager.save(this.userRepository.create(newUser)),
+      const newUser = await manager.save(
+        this.userRepository.create({
+          ...user,
+          password: await bcrypt.hash(
+            user.password,
+            this.configService.get('bcrypt').saltRounds,
+          ),
+          role: UserRole.USER,
+          verification_token: crypto.randomUUID(),
+          created_at: new Date(),
+          updated_at: new Date(),
+        }),
       );
+
+      const isEmailSent = await this.emailService.sendRegister(newUser);
+
+      if (!isEmailSent) {
+        throw new EmailSendFailureException();
+      }
+
+      return UserDto.fromEntity(newUser);
     });
   }
 
@@ -124,11 +127,12 @@ export class AuthService {
 
       existingUser.reset_token = crypto.randomUUID();
 
-      await this.mailerService.sendMail({
-        to: existingUser.email,
-        subject: 'Arkham Horror - Reset your password',
-        html: `<h1>Hello ${existingUser.name}, please reset your password</h1><p>Your reset token is: ${existingUser.reset_token}</p>`,
-      });
+      const isEmailSent =
+        await this.emailService.sendRemindPassword(existingUser);
+
+      if (!isEmailSent) {
+        throw new EmailSendFailureException();
+      }
 
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });
@@ -159,8 +163,6 @@ export class AuthService {
         this.configService.get('bcrypt').saltRounds,
       );
       existingUser.reset_token = null;
-
-      // TODO: send email
 
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });

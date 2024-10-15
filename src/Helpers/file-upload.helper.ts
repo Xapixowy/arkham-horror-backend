@@ -64,17 +64,17 @@ export class FileUploadHelper {
   localToRemotePath(localPath: string): string {
     const filePath = FileUploadHelper.localToRelativePath(localPath);
     const serverUrl =
-      this.configService.get<FileUploadConfig>('fileUploads').serverUrl;
+      this.configService.get<FileUploadConfig>('fileUpload').serverUrl;
 
     return `${serverUrl}${filePath}`;
   }
 
   remoteToLocalPath(remotePath: string): string {
     const filePath = remotePath.split(
-      this.configService.get<FileUploadConfig>('fileUploads').serverUrl,
+      this.configService.get<FileUploadConfig>('fileUpload').serverUrl,
     )[1];
     const projectPath = this.configService
-      .get<FileUploadConfig>('fileUploads')
+      .get<FileUploadConfig>('fileUpload')
       .uploadsPath.replace('/public', '');
 
     return `${projectPath}${filePath}`;
@@ -84,7 +84,7 @@ export class FileUploadHelper {
     path: string,
     createDirectories: boolean = false,
   ): string {
-    const destinationPath = `${this.configService.get<FileUploadConfig>('fileUploads').uploadsPath}/${path}`;
+    const destinationPath = `${this.configService.get<FileUploadConfig>('fileUpload').uploadsPath}/${path}`;
 
     if (createDirectories && !fs.existsSync(destinationPath)) {
       fs.mkdirSync(destinationPath, { recursive: true });

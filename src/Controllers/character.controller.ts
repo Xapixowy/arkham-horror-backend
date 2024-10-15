@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { CharacterService } from '@Services/character.service';
@@ -20,24 +21,23 @@ import { UpdateCharacterRequest } from '@Requests/Character/update-character.req
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { Roles } from '@Decorators/roles.decorator';
 import { UserRole } from '@Enums/User/user-role.enum';
+import { AuthGuard } from '@Guards/auth.guard';
+import { RolesGuard } from '@Guards/roles.guard';
+import { Public } from '@Decorators/public.decorator';
 
 @Controller('characters')
+@UseGuards(AuthGuard, RolesGuard)
 export class CharacterController {
-  uploadsPath: string;
-
-  constructor(
-    private characterService: CharacterService,
-    private fileUploadHelper: FileUploadHelper,
-  ) {}
+  constructor(private characterService: CharacterService) {}
 
   @Get()
-  @Roles(UserRole.USER, UserRole.ADMIN)
+  @Public()
   async index(): Promise<DataResponse<CharacterDto[]>> {
     return ResponseHelper.buildResponse(await this.characterService.findAll());
   }
 
   @Get(':id')
-  @Roles(UserRole.USER, UserRole.ADMIN)
+  @Public()
   async show(@Param('id') id: string): Promise<DataResponse<CharacterDto>> {
     return ResponseHelper.buildResponse(
       await this.characterService.findOne(+id),

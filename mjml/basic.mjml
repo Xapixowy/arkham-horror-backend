@@ -1,7 +1,6 @@
 <mjml>
     <mj-head>
         <mj-title>{{ title }}</mj-title>
-        <!--        <mj-preview>{{ truncatedContent }}</mj-preview>-->
         <mj-attributes>
             <mj-all font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"/>
             <mj-text font-weight="400" font-size="16px" color="#00010d" line-height="24px" align="justify"/>
@@ -20,7 +19,7 @@
                 <mj-image src="{{ header.top }}" width="600px" alt="" padding="0"/>
             </mj-column>
         </mj-section>
-        <mj-section background-color="#00010d">
+        <mj-section background-color="#00010d" padding-top="0" padding-bottom="0">
             <mj-column width="100%">
                 <mj-image src="{{ header.bottom }}" width="600px" alt="" padding="0"/>
             </mj-column>
@@ -42,6 +41,18 @@
                         {{ button.text }}
                     </mj-button>
                     <mj-text color="#606060" font-size="16px">
+                        {{{ farewell }}}
+                    </mj-text>
+                </mj-column>
+            </mj-section>
+            <mj-section background-color="#fafafa" padding-left="15px" padding-right="15px" padding-top="0">
+                <mj-column width="100%">
+                    <mj-divider border-color="#DFE3E8" border-width="1px"/>
+                </mj-column>
+            </mj-section>
+            <mj-section background-color="#fafafa" padding="0 15px 0 15px" padding-bottom="30px">
+                <mj-column width="100%">
+                    <mj-text color="#606060">
                         {{{ footer }}}
                     </mj-text>
                 </mj-column>

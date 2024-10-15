@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml"
+<html dir="auto" lang="und" xmlns="http://www.w3.org/1999/xhtml"
 >
 
 <head>
   <title>{{ title }}</title>
   <!--[if !mso]><!-->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <!--<![endif]-->
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
   <style type="text/css">
     #outlook a {
       padding: 0;
@@ -99,7 +99,7 @@
 </head>
 
 <body style="word-spacing:normal;background-color:#dcdcdc;">
-<div style="background-color:#dcdcdc;" lang="und" dir="auto">
+<div dir="auto" lang="und" style="background-color:#dcdcdc;">
   <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
          style="background:#00010d;background-color:#00010d;width:100%;">
     <tbody>
@@ -132,9 +132,10 @@
                           <tbody>
                           <tr>
                             <td style="width:600px;">
-                              <img alt="" src="{{ header.top }}"
+                              <img alt="" height="auto"
+                                   src="{{ header.top }}"
                                    style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;"
-                                   width="600" height="auto" />
+                                   width="600" />
                             </td>
                           </tr>
                           </tbody>
@@ -165,7 +166,7 @@
            style="background:#00010d;background-color:#00010d;width:100%;">
       <tbody>
       <tr>
-        <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
+        <td style="direction:ltr;font-size:0px;padding:20px 0;padding-bottom:0;padding-top:0;text-align:center;">
           <!--[if mso | IE]>
           <table role="presentation" border="0" cellpadding="0" cellspacing="0">
             <tr>
@@ -182,9 +183,10 @@
                     <tbody>
                     <tr>
                       <td style="width:600px;">
-                        <img alt="" src="{{ header.bottom }}"
+                        <img alt="" height="auto"
+                             src="{{ header.bottom }}"
                              style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;"
-                             width="600" height="auto" />
+                             width="600" />
                       </td>
                     </tr>
                     </tbody>
@@ -237,19 +239,25 @@
                       <tr>
                         <td align="justify" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div
-                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:20px;font-weight:bold;line-height:24px;text-align:justify;color:#00010d;">{{{ title }}}</div>
+                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:20px;font-weight:bold;line-height:24px;text-align:justify;color:#00010d;">
+                            {{{ title }}}
+                          </div>
                         </td>
                       </tr>
                       <tr>
                         <td align="justify" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div
-                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">{{{ greeting }}}</div>
+                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">
+                            {{{ greeting }}}
+                          </div>
                         </td>
                       </tr>
                       <tr>
                         <td align="justify" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div
-                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">{{{ content }}}</div>
+                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">
+                            {{{ content }}}
+                          </div>
                         </td>
                       </tr>
                       {{#if button}}
@@ -264,7 +272,9 @@
                                     valign="middle">
                                   <a href="{{ button.link }}"
                                      style="display:inline-block;width:250px;background:#a83832;color:#fafafa;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:17px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;"
-                                     target="_blank">{{ button.text }}</a>
+                                     target="_blank">
+                                    {{ button.text }}
+                                  </a>
                                 </td>
                               </tr>
                               </tbody>
@@ -275,7 +285,88 @@
                       <tr>
                         <td align="justify" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div
-                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">{{{ footer }}}</div>
+                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">
+                            {{{ farewell }}}
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <!--[if mso | IE]></td></tr></table></td></tr>
+        <tr>
+          <td class="" width="600px">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation"
+                   style="width:600px;" width="600" bgcolor="#fafafa">
+              <tr>
+                <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+          <div style="background:#fafafa;background-color:#fafafa;margin:0px auto;max-width:600px;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                   style="background:#fafafa;background-color:#fafafa;width:100%;">
+              <tbody>
+              <tr>
+                <td
+                  style="direction:ltr;font-size:0px;padding:20px 0;padding-left:15px;padding-right:15px;padding-top:0;text-align:center;">
+                  <!--[if mso | IE]>
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td class="" style="vertical-align:top;width:570px;"><![endif]-->
+                  <div class="mj-column-per-100 mj-outlook-group-fix"
+                       style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;"
+                           width="100%">
+                      <tbody>
+                      <tr>
+                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                          <p style="border-top:solid 1px #DFE3E8;font-size:1px;margin:0px auto;width:100%;">
+                          </p>
+                          <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px #DFE3E8;font-size:1px;margin:0px auto;width:520px;" role="presentation" width="520px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+</td></tr></table><![endif]-->
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!--[if mso | IE]></td></tr></table><![endif]-->
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <!--[if mso | IE]></td></tr></table></td></tr>
+        <tr>
+          <td class="" width="600px">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation"
+                   style="width:600px;" width="600" bgcolor="#fafafa">
+              <tr>
+                <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+          <div style="background:#fafafa;background-color:#fafafa;margin:0px auto;max-width:600px;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+                   style="background:#fafafa;background-color:#fafafa;width:100%;">
+              <tbody>
+              <tr>
+                <td style="direction:ltr;font-size:0px;padding:0 15px 0 15px;padding-bottom:30px;text-align:center;">
+                  <!--[if mso | IE]>
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td class="" style="vertical-align:top;width:570px;"><![endif]-->
+                  <div class="mj-column-per-100 mj-outlook-group-fix"
+                       style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;"
+                           width="100%">
+                      <tbody>
+                      <tr>
+                        <td align="justify" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                          <div
+                            style="font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;font-weight:400;line-height:24px;text-align:justify;color:#606060;">
+                            {{{ footer }}}
+                          </div>
                         </td>
                       </tr>
                       </tbody>

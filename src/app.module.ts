@@ -26,7 +26,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       useFactory: (configService: ConfigService) => [
         {
           rootPath:
-            configService.get<FileUploadConfig>('fileUploads').uploadsPath,
+            configService.get<FileUploadConfig>('fileUpload').uploadsPath,
           ...configService.get('serveStaticModule'),
         },
       ],
@@ -34,7 +34,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => configService.get('mailer')
+      useFactory: (configService: ConfigService) => configService.get('mailer'),
     }),
     RoutesModule,
   ],

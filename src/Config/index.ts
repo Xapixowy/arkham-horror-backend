@@ -6,8 +6,10 @@ import { serveStaticModuleConfig } from './serve-static-module.config';
 import { jwtConfig } from './jwt.config';
 import { bcryptConfig } from './bcrypt.config';
 import { mailerConfig } from './mailer.config';
+import { appConfig } from './app.config';
 
 export const configs: ConfigFactory[] = [
+  appConfig,
   databaseConfig,
   validationPipeConfig,
   fileUploadConfig,
