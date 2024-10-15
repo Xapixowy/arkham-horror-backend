@@ -1,7 +1,7 @@
 <mjml>
     <mj-head>
         <mj-title>{{ title }}</mj-title>
-        <mj-preview>{{ truncatedContent }}</mj-preview>
+        <!--        <mj-preview>{{ truncatedContent }}</mj-preview>-->
         <mj-attributes>
             <mj-all font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"/>
             <mj-text font-weight="400" font-size="16px" color="#00010d" line-height="24px" align="justify"/>
@@ -29,20 +29,20 @@
             <mj-section background-color="#fafafa" padding-left="15px" padding-right="15px">
                 <mj-column width="100%">
                     <mj-text font-weight="bold" font-size="20px">
-                        {{ title }}
+                        {{{ title }}}
                     </mj-text>
                     <mj-text color="#606060">
-                        {{ greeting }}
+                        {{{ greeting }}}
                     </mj-text>
                     <mj-text color="#606060">
-                        {{ content }}
+                        {{{ content }}}
                     </mj-text>
                     <mj-button background-color="#a83832" align="center" color="#fafafa" font-size="17px"
-                               font-weight="bold" href="https://google.com" width="300px">
-                        Click Here
+                               font-weight="bold" href="{{ button.link }}" width="300px">
+                        {{ button.text }}
                     </mj-button>
                     <mj-text color="#606060" font-size="16px">
-                        {{ footer }}
+                        {{{ footer }}}
                     </mj-text>
                 </mj-column>
             </mj-section>

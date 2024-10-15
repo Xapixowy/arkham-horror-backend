@@ -15,19 +15,18 @@ export class TestController {
       template: 'basic',
       context: {
         title: 'Test',
-        truncatedContent: 'This is a...',
         header: {
           top: 'https://res.cloudinary.com/dheck1ubc/image/upload/v1544156968/Email/Images/AnnouncementOffset/header-top.png',
           bottom:
             'https://res.cloudinary.com/dheck1ubc/image/upload/v1544156968/Email/Images/AnnouncementOffset/header-bottom.png',
         },
-        greeting: 'Hello',
+        // button: {
+        //   text: 'Click Here',
+        //   link: 'https://google.com',
+        // },
+        greeting: 'Hello Xapixowy,',
         content: 'This is a test',
-        footer: 'Xapixowy',
-        button: {
-          text: 'Click Here',
-          link: 'https://google.com',
-        },
+        footer: 'Best wishes<br>Arkham Horror Team',
       },
     });
 
