@@ -23,7 +23,8 @@
     "migration:generate": "npm run typeorm -- -d ./database/typeorm.config.ts migration:generate ./database/migrations/%npm_config_name%",
     "migration:create": "npm run typeorm -- migration:create ./database/migrations/$npm_config_name",
     "migration:revert": "npm run typeorm -- -d ./database/typeorm.config.ts migration:revert",
-    "migration:show": "npm run typeorm -- migration:show -d ./database/typeorm.config.ts"
+    "migration:show": "npm run typeorm -- migration:show -d ./database/typeorm.config.ts",
+    "mjml": "mjml -r mjml/**/*.mjml -o mjml"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -40,6 +41,8 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "filesize": "^10.1.6",
+    "handlebars": "^4.7.8",
+    "mjml": "^4.15.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.15",
     "pg": "^8.12.0",

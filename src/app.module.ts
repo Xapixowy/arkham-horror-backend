@@ -14,6 +14,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
       cache: true,
       load: configs,
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        configService.get('database'),
+    }),
     ServeStaticModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -25,16 +31,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
         },
       ],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        configService.get('database'),
-    }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => configService.get('mailer'),
+      useFactory: (configService: ConfigService) => configService.get('mailer')
     }),
     RoutesModule,
   ],

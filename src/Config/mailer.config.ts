@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 export type MailerConfig = {
   transport: {
@@ -10,6 +11,13 @@ export type MailerConfig = {
       pass: string;
     };
   };
+  template: {
+    dir: string;
+    adapter: HandlebarsAdapter;
+    options: {
+      strict: boolean;
+    }
+  }
 };
 
 export const mailerConfig = registerAs(
@@ -22,6 +30,13 @@ export const mailerConfig = registerAs(
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
+      },
+    },
+    template: {
+      dir: `${__dirname}/../../../templates`,
+      adapter: new HandlebarsAdapter(),
+      options: {
+        strict: true,
       },
     },
   }),
