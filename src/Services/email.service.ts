@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { FileUploadConfig } from '../Config/file-upload.config';
 import { AppConfig } from '../Config/app.config';
 import { User } from '@Entities/user.entity';
+import { I18nService } from 'nestjs-i18n';
+import { Language } from '@Enums/language';
 
 @Injectable()
 export class EmailService {
@@ -12,38 +14,51 @@ export class EmailService {
 
   constructor(
     private readonly mailerService: MailerService,
-    private configService: ConfigService,
+    private readonly configService: ConfigService,
+    private readonly i18nService: I18nService,
   ) {
     this.serverUrl =
       this.configService.get<FileUploadConfig>('fileUpload').serverUrl;
     this.frontendUrl = this.configService.get<AppConfig>('app').frontend_url;
   }
 
-  async sendRegister(user: User): Promise<boolean> {
+  async sendRegister(
+    user: User,
+    lang: Language = Language.ENGLISH,
+  ): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
         to: user.email,
-        subject: 'Arkham Horror - Account Verification',
+        subject: this.i18nService.translate('email.register_email.subject', {
+          lang,
+        }),
         template: 'basic',
         context: {
-          title: 'Your Journey into Arkham Awaits - Verify Your Account',
+          title: this.i18nService.translate('email.register_email.title', {
+            lang,
+          }),
           header: {
-            // top: `${this.serverUrl}/public/assets/images/email/banner-top.jpeg`,
-            // bottom: `${this.serverUrl}/public/assets/images/email/banner-bottom.jpeg`,
-            top: `https://i.ibb.co/fDKD0qg/banner-top.jpg`,
-            bottom: `https://i.ibb.co/zrRhQ0M/banner-bottom.jpg`,
+            top: `${this.serverUrl}/public/assets/images/email/banner-top.jpeg`,
+            bottom: `${this.serverUrl}/public/assets/images/email/banner-bottom.jpeg`,
           },
           button: {
-            text: 'Verify Account',
+            text: this.i18nService.translate('email.register_email.button', {
+              lang,
+            }),
             link: `${this.frontendUrl}/auth/verify/${user.verification_token}`,
           },
-          greeting: `Dear ${user.name},`,
-          content:
-            'In the shadowy streets of Arkham, ancient secrets stir, and you’ve taken your first step into the abyss by registering for an account. But before the veil can be fully lifted, one final rite remains to confirm your presence among us.<br><br><b>Click the button below to complete the verification and unlock the mysteries that await!</b>',
-          farewell:
-            'May the Elder Gods watch over you... from a distance<br>The Gatekeepers of Arkham',
-          footer:
-            'If you did not request this, do not be alarmed. The cosmic entities may have whispered in error, and you can safely ignore this message. However, if you wish to delve deeper into the unknown, your journey starts here.',
+          greeting: this.i18nService.translate(
+            'email.register_email.greeting',
+            {
+              lang,
+              args: { name: user.name },
+            },
+          ),
+          content: `${this.i18nService.translate('email.register_email.content', { lang })}<br><br><b>${this.i18nService.translate('email.register_email.instructions', { lang })}</b>`,
+          farewell: `${this.i18nService.translate('email.register_email.farewell', { lang })}<br>${this.i18nService.translate('email.register_email.signature', { lang })}`,
+          footer: this.i18nService.translate('email.register_email.footer', {
+            lang,
+          }),
         },
       });
       return true;
@@ -52,31 +67,55 @@ export class EmailService {
     }
   }
 
-  async sendRemindPassword(user: User): Promise<boolean> {
+  async sendRemindPassword(
+    user: User,
+    lang: Language = Language.ENGLISH,
+  ): Promise<boolean> {
     try {
       await this.mailerService.sendMail({
         to: user.email,
-        subject: 'Arkham Horror - Reset your password',
+        subject: this.i18nService.translate(
+          'email.remind_password_email.subject',
+          {
+            lang,
+          },
+        ),
         template: 'basic',
         context: {
-          title: 'Beware! A Password Reset Has Been Requested',
+          title: this.i18nService.translate(
+            'email.remind_password_email.title',
+            {
+              lang,
+            },
+          ),
           header: {
-            // top: `${this.serverUrl}/public/assets/images/email/banner-top.jpeg`,
-            // bottom: `${this.serverUrl}/public/assets/images/email/banner-bottom.jpeg`,
-            top: `https://i.ibb.co/fDKD0qg/banner-top.jpg`,
-            bottom: `https://i.ibb.co/zrRhQ0M/banner-bottom.jpg`,
+            top: `${this.serverUrl}/public/assets/images/email/banner-top.jpeg`,
+            bottom: `${this.serverUrl}/public/assets/images/email/banner-bottom.jpeg`,
           },
           button: {
-            text: 'Reset Password',
-            link: `${this.frontendUrl}/auth/reset-password/${user.verification_token}`,
+            text: this.i18nService.translate(
+              'email.remind_password_email.button',
+              {
+                lang,
+              },
+            ),
+            link: `${this.frontendUrl}/auth/reset-password/${user.reset_token}`,
           },
-          greeting: `Dear ${user.name},`,
-          content:
-            'The cryptic forces have spoken, and someone has sought to change the key to your Arkham account.<br><br><b>If it was you, click the link below to reset your password before the ancient texts are lost!</b>',
-          farewell:
-            'Beware of the lurking terrors, but know that we stand vigilant beside you<br>The Gatekeepers of Arkham',
-          footer:
-            'If this was not your doing, pay no heed to this summoning. Simply ignore this message, and no action will be taken—though the shadows may linger, they will not intrude.',
+          greeting: this.i18nService.translate(
+            'email.remind_password_email.greeting',
+            {
+              lang,
+              args: { name: user.name },
+            },
+          ),
+          content: `${this.i18nService.translate('email.remind_password_email.content', { lang })}<br><br><b>${this.i18nService.translate('email.remind_password_email.instructions', { lang })}</b>`,
+          farewell: `${this.i18nService.translate('email.remind_password_email.farewell', { lang })}<br>${this.i18nService.translate('email.remind_password_email.signature', { lang })}`,
+          footer: this.i18nService.translate(
+            'email.remind_password_email.footer',
+            {
+              lang,
+            },
+          ),
         },
       });
       return true;

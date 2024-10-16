@@ -1,0 +1,24 @@
+{
+  "register_email": {
+    "subject": "Arkham Horror - Weryfikacja Konta",
+    "title": "Twoja Podróż do Arkham czeka - Zweryfikuj Swoje Konto",
+    "button": "Zweryfikuj Konto",
+    "greeting": "Drogi/a {name},",
+    "content": "W mrocznych zaułkach Arkham pradawne tajemnice budzą się ze snu, a Ty zrobiłeś/aś pierwszy krok ku otchłani, rejestrując swoje konto. Jednak zanim zasłona tajemnicy zostanie w pełni odsłonięta, musisz jeszcze dopełnić ostatniego rytuału, by potwierdzić swoją obecność wśród nas.",
+    "instructions": "Kliknij przycisk poniżej, aby zakończyć weryfikację i odkryć sekrety, które na Ciebie czekają!",
+    "farewell": "Niech Starsi Bogowie czuwają nad Tobą... z daleka",
+    "signature": "Strażnicy Arkham",
+    "footer": "Jeśli nie Ty zainicjowałeś/aś to wezwanie, nie obawiaj się. Być może kosmiczne siły wyszeptały to przez pomyłkę, a Ty możesz bezpiecznie zignorować tę wiadomość. Jeśli jednak pragniesz zgłębić nieznane, Twoja podróż zaczyna się tutaj."
+  },
+  "remind_password_email": {
+    "subject": "Arkham Horror - Zresetuj swoje hasło",
+    "title": "Uwaga! Złożono żądanie zresetowania hasła",
+    "button": "Zresetuj Hasło",
+    "greeting": "Drogi/a {name},",
+    "content": "Tajemnicze siły przemówiły, a ktoś próbował zmienić klucz do Twojego konta w Arkham.",
+    "instructions": "Jeśli to Ty, kliknij poniższy link, aby zresetować swoje hasło, zanim starożytne teksty zostaną utracone!",
+    "farewell": "Strzeż się czyhających potworności, ale wiedz, że czuwamy przy Tobie.",
+    "signature": "Strażnicy Arkham",
+    "footer": "Jeśli to nie Ty wywołałeś/aś to wezwanie, zignoruj tę wiadomość. Nie zostaną podjęte żadne działania. Choć cienie mogą pozostać, nie wtargną do Twego świata."
+  }
+}

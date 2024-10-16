@@ -16,8 +16,8 @@ export type MailerConfig = {
     adapter: HandlebarsAdapter;
     options: {
       strict: boolean;
-    }
-  }
+    };
+  };
 };
 
 export const mailerConfig = registerAs(

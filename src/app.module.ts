@@ -6,6 +6,8 @@ import { configs } from './Config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FileUploadConfig } from './Config/file-upload.config';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { I18nModule } from 'nestjs-i18n';
+import { i18nResolvers } from './Config/i18n.config';
 
 @Module({
   imports: [
@@ -35,6 +37,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => configService.get('mailer'),
+    }),
+    I18nModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => configService.get('i18n'),
+      resolvers: i18nResolvers,
     }),
     RoutesModule,
   ],
