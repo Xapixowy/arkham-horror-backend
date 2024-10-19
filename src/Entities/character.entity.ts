@@ -1,9 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Statistics } from '@Types/Character/statistics.type';
 import { Skill } from '@Types/Character/skill.type';
 import { Equipment } from '@Types/Character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
 import { Language } from '@Enums/language';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
 
 @Entity()
 export class Character {
@@ -80,4 +81,11 @@ export class Character {
     length: 2,
   })
   locale: Language;
+
+  @OneToMany(
+    () => CharacterTranslation,
+    (characterTranslation) => characterTranslation.character,
+    { onDelete: 'CASCADE', eager: true },
+  )
+  translations: CharacterTranslation[];
 }

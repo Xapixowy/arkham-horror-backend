@@ -7,31 +7,48 @@ import { CardDto } from '@DTOs/card.dto';
 import { NotFoundException } from '@Exceptions/not-found.exception';
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/File/file-delete-failed.exception';
+import { Language } from '@Enums/language';
+import { AppConfig } from '../Config/app.config';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CardService {
+  appLanguage: Language;
+
   constructor(
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
     private dataSource: DataSource,
     private fileUploadHelper: FileUploadHelper,
-  ) {}
-
-  async findAll(): Promise<CardDto[]> {
-    const cards = await this.cardRepository.find();
-    return cards.map((card) => CardDto.fromEntity(card));
+    private configService: ConfigService,
+  ) {
+    this.appLanguage = this.configService.get<AppConfig>('app').language;
   }
 
-  async findOne(id: number): Promise<CardDto> {
+  async findAll(language?: Language): Promise<CardDto[]> {
+    const cards = await this.cardRepository.find();
+    return cards.map((card) =>
+      CardDto.fromEntity(
+        language ? this.getTranslatedCard(card, language) : card,
+      ),
+    );
+  }
+
+  async findOne(id: number, language?: Language): Promise<CardDto> {
     const existingCard = await this.cardRepository.findOneBy({ id });
     if (!existingCard) {
       throw new NotFoundException();
     }
-    return CardDto.fromEntity(existingCard);
+    return CardDto.fromEntity(
+      language ? this.getTranslatedCard(existingCard, language) : existingCard,
+    );
   }
 
   async add(cardRequest: CreateCardRequest): Promise<CardDto> {
-    const card = this.cardRepository.create(cardRequest);
+    const card = this.cardRepository.create({
+      ...cardRequest,
+      locale: this.appLanguage,
+    });
     return this.dataSource.transaction(async (manager) =>
       CardDto.fromEntity(await manager.save(card)),
     );
@@ -142,5 +159,22 @@ export class CardService {
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
+  }
+
+  private getTranslatedCard(card: Card, language: Language): Card {
+    const isTranslation = card.translations
+      .map((translation) => translation.locale)
+      .includes(language);
+
+    if (card.locale !== language && isTranslation) {
+      const translation = card.translations.find(
+        (translation) => translation.locale === language,
+      );
+      card.name = translation.name;
+      card.description = translation.description;
+      card.locale = translation.locale;
+    }
+
+    return card;
   }
 }

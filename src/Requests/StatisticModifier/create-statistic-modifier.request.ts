@@ -1,9 +1,10 @@
 import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
-import { IsInt, IsString } from 'class-validator';
+import { IsEnum, IsInt } from 'class-validator';
+import { CardStatisticModifierEnum } from '@Enums/Card/card-statistic-modifier.enum';
 
 export class CreateStatisticModifierRequest implements StatisticModifier {
-  @IsString()
-  modifier: string;
+  @IsEnum(CardStatisticModifierEnum)
+  modifier: CardStatisticModifierEnum;
 
   @IsInt()
   value: number;

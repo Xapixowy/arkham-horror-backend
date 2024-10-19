@@ -8,31 +8,50 @@ import { UpdateCharacterRequest } from '@Requests/Character/update-character.req
 import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/File/file-delete-failed.exception';
 import { NotFoundException } from '@Exceptions/not-found.exception';
+import { ConfigService } from '@nestjs/config';
+import { AppConfig } from '../Config/app.config';
+import { Language } from '@Enums/language';
 
 @Injectable()
 export class CharacterService {
+  appLanguage: Language;
+
   constructor(
     @InjectRepository(Character)
     private characterRepository: Repository<Character>,
     private dataSource: DataSource,
     private fileUploadHelper: FileUploadHelper,
-  ) {}
-
-  async findAll(): Promise<CharacterDto[]> {
-    const characters = await this.characterRepository.find();
-    return characters.map((character) => CharacterDto.fromEntity(character));
+    private configService: ConfigService,
+  ) {
+    this.appLanguage = this.configService.get<AppConfig>('app').language;
   }
 
-  async findOne(id: number): Promise<CharacterDto> {
+  async findAll(language?: Language): Promise<CharacterDto[]> {
+    const characters = await this.characterRepository.find();
+    return characters.map((character) =>
+      CharacterDto.fromEntity(
+        language ? this.getTranslatedCharacter(character, language) : character,
+      ),
+    );
+  }
+
+  async findOne(id: number, language?: Language): Promise<CharacterDto> {
     const existingCharacter = await this.characterRepository.findOneBy({ id });
     if (!existingCharacter) {
       throw new NotFoundException();
     }
-    return CharacterDto.fromEntity(existingCharacter);
+    return CharacterDto.fromEntity(
+      language
+        ? this.getTranslatedCharacter(existingCharacter, language)
+        : existingCharacter,
+    );
   }
 
   async add(characterRequest: CreateCharacterRequest): Promise<CharacterDto> {
-    const character = this.characterRepository.create(characterRequest);
+    const character = this.characterRepository.create({
+      ...characterRequest,
+      locale: this.appLanguage,
+    });
     return this.dataSource.transaction(async (manager) =>
       CharacterDto.fromEntity(await manager.save(character)),
     );
@@ -110,5 +129,27 @@ export class CharacterService {
         await manager.save(Character, existingCharacter),
       );
     });
+  }
+
+  private getTranslatedCharacter(
+    character: Character,
+    language: Language,
+  ): Character {
+    const isTranslation = character.translations
+      .map((translation) => translation.locale)
+      .includes(language);
+
+    if (character.locale !== language && isTranslation) {
+      const translation = character.translations.find(
+        (translation) => translation.locale === language,
+      );
+      character.name = translation.name;
+      character.description = translation.description;
+      character.profession = translation.profession;
+      character.starting_location = translation.starting_location;
+      character.locale = translation.locale;
+    }
+
+    return character;
   }
 }

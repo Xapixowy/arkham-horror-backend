@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -24,23 +25,46 @@ import { UserRole } from '@Enums/User/user-role.enum';
 import { AuthGuard } from '@Guards/auth.guard';
 import { RolesGuard } from '@Guards/roles.guard';
 import { Public } from '@Decorators/public.decorator';
+import { ConfigService } from '@nestjs/config';
+import { AppConfig } from '../Config/app.config';
+import { RequestHelper } from '@Helpers/request.helper';
 
 @Controller('characters')
 @UseGuards(AuthGuard, RolesGuard)
 export class CharacterController {
-  constructor(private characterService: CharacterService) {}
+  constructor(
+    private readonly characterService: CharacterService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get()
   @Public()
-  async index(): Promise<DataResponse<CharacterDto[]>> {
-    return ResponseHelper.buildResponse(await this.characterService.findAll());
+  async index(
+    @Headers() headers: Record<string, string>,
+  ): Promise<DataResponse<CharacterDto[]>> {
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
+
+    return ResponseHelper.buildResponse(
+      await this.characterService.findAll(language),
+    );
   }
 
   @Get(':id')
   @Public()
-  async show(@Param('id') id: string): Promise<DataResponse<CharacterDto>> {
+  async show(
+    @Headers() headers: Record<string, string>,
+    @Param('id') id: string,
+  ): Promise<DataResponse<CharacterDto>> {
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
+
     return ResponseHelper.buildResponse(
-      await this.characterService.findOne(+id),
+      await this.characterService.findOne(+id, language),
     );
   }
 

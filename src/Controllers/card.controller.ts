@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -25,22 +26,47 @@ import { RolesGuard } from '@Guards/roles.guard';
 import { Public } from '@Decorators/public.decorator';
 import { Roles } from '@Decorators/roles.decorator';
 import { UserRole } from '@Enums/User/user-role.enum';
+import { RequestHelper } from '@Helpers/request.helper';
+import { ConfigService } from '@nestjs/config';
+import { AppConfig } from '../Config/app.config';
 
 @Controller('cards')
 @UseGuards(AuthGuard, RolesGuard)
 export class CardController {
-  constructor(private readonly cardService: CardService) {}
+  constructor(
+    private readonly cardService: CardService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get()
   @Public()
-  async index(): Promise<DataResponse<CardDto[]>> {
-    return ResponseHelper.buildResponse(await this.cardService.findAll());
+  async index(
+    @Headers() headers: Record<string, string>,
+  ): Promise<DataResponse<CardDto[]>> {
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
+
+    return ResponseHelper.buildResponse(
+      await this.cardService.findAll(language),
+    );
   }
 
   @Get(':id')
   @Public()
-  async show(@Param('id') id: string): Promise<DataResponse<CardDto>> {
-    return ResponseHelper.buildResponse(await this.cardService.findOne(+id));
+  async show(
+    @Headers() headers: Record<string, string>,
+    @Param('id') id: string,
+  ): Promise<DataResponse<CardDto>> {
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
+
+    return ResponseHelper.buildResponse(
+      await this.cardService.findOne(+id, language),
+    );
   }
 
   @Post()

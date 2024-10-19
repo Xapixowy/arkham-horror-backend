@@ -1,14 +1,16 @@
 import { Card } from '@Entities/card.entity';
 import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
 import { Language } from '@Enums/language';
+import { CardTypeEnum } from '@Enums/Card/card-type.enum';
+import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 
 export class CardDto {
   constructor(
     public id: number,
     public name: string,
     public description: string,
-    public type: string,
-    public subtype: string,
+    public type: CardTypeEnum,
+    public subtype: CardSubtypeEnum,
     public statisticModifiers: StatisticModifier[],
     public handUsage: number,
     public front_image_path: string,

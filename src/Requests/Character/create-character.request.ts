@@ -10,7 +10,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Expansion } from '@Enums/expansion.enum';
-import { Language } from '@Enums/language';
 import { Type } from 'class-transformer';
 import { CreateCharacterStatisticsRequest } from '@Requests/Character/create-character-statistics.request';
 import { CreateCharacterSkillRequest } from '@Requests/Character/create-character-skill.request';
@@ -63,7 +62,4 @@ export class CreateCharacterRequest {
   @Type(() => CreateCharacterEquipmentRequest)
   @IsNotEmpty()
   equipment: CreateCharacterEquipmentRequest;
-
-  @IsEnum(Language)
-  locale: Language;
 }

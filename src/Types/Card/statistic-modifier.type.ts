@@ -1,4 +1,6 @@
+import { CardStatisticModifierEnum } from '@Enums/Card/card-statistic-modifier.enum';
+
 export type StatisticModifier = {
-  modifier: string;
+  modifier: CardStatisticModifierEnum;
   value: number;
 };

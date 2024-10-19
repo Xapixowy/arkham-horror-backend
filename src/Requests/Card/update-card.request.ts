@@ -5,10 +5,11 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
   Min,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Language } from '@Enums/language';
 import { CardTypeEnum } from '@Enums/Card/card-type.enum';
 import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 import { Type } from 'class-transformer';
@@ -16,6 +17,8 @@ import { CreateStatisticModifierRequest } from '@Requests/StatisticModifier/crea
 
 export class UpdateCardRequest {
   @IsString()
+  @MaxLength(255)
+  @MinLength(3)
   @IsOptional()
   name: string;
 
@@ -23,17 +26,13 @@ export class UpdateCardRequest {
   @IsOptional()
   description: string;
 
-  @IsEnum(Language)
-  @IsOptional()
-  locale: Language;
-
   @IsEnum(CardTypeEnum)
   @IsOptional()
-  type: string;
+  type: CardTypeEnum;
 
   @IsEnum(CardSubtypeEnum)
   @IsOptional()
-  subtype: string;
+  subtype: CardSubtypeEnum;
 
   @IsArray()
   @IsOptional()

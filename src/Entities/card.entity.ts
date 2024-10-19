@@ -1,6 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
 import { Language } from '@Enums/language';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { CardTypeEnum } from '@Enums/Card/card-type.enum';
+import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
 
 @Entity()
 export class Card {
@@ -22,14 +25,14 @@ export class Card {
     type: 'varchar',
     length: 64,
   })
-  type: string;
+  type: CardTypeEnum;
 
   @Column({
     type: 'varchar',
     length: 64,
     nullable: true,
   })
-  subtype: string;
+  subtype: CardSubtypeEnum;
 
   @Column({
     type: 'json',
@@ -60,4 +63,10 @@ export class Card {
     length: 2,
   })
   locale: Language;
+
+  @OneToMany(() => CardTranslation, (cardTranslation) => cardTranslation.card, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  translations: CardTranslation[];
 }

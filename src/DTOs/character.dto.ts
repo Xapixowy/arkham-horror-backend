@@ -3,6 +3,7 @@ import { Statistics } from '@Types/Character/statistics.type';
 import { Skill } from '@Types/Character/skill.type';
 import { Equipment } from '@Types/Character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
+import { Language } from '@Enums/language';
 
 export class CharacterDto {
   constructor(
@@ -19,7 +20,7 @@ export class CharacterDto {
     public statistics: Statistics,
     public skills: Skill[],
     public equipment: Equipment,
-    public locale: string,
+    public locale: Language,
   ) {}
 
   static fromEntity(character: Character): CharacterDto {
