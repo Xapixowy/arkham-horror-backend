@@ -8,7 +8,6 @@ export class UserNotVerifiedException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.USER_NOT_VERIFIED,
         HttpStatus.BAD_REQUEST,
-        ['User is not verified'],
       ),
       HttpStatus.BAD_REQUEST,
     );

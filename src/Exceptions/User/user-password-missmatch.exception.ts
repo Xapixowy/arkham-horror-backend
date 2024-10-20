@@ -8,7 +8,6 @@ export class UserPasswordMissmatchException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.USER_PASSWORD_MISMATCH,
         HttpStatus.BAD_REQUEST,
-        ['User password and confirmation password are not the same'],
       ),
       HttpStatus.BAD_REQUEST,
     );

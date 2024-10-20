@@ -2,12 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipeConfig } from './Config/validation-pipe.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  app.useGlobalPipes(new ValidationPipe(configService.get('validationPipe')));
+  app.useGlobalPipes(
+    new ValidationPipe(
+      configService.get<ValidationPipeConfig>('validationPipe'),
+    ),
+  );
 
   await app.listen(process.env.APP_PORT);
 }

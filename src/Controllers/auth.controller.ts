@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -19,16 +20,30 @@ import { LoginUserRequest } from '@Requests/User/login-user.request';
 import { RemindPasswordRequest } from '@Requests/User/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/User/reset-user-password.request';
 import { AuthGuard } from '@Guards/auth.guard';
+import { ConfigService } from '@nestjs/config';
+import { RequestHelper } from '@Helpers/request.helper';
+import { AppConfig } from '../Config/app.config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   async register(
+    @Headers() headers: Record<string, string>,
     @Body() user: RegisterUserRequest,
   ): Promise<DataResponse<UserDto>> {
-    return ResponseHelper.buildResponse(await this.authService.register(user));
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
+
+    return ResponseHelper.buildResponse(
+      await this.authService.register(user, language),
+    );
   }
 
   @Post('verify/:token')
@@ -47,9 +62,16 @@ export class AuthController {
 
   @Post('remind-password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remindPassword(@Body() user: RemindPasswordRequest): Promise<void> {
+  async remindPassword(
+    @Headers() headers: Record<string, string>,
+    @Body() user: RemindPasswordRequest,
+  ): Promise<void> {
+    const language = RequestHelper.getLanguage(
+      headers,
+      this.configService.get<AppConfig>('app').language,
+    );
     try {
-      await this.authService.remindPassword(user);
+      await this.authService.remindPassword(user, language);
     } catch (e) {}
   }
 

@@ -8,7 +8,6 @@ export class UserEmailAndTokenMismatchException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.USER_EMAIL_AND_TOKEN_MISMATCH,
         HttpStatus.CONFLICT,
-        ['User email does not match the token'],
       ),
       HttpStatus.CONFLICT,
     );

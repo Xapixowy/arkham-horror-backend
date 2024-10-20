@@ -8,7 +8,6 @@ export class UserWrongPasswordException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.USER_WRONG_PASSWORD,
         HttpStatus.UNAUTHORIZED,
-        ['User password is wrong'],
       ),
       HttpStatus.UNAUTHORIZED,
     );

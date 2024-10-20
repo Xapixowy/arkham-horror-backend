@@ -18,9 +18,9 @@ import { ConfigService } from '@nestjs/config';
 import { RemindPasswordRequest } from '@Requests/User/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/User/reset-user-password.request';
 import { UserPasswordMissmatchException } from '@Exceptions/User/user-password-missmatch.exception';
-import { MailerService } from '@nestjs-modules/mailer';
 import { EmailService } from '@Services/email.service';
 import { EmailSendFailureException } from '@Exceptions/email-send-failure.exception';
+import { Language } from '@Enums/language';
 
 @Injectable()
 export class AuthService {
@@ -30,11 +30,13 @@ export class AuthService {
     private dataSource: DataSource,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private mailerService: MailerService,
     private emailService: EmailService,
   ) {}
 
-  async register(user: RegisterUserRequest): Promise<UserDto> {
+  async register(
+    user: RegisterUserRequest,
+    language?: Language,
+  ): Promise<UserDto> {
     return this.dataSource.transaction(async (manager) => {
       if (user.password !== user.password_confirmation) {
         throw new UserPasswordMissmatchException();
@@ -59,7 +61,10 @@ export class AuthService {
         }),
       );
 
-      const isEmailSent = await this.emailService.sendRegister(newUser);
+      const isEmailSent = await this.emailService.sendRegister(
+        newUser,
+        language,
+      );
 
       if (!isEmailSent) {
         throw new EmailSendFailureException();
@@ -118,7 +123,10 @@ export class AuthService {
     });
   }
 
-  async remindPassword(user: RemindPasswordRequest): Promise<UserDto> {
+  async remindPassword(
+    user: RemindPasswordRequest,
+    language?: Language,
+  ): Promise<UserDto> {
     return this.dataSource.transaction(async (manager) => {
       const existingUser = await manager.findOneBy(User, { email: user.email });
       if (!existingUser) {
@@ -127,8 +135,10 @@ export class AuthService {
 
       existingUser.reset_token = crypto.randomUUID();
 
-      const isEmailSent =
-        await this.emailService.sendRemindPassword(existingUser);
+      const isEmailSent = await this.emailService.sendRemindPassword(
+        existingUser,
+        language,
+      );
 
       if (!isEmailSent) {
         throw new EmailSendFailureException();

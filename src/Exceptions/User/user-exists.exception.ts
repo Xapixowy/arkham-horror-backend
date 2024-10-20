@@ -8,7 +8,6 @@ export class UserExistsException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.USER_EXISTS,
         HttpStatus.CONFLICT,
-        ['User already exists'],
       ),
       HttpStatus.CONFLICT,
     );

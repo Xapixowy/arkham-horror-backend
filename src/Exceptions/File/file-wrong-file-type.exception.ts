@@ -9,7 +9,7 @@ export class FileWrongFileTypeException extends HttpException {
         ErrorEnum.FILE_WRONG_FILE_TYPE,
         HttpStatus.BAD_REQUEST,
         [
-          `file must be one of the following types: ${eligibleMimeTypes.join(', ')}`,
+          `File must be one of the following types: ${eligibleMimeTypes.join(', ')}`,
         ],
       ),
       HttpStatus.BAD_REQUEST,

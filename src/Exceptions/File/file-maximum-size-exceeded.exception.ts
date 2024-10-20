@@ -9,7 +9,7 @@ export class FileMaximumSizeExceededException extends HttpException {
       ResponseHelper.buildExceptionResponse(
         ErrorEnum.FILE_MAXIMUM_SIZE_EXCEEDED,
         HttpStatus.BAD_REQUEST,
-        ['file size exceeds the maximum allowed size of ' + filesize(maxSize)],
+        ['File size exceeds the maximum allowed size of ' + filesize(maxSize)],
       ),
       HttpStatus.BAD_REQUEST,
     );
