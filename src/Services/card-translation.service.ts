@@ -109,6 +109,7 @@ export class CardTranslationService {
 
       manager.merge(CardTranslation, existingCardTranslation, {
         ...cardTranslationRequest,
+        updated_at: new Date(),
       });
 
       return CardTranslationDto.fromEntity(

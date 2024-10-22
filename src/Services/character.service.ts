@@ -66,7 +66,10 @@ export class CharacterService {
       if (!existingCharacter) {
         throw new NotFoundException();
       }
-      manager.merge(Character, existingCharacter, characterRequest);
+      manager.merge(Character, existingCharacter, {
+        ...characterRequest,
+        updated_at: new Date(),
+      });
       return CharacterDto.fromEntity(
         await manager.save(Character, existingCharacter),
       );
@@ -99,6 +102,7 @@ export class CharacterService {
 
       existingCharacter.image_path =
         this.fileUploadHelper.localToRemotePath(savedFilePath);
+      existingCharacter.updated_at = new Date();
 
       return CharacterDto.fromEntity(
         await manager.save(Character, existingCharacter),
@@ -123,6 +127,7 @@ export class CharacterService {
         }
 
         existingCharacter.image_path = null;
+        existingCharacter.updated_at = new Date();
       }
 
       return CharacterDto.fromEntity(

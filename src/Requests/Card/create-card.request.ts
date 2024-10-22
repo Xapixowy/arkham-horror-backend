@@ -10,8 +10,8 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { CardTypeEnum } from '@Enums/Card/card-type.enum';
-import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
+import { CardType } from '@Enums/Card/card.type';
+import { CardSubtype } from '@Enums/Card/card.subtype';
 import { Type } from 'class-transformer';
 import { CreateStatisticModifierRequest } from '@Requests/StatisticModifier/create-statistic-modifier.request';
 
@@ -24,11 +24,12 @@ export class CreateCardRequest {
   @IsString()
   description: string;
 
-  @IsEnum(CardTypeEnum)
-  type: CardTypeEnum;
+  @IsEnum(CardType)
+  type: CardType;
 
-  @IsEnum(CardSubtypeEnum)
-  subtype: CardSubtypeEnum;
+  @IsEnum(CardSubtype)
+  @IsOptional()
+  subtype: CardSubtype;
 
   @IsArray()
   @IsOptional()

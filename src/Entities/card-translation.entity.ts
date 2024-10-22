@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Language } from '@Enums/language';
 import { Card } from '@Entities/card.entity';
 
@@ -25,10 +19,22 @@ export class CardTranslation {
   description: string;
 
   @Column({
-    type: 'varchar',
-    length: 2,
+    type: 'enum',
+    enum: Language,
   })
   locale: Language;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updated_at: Date;
 
   @ManyToOne(() => Card, (card) => card.translations)
   @JoinColumn({ name: 'card_id' })

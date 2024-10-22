@@ -114,6 +114,7 @@ export class CharacterTranslationService {
 
       manager.merge(CharacterTranslation, existingCharacterTranslation, {
         ...characterTranslationRequest,
+        updated_at: new Date(),
       });
 
       return CharacterTranslationDto.fromEntity(

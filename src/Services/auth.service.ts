@@ -89,6 +89,7 @@ export class AuthService {
 
       existingUser.verified_at = new Date();
       existingUser.verification_token = null;
+      existingUser.updated_at = new Date();
 
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });
@@ -134,6 +135,7 @@ export class AuthService {
       }
 
       existingUser.reset_token = crypto.randomUUID();
+      existingUser.updated_at = new Date();
 
       const isEmailSent = await this.emailService.sendRemindPassword(
         existingUser,
@@ -173,6 +175,7 @@ export class AuthService {
         this.configService.get('bcrypt').saltRounds,
       );
       existingUser.reset_token = null;
+      existingUser.updated_at = new Date();
 
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });

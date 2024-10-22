@@ -1,9 +1,17 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { StatisticModifier } from '@Types/Card/statistic-modifier.type';
 import { Language } from '@Enums/language';
 import { CardTranslation } from '@Entities/card-translation.entity';
-import { CardTypeEnum } from '@Enums/Card/card-type.enum';
-import { CardSubtypeEnum } from '@Enums/Card/card-subtype.enum';
+import { CardType } from '@Enums/Card/card.type';
+import { CardSubtype } from '@Enums/Card/card.subtype';
+import { Player } from '@Entities/player.entity';
+import { Character } from '@Entities/character.entity';
 
 @Entity()
 export class Card {
@@ -22,17 +30,17 @@ export class Card {
   description: string;
 
   @Column({
-    type: 'varchar',
-    length: 64,
+    type: 'enum',
+    enum: CardType,
   })
-  type: CardTypeEnum;
+  type: CardType;
 
   @Column({
-    type: 'varchar',
-    length: 64,
+    type: 'enum',
+    enum: CardSubtype,
     nullable: true,
   })
-  subtype: CardSubtypeEnum;
+  subtype: CardSubtype;
 
   @Column({
     type: 'json',
@@ -59,14 +67,32 @@ export class Card {
   back_image_path: string;
 
   @Column({
-    type: 'varchar',
-    length: 2,
+    type: 'enum',
+    enum: Language,
   })
   locale: Language;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updated_at: Date;
 
   @OneToMany(() => CardTranslation, (cardTranslation) => cardTranslation.card, {
     onDelete: 'CASCADE',
     eager: true,
   })
   translations: CardTranslation[];
+
+  @ManyToMany(() => Character, (character) => character.cards)
+  characters: Character[];
+
+  @ManyToMany(() => Player, (player) => player.cards)
+  players: Player[];
 }

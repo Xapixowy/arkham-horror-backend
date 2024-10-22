@@ -60,7 +60,10 @@ export class CardService {
       if (!existingCard) {
         throw new NotFoundException();
       }
-      manager.merge(Card, existingCard, cardRequest);
+      manager.merge(Card, existingCard, {
+        ...cardRequest,
+        updated_at: new Date(),
+      });
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
   }
@@ -89,6 +92,7 @@ export class CardService {
 
       existingCard.front_image_path =
         this.fileUploadHelper.localToRemotePath(savedFilePath);
+      existingCard.updated_at = new Date();
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
@@ -113,6 +117,7 @@ export class CardService {
         }
 
         existingCard.front_image_path = null;
+        existingCard.updated_at = new Date();
       }
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
@@ -133,6 +138,7 @@ export class CardService {
 
       existingCard.back_image_path =
         this.fileUploadHelper.localToRemotePath(savedFilePath);
+      existingCard.updated_at = new Date();
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
@@ -155,6 +161,7 @@ export class CardService {
         }
 
         existingCard.back_image_path = null;
+        existingCard.updated_at = new Date();
       }
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));

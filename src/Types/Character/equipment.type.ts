@@ -8,5 +8,4 @@ export type Equipment = {
     abilities: number;
     allies: number;
   };
-  static: number[];
 };

@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserRole } from '@Enums/User/user-role.enum';
+import { Player } from '@Entities/player.entity';
 
 @Entity()
 export class User {
@@ -24,7 +25,9 @@ export class User {
   password: string;
 
   @Column({
-    type: 'integer',
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
   })
   role: UserRole;
 
@@ -51,15 +54,16 @@ export class User {
 
   @Column({
     type: 'timestamp',
-    nullable: true,
-    default: null,
+    default: () => 'CURRENT_TIMESTAMP',
   })
   created_at: Date;
 
   @Column({
     type: 'timestamp',
-    nullable: true,
-    default: null,
+    default: () => 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
+
+  @OneToMany(() => Player, (player) => player.user)
+  players: Player[];
 }

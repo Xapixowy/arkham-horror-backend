@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Language } from '@Enums/language';
 import { Character } from '@Entities/character.entity';
 
@@ -37,11 +31,23 @@ export class CharacterTranslation {
   starting_location: string;
 
   @Column({
-    type: 'varchar',
-    length: 2,
+    type: 'enum',
+    enum: Language,
   })
   locale: Language;
 
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updated_at: Date;
+  
   @ManyToOne(() => Character, (character) => character.translations)
   @JoinColumn({ name: 'character_id' })
   character: Character;

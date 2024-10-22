@@ -1,10 +1,19 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Statistics } from '@Types/Character/statistics.type';
 import { Skill } from '@Types/Character/skill.type';
 import { Equipment } from '@Types/Character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
 import { Language } from '@Enums/language';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { Card } from '@Entities/card.entity';
+import { Player } from '@Entities/player.entity';
 
 @Entity()
 export class Character {
@@ -12,8 +21,8 @@ export class Character {
   id: number;
 
   @Column({
-    type: 'varchar',
-    length: 64,
+    type: 'enum',
+    enum: Expansion,
   })
   expansion: Expansion;
 
@@ -77,10 +86,22 @@ export class Character {
   equipment: Equipment;
 
   @Column({
-    type: 'varchar',
-    length: 2,
+    type: 'enum',
+    enum: Language,
   })
   locale: Language;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updated_at: Date;
 
   @OneToMany(
     () => CharacterTranslation,
@@ -88,4 +109,20 @@ export class Character {
     { onDelete: 'CASCADE', eager: true },
   )
   translations: CharacterTranslation[];
+
+  @ManyToMany(() => Card, (card) => card.characters)
+  @JoinTable({
+    joinColumn: {
+      name: 'character_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'card_id',
+      referencedColumnName: 'id',
+    },
+  })
+  cards: Card[];
+
+  @OneToMany(() => Player, (player) => player.character)
+  players: Player[];
 }
