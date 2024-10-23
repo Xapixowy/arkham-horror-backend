@@ -26,7 +26,9 @@ export class CardService {
   }
 
   async findAll(language?: Language): Promise<CardDto[]> {
-    const cards = await this.cardRepository.find();
+    const cards = await this.cardRepository.find({
+      relations: ['translations'],
+    });
     return cards.map((card) =>
       CardDto.fromEntity(
         language ? this.getTranslatedCard(card, language) : card,
@@ -35,7 +37,10 @@ export class CardService {
   }
 
   async findOne(id: number, language?: Language): Promise<CardDto> {
-    const existingCard = await this.cardRepository.findOneBy({ id });
+    const existingCard = await this.cardRepository.findOne({
+      where: { id },
+      relations: ['translations'],
+    });
     if (!existingCard) {
       throw new NotFoundException();
     }
@@ -56,7 +61,9 @@ export class CardService {
 
   async edit(id: number, cardRequest: CreateCardRequest): Promise<CardDto> {
     return await this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }
@@ -70,7 +77,9 @@ export class CardService {
 
   async remove(id: number): Promise<CardDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }
@@ -80,7 +89,9 @@ export class CardService {
 
   async setFrontPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }
@@ -100,7 +111,9 @@ export class CardService {
 
   async deleteFrontPhoto(id: number): Promise<CardDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }
@@ -126,7 +139,9 @@ export class CardService {
 
   async setBackPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }
@@ -146,7 +161,9 @@ export class CardService {
 
   async deleteBackPhoto(id: number): Promise<CardDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, { id });
+      const existingCard = await manager.findOne(Card, {
+        where: { id },
+      });
       if (!existingCard) {
         throw new NotFoundException();
       }

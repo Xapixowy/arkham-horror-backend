@@ -86,7 +86,6 @@ export class Card {
 
   @OneToMany(() => CardTranslation, (cardTranslation) => cardTranslation.card, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   translations: CardTranslation[];
 

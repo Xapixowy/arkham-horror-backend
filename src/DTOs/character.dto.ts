@@ -4,8 +4,26 @@ import { Skill } from '@Types/Character/skill.type';
 import { Equipment } from '@Types/Character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
 import { Language } from '@Enums/language';
+import { CharacterTranslationDto } from '@DTOs/character-translation.dto';
+import { CardDto } from '@DTOs/card.dto';
+import { PlayerDto } from '@DTOs/player.dto';
+import { DTOTypeMapping } from '@Types/DTO/dto-type-mapping.type';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { Card } from '@Entities/card.entity';
+import { Player } from '@Entities/player.entity';
+import { DtoHelper } from '@Helpers/dto.helper';
 
 export class CharacterDto {
+  private static readonly typeMapping: DTOTypeMapping = {
+    translations: (translations: CharacterTranslation[]) =>
+      translations.map((translation) =>
+        CharacterTranslationDto.fromEntity(translation),
+      ),
+    cards: (cards: Card[]) => cards.map((card) => CardDto.fromEntity(card)),
+    players: (players: Player[]) =>
+      players.map((player) => PlayerDto.fromEntity(player)),
+  };
+
   constructor(
     public id: number,
     public expansion: Expansion,
@@ -21,24 +39,43 @@ export class CharacterDto {
     public skills: Skill[],
     public equipment: Equipment,
     public locale: Language,
+    public created_at: Date,
+    public updated_at: Date,
+    public translations?: CharacterTranslationDto[],
+    public cards?: CardDto[],
+    public players?: PlayerDto[],
   ) {}
 
-  static fromEntity(character: Character): CharacterDto {
-    return new CharacterDto(
-      character.id,
-      character.expansion,
-      character.name,
-      character.description,
-      character.profession,
-      character.starting_location,
-      character.image_path,
-      character.sanity,
-      character.endurance,
-      character.concentration,
-      character.statistics,
-      character.skills,
-      character.equipment,
-      character.locale,
+  static fromEntity(
+    character: Character,
+    properties?: {
+      translations?: true;
+      cards?: true;
+      players?: true;
+    },
+  ): CharacterDto {
+    return DtoHelper.populateDtoWithOptionalProperties(
+      new CharacterDto(
+        character.id,
+        character.expansion,
+        character.name,
+        character.description,
+        character.profession,
+        character.starting_location,
+        character.image_path,
+        character.sanity,
+        character.endurance,
+        character.concentration,
+        character.statistics,
+        character.skills,
+        character.equipment,
+        character.locale,
+        character.created_at,
+        character.updated_at,
+      ),
+      character,
+      this.typeMapping,
+      properties,
     );
   }
 }

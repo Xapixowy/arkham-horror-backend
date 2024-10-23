@@ -22,8 +22,9 @@ export class CardTranslationService {
   ) {}
 
   async findAll(cardId: number): Promise<CardTranslationDto[]> {
-    const card = await this.cardRepository.findOneBy({
-      id: cardId,
+    const card = await this.cardRepository.findOne({
+      where: { id: cardId },
+      relations: ['translations'],
     });
     if (!card) {
       throw new NotFoundException();
@@ -34,8 +35,9 @@ export class CardTranslationService {
   }
 
   async findOne(cardId: number, locale: string): Promise<CardTranslationDto> {
-    const card = await this.cardRepository.findOneBy({
-      id: cardId,
+    const card = await this.cardRepository.findOne({
+      where: { id: cardId },
+      relations: ['translations'],
     });
     if (!card) {
       throw new NotFoundException();
@@ -54,8 +56,9 @@ export class CardTranslationService {
     cardTranslationRequest: CreateCardTranslationRequest,
   ): Promise<CardTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, {
-        id: cardId,
+      const existingCard = await manager.findOne(Card, {
+        where: { id: cardId },
+        relations: ['translations'],
       });
       if (!existingCard) {
         throw new NotFoundException();
@@ -93,8 +96,9 @@ export class CardTranslationService {
     cardTranslationRequest: UpdateCardTranslationRequest,
   ): Promise<CardTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, {
-        id: cardId,
+      const existingCard = await manager.findOne(Card, {
+        where: { id: cardId },
+        relations: ['translations'],
       });
       if (!existingCard) {
         throw new NotFoundException();
@@ -120,8 +124,9 @@ export class CardTranslationService {
 
   async delete(cardId: number, locale: string): Promise<CardTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOneBy(Card, {
-        id: cardId,
+      const existingCard = await manager.findOne(Card, {
+        where: { id: cardId },
+        relations: ['translations'],
       });
       if (!existingCard) {
         throw new NotFoundException();

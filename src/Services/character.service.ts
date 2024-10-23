@@ -27,7 +27,9 @@ export class CharacterService {
   }
 
   async findAll(language?: Language): Promise<CharacterDto[]> {
-    const characters = await this.characterRepository.find();
+    const characters = await this.characterRepository.find({
+      relations: ['translations'],
+    });
     return characters.map((character) =>
       CharacterDto.fromEntity(
         language ? this.getTranslatedCharacter(character, language) : character,
@@ -36,7 +38,10 @@ export class CharacterService {
   }
 
   async findOne(id: number, language?: Language): Promise<CharacterDto> {
-    const existingCharacter = await this.characterRepository.findOneBy({ id });
+    const existingCharacter = await this.characterRepository.findOne({
+      where: { id },
+      relations: ['translations'],
+    });
     if (!existingCharacter) {
       throw new NotFoundException();
     }
@@ -62,7 +67,9 @@ export class CharacterService {
     characterRequest: UpdateCharacterRequest,
   ): Promise<CharacterDto> {
     return await this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, { id });
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id },
+      });
       if (!existingCharacter) {
         throw new NotFoundException();
       }
@@ -78,7 +85,9 @@ export class CharacterService {
 
   async remove(id: number): Promise<CharacterDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, { id });
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id },
+      });
       if (!existingCharacter) {
         throw new NotFoundException();
       }
@@ -90,7 +99,9 @@ export class CharacterService {
 
   async setPhoto(id: number, file: Express.Multer.File): Promise<CharacterDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, { id });
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id },
+      });
       if (!existingCharacter) {
         throw new NotFoundException();
       }
@@ -112,7 +123,9 @@ export class CharacterService {
 
   async deletePhoto(id: number): Promise<CharacterDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, { id });
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id },
+      });
       if (!existingCharacter) {
         throw new NotFoundException();
       }

@@ -58,15 +58,15 @@ export class Player {
   })
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user?: User;
 
-  @ManyToOne(() => Character, (character) => character.id)
+  @ManyToOne(() => Character, (character) => character.id, { nullable: true })
   @JoinColumn({ name: 'character_id' })
-  character: Character;
+  character?: Character;
 
-  @ManyToMany(() => Card, (card) => card.players)
+  @ManyToMany(() => Card, (card) => card.players, { nullable: true })
   @JoinTable({
     joinColumn: {
       name: 'player_id',
@@ -77,7 +77,7 @@ export class Player {
       referencedColumnName: 'id',
     },
   })
-  cards: Card[];
+  cards?: Card[];
 
   @ManyToOne(() => GameSession, (gameSession) => gameSession.id)
   @JoinColumn({ name: 'game_session_id' })

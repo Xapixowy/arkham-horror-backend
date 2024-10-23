@@ -1,11 +1,10 @@
-import { User } from '@Entities/user.entity';
-import { UserRole } from '@Enums/User/user-role.enum';
 import { PlayerDto } from '@DTOs/player.dto';
 import { DTOTypeMapping } from '@Types/DTO/dto-type-mapping.type';
 import { Player } from '@Entities/player.entity';
 import { DtoHelper } from '@Helpers/dto.helper';
+import { GameSession } from '@Entities/game-session.entity';
 
-export class UserDto {
+export class GameSessionDto {
   private static readonly typeMapping: DTOTypeMapping = {
     players: (players: Player[]) =>
       players.map((player) => PlayerDto.fromEntity(player)),
@@ -13,26 +12,26 @@ export class UserDto {
 
   constructor(
     public id: number,
-    public name: string,
-    public email: string,
-    public role: UserRole,
+    public token: string,
+    public is_active: boolean,
     public created_at: Date,
     public updated_at: Date,
-    public access_token?: string,
     public players?: PlayerDto[],
   ) {}
 
-  static fromEntity(user: User, properties?: { players?: true }): UserDto {
+  static fromEntity(
+    gameSession: GameSession,
+    properties?: { players?: true },
+  ): GameSessionDto {
     return DtoHelper.populateDtoWithOptionalProperties(
-      new UserDto(
-        user.id,
-        user.name,
-        user.email,
-        user.role,
-        user.created_at,
-        user.updated_at,
+      new GameSessionDto(
+        gameSession.id,
+        gameSession.token,
+        gameSession.is_active,
+        gameSession.created_at,
+        gameSession.updated_at,
       ),
-      user,
+      gameSession,
       this.typeMapping,
       properties,
     );

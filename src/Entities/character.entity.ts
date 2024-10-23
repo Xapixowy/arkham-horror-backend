@@ -106,7 +106,7 @@ export class Character {
   @OneToMany(
     () => CharacterTranslation,
     (characterTranslation) => characterTranslation.character,
-    { onDelete: 'CASCADE', eager: true },
+    { onDelete: 'CASCADE' },
   )
   translations: CharacterTranslation[];
 

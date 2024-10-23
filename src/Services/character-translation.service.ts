@@ -22,8 +22,9 @@ export class CharacterTranslationService {
   ) {}
 
   async findAll(characterId: number): Promise<CharacterTranslationDto[]> {
-    const character = await this.characterRepository.findOneBy({
-      id: characterId,
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+      relations: ['translations'],
     });
     if (!character) {
       throw new NotFoundException();
@@ -37,8 +38,9 @@ export class CharacterTranslationService {
     characterId: number,
     locale: string,
   ): Promise<CharacterTranslationDto> {
-    const character = await this.characterRepository.findOneBy({
-      id: characterId,
+    const character = await this.characterRepository.findOne({
+      where: { id: characterId },
+      relations: ['translations'],
     });
     if (!character) {
       throw new NotFoundException();
@@ -57,8 +59,9 @@ export class CharacterTranslationService {
     characterTranslationRequest: CreateCharacterTranslationRequest,
   ): Promise<CharacterTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, {
-        id: characterId,
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id: characterId },
+        relations: ['translations'],
       });
       if (!existingCharacter) {
         throw new NotFoundException();
@@ -98,8 +101,9 @@ export class CharacterTranslationService {
     characterTranslationRequest: UpdateCharacterTranslationRequest,
   ): Promise<CharacterTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, {
-        id: characterId,
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id: characterId },
+        relations: ['translations'],
       });
       if (!existingCharacter) {
         throw new NotFoundException();
@@ -128,8 +132,9 @@ export class CharacterTranslationService {
     locale: string,
   ): Promise<CharacterTranslationDto> {
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOneBy(Character, {
-        id: characterId,
+      const existingCharacter = await manager.findOne(Character, {
+        where: { id: characterId },
+        relations: ['translations'],
       });
       if (!existingCharacter) {
         throw new NotFoundException();
