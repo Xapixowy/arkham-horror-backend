@@ -2,10 +2,16 @@ import { Module } from '@nestjs/common';
 import { CardModule } from '@Modules/card.module';
 import { CharacterModule } from '@Modules/character.module';
 import { AuthModule } from '@Modules/auth.module';
-import { UserModule } from '@Modules/user.module';
 import { TestModule } from '@Modules/test.module';
+import { GameSessionModule } from '@Modules/game-session.module';
 
 @Module({
-  imports: [CardModule, CharacterModule, AuthModule, UserModule, TestModule],
+  imports: [
+    CardModule,
+    CharacterModule,
+    AuthModule,
+    GameSessionModule,
+    TestModule,
+  ],
 })
 export class RoutesModule {}

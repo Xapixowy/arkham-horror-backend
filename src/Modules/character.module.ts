@@ -7,9 +7,10 @@ import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
 import { CharacterTranslationService } from '@Services/character-translation.service';
 import { CharacterTranslationController } from '@Controllers/character-translation.controller';
+import { User } from '@Entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Character, CharacterTranslation])],
+  imports: [TypeOrmModule.forFeature([Character, CharacterTranslation, User])],
   controllers: [CharacterController, CharacterTranslationController],
   providers: [CharacterService, CharacterTranslationService, FileUploadHelper],
 })

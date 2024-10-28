@@ -13,7 +13,6 @@ export class GameSessionDto {
   constructor(
     public id: number,
     public token: string,
-    public is_active: boolean,
     public created_at: Date,
     public updated_at: Date,
     public players?: PlayerDto[],
@@ -27,7 +26,6 @@ export class GameSessionDto {
       new GameSessionDto(
         gameSession.id,
         gameSession.token,
-        gameSession.is_active,
         gameSession.created_at,
         gameSession.updated_at,
       ),

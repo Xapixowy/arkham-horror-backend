@@ -7,9 +7,10 @@ import { FileUploadHelper } from '@Helpers/file-upload.helper';
 import { CardTranslationController } from '@Controllers/card-translation.controller';
 import { CardTranslationService } from '@Services/card-translation.service';
 import { CardTranslation } from '@Entities/card-translation.entity';
+import { User } from '@Entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Card, CardTranslation])],
+  imports: [TypeOrmModule.forFeature([Card, CardTranslation, User])],
   controllers: [CardController, CardTranslationController],
   providers: [CardService, CardTranslationService, FileUploadHelper],
 })

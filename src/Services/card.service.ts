@@ -50,13 +50,14 @@ export class CardService {
   }
 
   async add(cardRequest: CreateCardRequest): Promise<CardDto> {
-    const card = this.cardRepository.create({
-      ...cardRequest,
-      locale: this.appLanguage,
+    return this.dataSource.transaction(async (manager) => {
+      const card = manager.create(Card, {
+        ...cardRequest,
+        locale: this.appLanguage,
+      });
+
+      return CardDto.fromEntity(await manager.save(card));
     });
-    return this.dataSource.transaction(async (manager) =>
-      CardDto.fromEntity(await manager.save(card)),
-    );
   }
 
   async edit(id: number, cardRequest: CreateCardRequest): Promise<CardDto> {

@@ -25,7 +25,6 @@ export class DtoHelper {
         typeMapping && typeMapping[property]
           ? typeMapping[property](entity[property])
           : entity[property];
-      console.log(dto[property]);
     });
 
     return dto;

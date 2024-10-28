@@ -13,12 +13,6 @@ export class GameSession {
   token: string;
 
   @Column({
-    type: 'boolean',
-    default: false,
-  })
-  is_active: boolean;
-
-  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -30,6 +24,6 @@ export class GameSession {
   })
   updated_at: Date;
 
-  @OneToMany(() => Player, (player) => player.id)
+  @OneToMany(() => Player, (player) => player.game_session)
   players: Player[];
 }

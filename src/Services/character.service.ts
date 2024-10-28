@@ -53,13 +53,14 @@ export class CharacterService {
   }
 
   async add(characterRequest: CreateCharacterRequest): Promise<CharacterDto> {
-    const character = this.characterRepository.create({
-      ...characterRequest,
-      locale: this.appLanguage,
+    return this.dataSource.transaction(async (manager) => {
+      const character = manager.create(Character, {
+        ...characterRequest,
+        locale: this.appLanguage,
+      });
+
+      return CharacterDto.fromEntity(await manager.save(character));
     });
-    return this.dataSource.transaction(async (manager) =>
-      CharacterDto.fromEntity(await manager.save(character)),
-    );
   }
 
   async edit(
