@@ -7,7 +7,12 @@ import { GameSession } from '@Entities/game-session.entity';
 export class GameSessionDto {
   private static readonly typeMapping: DTOTypeMapping = {
     players: (players: Player[]) =>
-      players.map((player) => PlayerDto.fromEntity(player)),
+      players.map((player) =>
+        PlayerDto.fromEntity(player, {
+          user: true,
+          character: true,
+        }),
+      ),
   };
 
   constructor(

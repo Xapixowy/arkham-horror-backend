@@ -6,7 +6,7 @@ export class EmailSendFailureException extends HttpException {
   constructor() {
     super(
       ResponseHelper.buildExceptionResponse(
-        ErrorEnum.EMAIL_SEND_FAILIRE,
+        ErrorEnum.EMAIL_SEND_FAILURE,
         HttpStatus.INTERNAL_SERVER_ERROR,
       ),
       HttpStatus.INTERNAL_SERVER_ERROR,

@@ -22,6 +22,12 @@ export class Player {
   id: number;
 
   @Column({
+    type: 'uuid',
+    unique: true,
+  })
+  token: string;
+
+  @Column({
     type: 'enum',
     enum: PlayerRole,
     default: PlayerRole.PLAYER,
