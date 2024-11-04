@@ -8,7 +8,6 @@ import { User } from '@Entities/user.entity';
 import { StringHelper } from '@Helpers/string.helper';
 import { Player } from '@Entities/player.entity';
 import { PlayerRole } from '@Enums/Player/player-role.enum';
-import { PlayerDto } from '@DTOs/player.dto';
 
 @Injectable()
 export class GameSessionService {
@@ -86,37 +85,6 @@ export class GameSessionService {
       return GameSessionDto.fromEntity(
         await manager.remove(GameSession, existingGameSession),
       );
-    });
-  }
-
-  private async addPlayer(token: string, userId: number): Promise<PlayerDto> {
-    const existingGameSession = await this.gameSessionRepository.findOne({
-      where: { token },
-      relations: ['players'],
-    });
-
-    if (!existingGameSession) {
-      throw new NotFoundException();
-    }
-
-    const existingUser = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!existingUser) {
-      throw new NotFoundException();
-    }
-
-    return this.dataSource.transaction(async (manager) => {
-      const newPlayer = manager.create(Player, {
-        user: existingUser,
-        game_session: existingGameSession,
-        role: PlayerRole.PLAYER,
-      });
-
-      await manager.save(Player, newPlayer);
-
-      return PlayerDto.fromEntity(newPlayer);
     });
   }
 

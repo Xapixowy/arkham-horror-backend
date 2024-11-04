@@ -37,7 +37,12 @@ export class PlayerService {
     );
   }
 
-  async findOne(playerToken: string): Promise<PlayerDto> {
+  async findOne(
+    gameSessionToken: string,
+    playerToken: string,
+  ): Promise<PlayerDto> {
+    await this.getGameSession(gameSessionToken);
+
     const existingPlayer = await this.getPlayer(playerToken);
 
     return PlayerDto.fromEntity(existingPlayer, {
