@@ -1,0 +1,15 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { ErrorEnum } from '@enums/error.enum';
+import { ResponseHelper } from '@helpers/response.helper';
+
+export class EmailSendFailureException extends HttpException {
+  constructor() {
+    super(
+      ResponseHelper.buildExceptionResponse(
+        ErrorEnum.EMAIL_SEND_FAILURE,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      ),
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+}
