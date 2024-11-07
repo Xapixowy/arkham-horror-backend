@@ -9,14 +9,14 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { ResponseHelper } from '@helpers/response.helper';
-import { DataResponse } from '@custom-types/data-response.type';
-import { UserRoles } from '@decorators/user-roles.decorator';
-import { UserRole } from '@enums/user/user-role.enum';
-import { Public } from '@decorators/public.decorator';
-import { GameSessionService } from '@services/game_session.service';
-import { GameSessionDto } from '@dtos/game-session.dto';
-import { CreateGameSessionRequest } from '@requests/game-session/create-game-session.request';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { DataResponse } from '@Types/data-response.type';
+import { UserRoles } from '@Decorators/user-roles.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { Public } from '@Decorators/public.decorator';
+import { GameSessionService } from '@Services/game-session/game-session.service';
+import { GameSessionDto } from '@Dtos/game-session.dto';
+import { CreateGameSessionRequest } from '@Requests/game-session/create-game-session.request';
 
 @Controller('game-sessions')
 export class GameSessionController {

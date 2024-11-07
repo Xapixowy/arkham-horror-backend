@@ -1,9 +1,9 @@
-import { User } from '@entities/user.entity';
-import { UserRole } from '@enums/user/user-role.enum';
-import { PlayerDto } from '@dtos/player.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { Player } from '@entities/player.entity';
-import { DtoHelper } from '@helpers/dto.helper';
+import { User } from '@Entities/user.entity';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { PlayerDto } from '@Dtos/player.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { Player } from '@Entities/player.entity';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class UserDto {
   private static readonly typeMapping: DTOTypeMapping = {

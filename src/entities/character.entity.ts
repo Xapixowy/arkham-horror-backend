@@ -6,14 +6,14 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Statistics } from '@custom-types/character/statistics.type';
-import { Skill } from '@custom-types/character/skill.type';
-import { Equipment } from '@custom-types/character/equipment.type';
-import { Expansion } from '@enums/expansion.enum';
-import { Language } from '@enums/language';
-import { CharacterTranslation } from '@entities/character-translation.entity';
-import { Card } from '@entities/card.entity';
-import { Player } from '@entities/player.entity';
+import { Statistics } from '@Types/character/statistics.type';
+import { Skill } from '@Types/character/skill.type';
+import { Equipment } from '@Types/character/equipment.type';
+import { Expansion } from '@Enums/expansion.enum';
+import { Language } from '@Enums/language';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { Card } from '@Entities/card.entity';
+import { Player } from '@Entities/player.entity';
 
 @Entity()
 export class Character {

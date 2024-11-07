@@ -9,19 +9,19 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { AuthService } from '@services/auth.service';
-import { RegisterUserRequest } from '@requests/user/register-user.request';
-import { DataResponse } from '@custom-types/data-response.type';
-import { UserDto } from '@dtos/user.dto';
-import { ResponseHelper } from '@helpers/response.helper';
-import { VerifyUserRequest } from '@requests/user/verify-user.request';
-import { LoginUserRequest } from '@requests/user/login-user.request';
-import { RemindPasswordRequest } from '@requests/user/remind-password.request';
-import { ResetUserPasswordRequest } from '@requests/user/reset-user-password.request';
+import { AuthService } from '@Services/auth/auth.service';
+import { RegisterUserRequest } from '@Requests/user/register-user.request';
+import { DataResponse } from '@Types/data-response.type';
+import { UserDto } from '@Dtos/user.dto';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { VerifyUserRequest } from '@Requests/user/verify-user.request';
+import { LoginUserRequest } from '@Requests/user/login-user.request';
+import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
+import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
 import { ConfigService } from '@nestjs/config';
-import { RequestHelper } from '@helpers/request.helper';
-import { AppConfig } from '@configs/app.config';
-import { Public } from '@decorators/public.decorator';
+import { RequestHelper } from '@Helpers/request/request.helper';
+import { AppConfig } from '@Configs/app.config';
+import { Public } from '@Decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {

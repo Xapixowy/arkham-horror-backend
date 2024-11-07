@@ -1,5 +1,5 @@
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { DTOProperties } from '@custom-types/dto/dto-properties.type';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { DTOProperties } from '@Types/dto/dto-properties.type';
 
 export class DtoHelper {
   static populateDtoWithOptionalProperties<T, Y>(

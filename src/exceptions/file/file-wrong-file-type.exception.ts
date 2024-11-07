@@ -1,6 +1,6 @@
-import { ErrorEnum } from '@enums/error.enum';
+import { ErrorEnum } from '@Enums/error.enum';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ResponseHelper } from '@helpers/response.helper';
+import { ResponseHelper } from '@Helpers/response/response.helper';
 
 export class FileWrongFileTypeException extends HttpException {
   constructor(eligibleMimeTypes: string[]) {

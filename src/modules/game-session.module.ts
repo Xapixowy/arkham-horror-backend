@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GameSession } from '@entities/game-session.entity';
-import { GameSessionController } from '@controllers/game-session.controller';
-import { GameSessionService } from '@services/game_session.service';
-import { User } from '@entities/user.entity';
-import { PlayerService } from '@services/player.service';
-import { Player } from '@entities/player.entity';
+import { GameSession } from '@Entities/game-session.entity';
+import { GameSessionController } from '@Controllers/game-session.controller';
+import { GameSessionService } from '@Services/game-session/game-session.service';
+import { User } from '@Entities/user.entity';
+import { PlayerService } from '@Services/player/player.service';
+import { Player } from '@Entities/player.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GameSession, User, Player])],

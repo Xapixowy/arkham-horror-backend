@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Character } from '@entities/character.entity';
+import { Character } from '@Entities/character.entity';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@exceptions/not-found.exception';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
-import { CreateCharacterTranslationRequest } from '@requests/character-translation/create-character-translation.request';
-import { CharacterTranslation } from '@entities/character-translation.entity';
-import { TranslationExistsException } from '@exceptions/translation-exists.exception';
-import { CharacterTranslationDto } from '@dtos/character-translation.dto';
-import { AppConfig } from '@configs/app.config';
-import { LanguageNotSupportedExceptionException } from '@exceptions/language-not-supported-exception.exception';
-import { UpdateCharacterTranslationRequest } from '@requests/character-translation/update-character-translation.request';
+import { CreateCharacterTranslationRequest } from '@Requests/character-translation/create-character-translation.request';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { TranslationExistsException } from '@Exceptions/translation-exists.exception';
+import { CharacterTranslationDto } from '@Dtos/character-translation.dto';
+import { AppConfig } from '@Configs/app.config';
+import { LanguageNotSupportedExceptionException } from '@Exceptions/language-not-supported-exception.exception';
+import { UpdateCharacterTranslationRequest } from '@Requests/character-translation/update-character-translation.request';
 
 @Injectable()
 export class CharacterTranslationService {

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '@entities/user.entity';
+import { User } from '@Entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtUser } from '@custom-types/user/jwt-user.type';
-import { JwtConfig } from '@configs/jwt.config';
-import { UserDto } from '@dtos/user.dto';
+import { JwtUser } from '@Types/user/jwt-user.type';
+import { JwtConfig } from '@Configs/jwt.config';
+import { UserDto } from '@Dtos/user.dto';
 
 @Injectable()
 export class UserService {

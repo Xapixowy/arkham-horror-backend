@@ -1,17 +1,17 @@
-import { Character } from '@entities/character.entity';
-import { Statistics } from '@custom-types/character/statistics.type';
-import { Skill } from '@custom-types/character/skill.type';
-import { Equipment } from '@custom-types/character/equipment.type';
-import { Expansion } from '@enums/expansion.enum';
-import { Language } from '@enums/language';
-import { CharacterTranslationDto } from '@dtos/character-translation.dto';
-import { CardDto } from '@dtos/card.dto';
-import { PlayerDto } from '@dtos/player.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { CharacterTranslation } from '@entities/character-translation.entity';
-import { Card } from '@entities/card.entity';
-import { Player } from '@entities/player.entity';
-import { DtoHelper } from '@helpers/dto.helper';
+import { Character } from '@Entities/character.entity';
+import { Statistics } from '@Types/character/statistics.type';
+import { Skill } from '@Types/character/skill.type';
+import { Equipment } from '@Types/character/equipment.type';
+import { Expansion } from '@Enums/expansion.enum';
+import { Language } from '@Enums/language';
+import { CharacterTranslationDto } from '@Dtos/character-translation.dto';
+import { CardDto } from '@Dtos/card.dto';
+import { PlayerDto } from '@Dtos/player.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { Card } from '@Entities/card.entity';
+import { Player } from '@Entities/player.entity';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class CharacterDto {
   private static readonly typeMapping: DTOTypeMapping = {

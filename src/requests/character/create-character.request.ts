@@ -9,11 +9,11 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Expansion } from '@enums/expansion.enum';
+import { Expansion } from '@Enums/expansion.enum';
 import { Type } from 'class-transformer';
-import { CreateCharacterStatisticsRequest } from '@requests/character/create-character-statistics.request';
-import { CreateCharacterSkillRequest } from '@requests/character/create-character-skill.request';
-import { CreateCharacterEquipmentRequest } from '@requests/character/create-character-equipment.request';
+import { CreateCharacterStatisticsRequest } from '@Requests/character/create-character-statistics.request';
+import { CreateCharacterSkillRequest } from '@Requests/character/create-character-skill.request';
+import { CreateCharacterEquipmentRequest } from '@Requests/character/create-character-equipment.request';
 
 export class CreateCharacterRequest {
   @IsEnum(Expansion)

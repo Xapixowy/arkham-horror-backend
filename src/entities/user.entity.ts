@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from '@enums/user/user-role.enum';
-import { Player } from '@entities/player.entity';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { Player } from '@Entities/player.entity';
 
 @Entity()
 export class User {

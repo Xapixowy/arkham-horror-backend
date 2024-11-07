@@ -5,13 +5,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { StatisticModifier } from '@custom-types/card/statistic-modifier.type';
-import { Language } from '@enums/language';
-import { CardTranslation } from '@entities/card-translation.entity';
-import { CardType } from '@enums/card/card.type';
-import { CardSubtype } from '@enums/card/card.subtype';
-import { Player } from '@entities/player.entity';
-import { Character } from '@entities/character.entity';
+import { StatisticModifier } from '@Types/card/statistic-modifier.type';
+import { Language } from '@Enums/language';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { CardType } from '@Enums/card/card.type';
+import { CardSubtype } from '@Enums/card/card.subtype';
+import { Player } from '@Entities/player.entity';
+import { Character } from '@Entities/character.entity';
 
 @Entity()
 export class Card {

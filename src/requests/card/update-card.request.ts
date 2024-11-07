@@ -10,10 +10,10 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { CardType } from '@enums/card/card.type';
-import { CardSubtype } from '@enums/card/card.subtype';
+import { CardType } from '@Enums/card/card.type';
+import { CardSubtype } from '@Enums/card/card.subtype';
 import { Type } from 'class-transformer';
-import { CreateStatisticModifierRequest } from '@requests/statistic-modifier/create-statistic-modifier.request';
+import { CreateStatisticModifierRequest } from '@Requests/statistic-modifier/create-statistic-modifier.request';
 
 export class UpdateCardRequest {
   @IsString()

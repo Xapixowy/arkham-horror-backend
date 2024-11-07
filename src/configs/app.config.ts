@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { Language } from '@enums/language';
+import { Language } from '@Enums/language';
 
 export type AppConfig = {
   backend_url: string;

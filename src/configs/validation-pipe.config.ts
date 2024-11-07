@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { HttpException, ValidationError } from '@nestjs/common';
-import { ValidationFailedException } from '@exceptions/validation-failed.exception';
+import { ValidationFailedException } from '@Exceptions/validation-failed.exception';
 
 export type ValidationPipeConfig = {
   transform: boolean;

@@ -1,5 +1,5 @@
 import { IsEnum, IsString, MaxLength, MinLength } from 'class-validator';
-import { Language } from '@enums/language';
+import { Language } from '@Enums/language';
 
 export class CreateCardTranslationRequest {
   @IsString()

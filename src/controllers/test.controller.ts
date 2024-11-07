@@ -1,5 +1,5 @@
 import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
-import { Public } from '@decorators/public.decorator';
+import { Public } from '@Decorators/public.decorator';
 
 @Controller('test')
 export class TestController {

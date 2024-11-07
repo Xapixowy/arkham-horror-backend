@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { CardController } from '@controllers/card.controller';
-import { CardService } from '@services/card.service';
+import { CardController } from '@Controllers/card.controller';
+import { CardService } from '@Services/card/card.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Card } from '@entities/card.entity';
-import { FileUploadHelper } from '@helpers/file-upload.helper';
-import { CardTranslationController } from '@controllers/card-translation.controller';
-import { CardTranslationService } from '@services/card-translation.service';
-import { CardTranslation } from '@entities/card-translation.entity';
-import { User } from '@entities/user.entity';
+import { Card } from '@Entities/card.entity';
+import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
+import { CardTranslationController } from '@Controllers/card-translation.controller';
+import { CardTranslationService } from '@Services/card-translation/card-translation.service';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { User } from '@Entities/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Card, CardTranslation, User])],

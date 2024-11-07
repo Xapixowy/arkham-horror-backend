@@ -1,8 +1,8 @@
-import { PlayerDto } from '@dtos/player.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { Player } from '@entities/player.entity';
-import { DtoHelper } from '@helpers/dto.helper';
-import { GameSession } from '@entities/game-session.entity';
+import { PlayerDto } from '@Dtos/player.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { Player } from '@Entities/player.entity';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { GameSession } from '@Entities/game-session.entity';
 
 export class GameSessionDto {
   private static readonly typeMapping: DTOTypeMapping = {

@@ -12,20 +12,20 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { CardService } from '@services/card.service';
-import { CardDto } from '@dtos/card.dto';
-import { ResponseHelper } from '@helpers/response.helper';
-import { DataResponse } from '@custom-types/data-response.type';
-import { CreateCardRequest } from '@requests/card/create-card.request';
-import { UpdateCardRequest } from '@requests/card/update-card.request';
-import { FileUploadHelper } from '@helpers/file-upload.helper';
-import { CharacterDto } from '@dtos/character.dto';
-import { Public } from '@decorators/public.decorator';
-import { UserRoles } from '@decorators/user-roles.decorator';
-import { UserRole } from '@enums/user/user-role.enum';
-import { RequestHelper } from '@helpers/request.helper';
+import { CardService } from '@Services/card/card.service';
+import { CardDto } from '@Dtos/card.dto';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { DataResponse } from '@Types/data-response.type';
+import { CreateCardRequest } from '@Requests/card/create-card.request';
+import { UpdateCardRequest } from '@Requests/card/update-card.request';
+import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
+import { CharacterDto } from '@Dtos/character.dto';
+import { Public } from '@Decorators/public.decorator';
+import { UserRoles } from '@Decorators/user-roles.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { RequestHelper } from '@Helpers/request/request.helper';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '@configs/app.config';
+import { AppConfig } from '@Configs/app.config';
 
 @Controller('cards')
 export class CardController {

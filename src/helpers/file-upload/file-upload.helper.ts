@@ -12,7 +12,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
-import { FileUploadConfig } from '@configs/file-upload.config';
+import { FileUploadConfig } from '@Configs/file-upload.config';
 
 @Injectable()
 export class FileUploadHelper {
@@ -102,7 +102,7 @@ export class FileUploadHelper {
     try {
       fs.writeFileSync(filePath, file.buffer);
       return filePath;
-    } catch (e) {
+    } catch {
       return null;
     }
   }
@@ -111,7 +111,7 @@ export class FileUploadHelper {
     try {
       fs.unlinkSync(path);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -120,7 +120,7 @@ export class FileUploadHelper {
     try {
       fs.rmdirSync(path, { recursive });
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }

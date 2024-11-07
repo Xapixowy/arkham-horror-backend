@@ -1,10 +1,13 @@
 export class EnumHelper {
   static getValues<T extends object>(enumObject: T): (string | number)[] {
-    return Object.values(enumObject);
+    return Object.values(enumObject).filter(
+      (value) =>
+        typeof value !== 'string' || !Object.keys(enumObject).includes(value),
+    );
   }
 
   static getKeys<T extends object>(enumObject: T): string[] {
-    return Object.keys(enumObject);
+    return Object.keys(enumObject).filter((key) => isNaN(Number(key)));
   }
 
   static getValue<T extends object>(
@@ -35,6 +38,7 @@ export class EnumHelper {
     enumObject: T,
     value: string | number,
   ): boolean {
+    console.warn(this.getValues(enumObject));
     return this.getValues(enumObject).includes(value);
   }
 

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@exceptions/not-found.exception';
-import { GameSession } from '@entities/game-session.entity';
-import { GameSessionDto } from '@dtos/game-session.dto';
-import { User } from '@entities/user.entity';
-import { StringHelper } from '@helpers/string.helper';
-import { Player } from '@entities/player.entity';
-import { PlayerService } from './player.service';
+import { NotFoundException } from '@Exceptions/not-found.exception';
+import { GameSession } from '@Entities/game-session.entity';
+import { GameSessionDto } from '@Dtos/game-session.dto';
+import { User } from '@Entities/user.entity';
+import { StringHelper } from '@Helpers/string/string.helper';
+import { Player } from '@Entities/player.entity';
+import { PlayerService } from '../player/player.service';
 
 @Injectable()
 export class GameSessionService {

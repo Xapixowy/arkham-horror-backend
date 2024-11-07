@@ -1,9 +1,9 @@
-import { Language } from '@enums/language';
-import { CardTranslation } from '@entities/card-translation.entity';
-import { CardDto } from '@dtos/card.dto';
-import { DtoHelper } from '@helpers/dto.helper';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { Card } from '@entities/card.entity';
+import { Language } from '@Enums/language';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { CardDto } from '@Dtos/card.dto';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { Card } from '@Entities/card.entity';
 
 export class CardTranslationDto {
   private static readonly typeMapping: DTOTypeMapping = {

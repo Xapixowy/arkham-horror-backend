@@ -14,10 +14,10 @@ export class StringHelper {
 
     let characters = alpha;
 
-    if (options.numbers || options.numbers === undefined) {
+    if (options?.numbers || options?.numbers === undefined) {
       characters += numbers;
     }
-    if (options.symbols || options.symbols === undefined) {
+    if (options?.symbols || options?.symbols === undefined) {
       characters += symbols;
     }
 

@@ -1,4 +1,4 @@
-import { Language } from '@enums/language';
+import { Language } from '@Enums/language';
 import { registerAs } from '@nestjs/config';
 import {
   AcceptLanguageResolver,

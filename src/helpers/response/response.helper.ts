@@ -1,7 +1,7 @@
-import { DataResponse } from '@custom-types/data-response.type';
-import { ErrorEnum } from '@enums/error.enum';
+import { DataResponse } from '@Types/data-response.type';
+import { ErrorEnum } from '@Enums/error.enum';
 import { HttpStatus } from '@nestjs/common';
-import { ExceptionResponse } from '@custom-types/exception.response';
+import { ExceptionResponse } from '@Types/exception.response';
 
 export class ResponseHelper {
   static buildResponse(data: any): DataResponse<any> {

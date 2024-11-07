@@ -5,7 +5,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { CreateCharacterEquipmentRandomRequest } from '@requests/character/create-character-equipment-random.request';
+import { CreateCharacterEquipmentRandomRequest } from '@Requests/character/create-character-equipment-random.request';
 import { Type } from 'class-transformer';
 
 export class CreateCharacterEquipmentRequest {

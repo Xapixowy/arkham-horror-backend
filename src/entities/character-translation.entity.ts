@@ -5,8 +5,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Language } from '@enums/language';
-import { Character } from '@entities/character.entity';
+import { Language } from '@Enums/language';
+import { Character } from '@Entities/character.entity';
 
 @Entity()
 export class CharacterTranslation {

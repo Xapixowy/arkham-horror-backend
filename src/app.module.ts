@@ -4,18 +4,18 @@ import { RoutesModule } from './routes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configs } from './configs';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { FileUploadConfig } from '@configs/file-upload.config';
+import { FileUploadConfig } from '@Configs/file-upload.config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { I18nModule } from 'nestjs-i18n';
-import { i18nResolvers } from '@configs/i18n.config';
-import { UserInterceptor } from '@interceptors/user.interceptor';
-import { UserService } from '@services/user.service';
-import { UserModule } from '@modules/user.module';
-import { AuthGuard } from '@guards/auth.guard';
+import { i18nResolvers } from '@Configs/i18n.config';
+import { UserInterceptor } from '@Interceptors/user.interceptor';
+import { UserService } from '@Services/user/user.service';
+import { UserModule } from '@Modules/user.module';
+import { AuthGuard } from '@Guards/auth.guard';
 import { Reflector } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { UserRolesGuard } from '@guards/user-roles.guard';
-import { PlayerRolesGuard } from '@guards/player-roles.guard';
+import { UserRolesGuard } from '@Guards/user-roles.guard';
+import { PlayerRolesGuard } from '@Guards/player-roles.guard';
 
 @Module({
   imports: [

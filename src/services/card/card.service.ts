@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCardRequest } from '@requests/card/create-card.request';
+import { CreateCardRequest } from '@Requests/card/create-card.request';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Card } from '@entities/card.entity';
+import { Card } from '@Entities/card.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CardDto } from '@dtos/card.dto';
-import { NotFoundException } from '@exceptions/not-found.exception';
-import { FileUploadHelper } from '@helpers/file-upload.helper';
-import { FileDeleteFailedException } from '@exceptions/file/file-delete-failed.exception';
-import { Language } from '@enums/language';
-import { AppConfig } from '@configs/app.config';
+import { CardDto } from '@Dtos/card.dto';
+import { NotFoundException } from '@Exceptions/not-found.exception';
+import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
+import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
+import { Language } from '@Enums/language';
+import { AppConfig } from '@Configs/app.config';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

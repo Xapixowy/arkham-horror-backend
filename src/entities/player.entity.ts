@@ -7,14 +7,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '@entities/user.entity';
-import { Character } from '@entities/character.entity';
-import { Card } from '@entities/card.entity';
-import { PlayerRole } from '@enums/player/player-role.enum';
-import { Equipment } from '@custom-types/player/equipment.type';
-import { Statistics } from '@custom-types/player/statistics.type';
-import { Status } from '@custom-types/player/status.type';
-import { GameSession } from '@entities/game-session.entity';
+import { User } from '@Entities/user.entity';
+import { Character } from '@Entities/character.entity';
+import { Card } from '@Entities/card.entity';
+import { PlayerRole } from '@Enums/player/player-role.enum';
+import { Equipment } from '@Types/player/equipment.type';
+import { Statistics } from '@Types/player/statistics.type';
+import { Status } from '@Types/player/status.type';
+import { GameSession } from '@Entities/game-session.entity';
 
 @Entity()
 export class Player {

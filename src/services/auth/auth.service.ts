@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { User } from '@entities/user.entity';
-import { RegisterUserRequest } from '@requests/user/register-user.request';
-import { UserExistsException } from '@exceptions/user/user-exists.exception';
+import { User } from '@Entities/user.entity';
+import { RegisterUserRequest } from '@Requests/user/register-user.request';
+import { UserExistsException } from '@Exceptions/user/user-exists.exception';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from '@enums/user/user-role.enum';
-import { UserDto } from '@dtos/user.dto';
-import { VerifyUserRequest } from '@requests/user/verify-user.request';
-import { NotFoundException } from '@exceptions/not-found.exception';
-import { UserEmailAndTokenMismatchException } from '@exceptions/user/user-email-and-token-mismatch.exception';
-import { LoginUserRequest } from '@requests/user/login-user.request';
-import { UserNotVerifiedException } from '@exceptions/user/user-not-verified.exception';
-import { UserWrongPasswordException } from '@exceptions/user/user-wrong-password.exception';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { UserDto } from '@Dtos/user.dto';
+import { VerifyUserRequest } from '@Requests/user/verify-user.request';
+import { NotFoundException } from '@Exceptions/not-found.exception';
+import { UserEmailAndTokenMismatchException } from '@Exceptions/user/user-email-and-token-mismatch.exception';
+import { LoginUserRequest } from '@Requests/user/login-user.request';
+import { UserNotVerifiedException } from '@Exceptions/user/user-not-verified.exception';
+import { UserWrongPasswordException } from '@Exceptions/user/user-wrong-password.exception';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { RemindPasswordRequest } from '@requests/user/remind-password.request';
-import { ResetUserPasswordRequest } from '@requests/user/reset-user-password.request';
-import { UserPasswordMissmatchException } from '@exceptions/user/user-password-missmatch.exception';
-import { EmailService } from './email.service';
-import { EmailSendFailureException } from '@exceptions/email-send-failure.exception';
-import { Language } from '@enums/language';
+import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
+import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
+import { UserPasswordMissmatchException } from '@Exceptions/user/user-password-missmatch.exception';
+import { EmailService } from '../email/email.service';
+import { EmailSendFailureException } from '@Exceptions/email-send-failure.exception';
+import { Language } from '@Enums/language';
 
 @Injectable()
 export class AuthService {

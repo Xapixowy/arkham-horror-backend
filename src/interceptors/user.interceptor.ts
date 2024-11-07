@@ -4,8 +4,8 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { RequestHelper } from '@helpers/request.helper';
-import { UserService } from '@services/user.service';
+import { RequestHelper } from '@Helpers/request/request.helper';
+import { UserService } from '@Services/user/user.service';
 
 @Injectable()
 export class UserInterceptor implements NestInterceptor {

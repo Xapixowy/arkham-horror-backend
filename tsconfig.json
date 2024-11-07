@@ -18,55 +18,55 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@configs/*": [
+      "@Configs/*": [
         "./src/configs/*"
       ],
-      "@controllers/*": [
+      "@Controllers/*": [
         "./src/controllers/*"
       ],
-      "@dtos/*": [
+      "@Dtos/*": [
         "./src/dtos/*"
       ],
-      "@entities/*": [
+      "@Entities/*": [
         "./src/entities/*"
       ],
-      "@enums/*": [
+      "@Enums/*": [
         "./src/enums/*"
       ],
-      "@exceptions/*": [
+      "@Exceptions/*": [
         "./src/exceptions/*"
       ],
-      "@helpers/*": [
+      "@Helpers/*": [
         "./src/helpers/*"
       ],
-      "@modules/*": [
+      "@Modules/*": [
         "./src/modules/*"
       ],
-      "@providers/*": [
+      "@Providers/*": [
         "./src/providers/*"
       ],
-      "@repositories/*": [
+      "@Repositories/*": [
         "./src/repositories/*"
       ],
-      "@requests/*": [
+      "@Requests/*": [
         "./src/requests/*"
       ],
-      "@services/*": [
+      "@Services/*": [
         "./src/services/*"
       ],
-      "@custom-types/*": [
+      "@Types/*": [
         "./src/types/*"
       ],
-      "@interceptors/*": [
+      "@Interceptors/*": [
         "./src/interceptors/*"
       ],
-      "@guards/*": [
+      "@Guards/*": [
         "./src/guards/*"
       ],
-      "@decorators/*": [
+      "@Decorators/*": [
         "./src/decorators/*"
       ],
-      "@templates/*": [
+      "@Templates/*": [
         "./src/templates/*"
       ]
     }

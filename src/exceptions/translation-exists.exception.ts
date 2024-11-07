@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { ErrorEnum } from '@enums/error.enum';
-import { ResponseHelper } from '@helpers/response.helper';
+import { ErrorEnum } from '@Enums/error.enum';
+import { ResponseHelper } from '@Helpers/response/response.helper';
 
 export class TranslationExistsException extends HttpException {
   constructor() {

@@ -1,4 +1,4 @@
-import { CardStatisticModifierEnum } from '@enums/card/card-statistic-modifier.enum';
+import { CardStatisticModifierEnum } from '@Enums/card/card-statistic-modifier.enum';
 
 export type StatisticModifier = {
   modifier: CardStatisticModifierEnum;

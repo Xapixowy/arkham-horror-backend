@@ -1,9 +1,9 @@
-import { CharacterTranslation } from '@entities/character-translation.entity';
-import { Language } from '@enums/language';
-import { CharacterDto } from '@dtos/character.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { Character } from '@entities/character.entity';
-import { DtoHelper } from '@helpers/dto.helper';
+import { CharacterTranslation } from '@Entities/character-translation.entity';
+import { Language } from '@Enums/language';
+import { CharacterDto } from '@Dtos/character.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { Character } from '@Entities/character.entity';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class CharacterTranslationDto {
   private static readonly typeMapping: DTOTypeMapping = {

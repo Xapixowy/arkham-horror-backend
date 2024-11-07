@@ -1,18 +1,18 @@
-import { Statistics } from '@custom-types/player/statistics.type';
-import { Equipment } from '@custom-types/player/equipment.type';
-import { PlayerRole } from '@enums/player/player-role.enum';
-import { Status } from '@custom-types/player/status.type';
-import { UserDto } from '@dtos/user.dto';
-import { CharacterDto } from '@dtos/character.dto';
-import { CardDto } from '@dtos/card.dto';
-import { Player } from '@entities/player.entity';
-import { GameSessionDto } from '@dtos/game-session.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { User } from '@entities/user.entity';
-import { Character } from '@entities/character.entity';
-import { Card } from '@entities/card.entity';
-import { GameSession } from '@entities/game-session.entity';
-import { DtoHelper } from '@helpers/dto.helper';
+import { Statistics } from '@Types/player/statistics.type';
+import { Equipment } from '@Types/player/equipment.type';
+import { PlayerRole } from '@Enums/player/player-role.enum';
+import { Status } from '@Types/player/status.type';
+import { UserDto } from '@Dtos/user.dto';
+import { CharacterDto } from '@Dtos/character.dto';
+import { CardDto } from '@Dtos/card.dto';
+import { Player } from '@Entities/player.entity';
+import { GameSessionDto } from '@Dtos/game-session.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { User } from '@Entities/user.entity';
+import { Character } from '@Entities/character.entity';
+import { Card } from '@Entities/card.entity';
+import { GameSession } from '@Entities/game-session.entity';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class PlayerDto {
   private static readonly typeMapping: DTOTypeMapping = {

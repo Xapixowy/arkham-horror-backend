@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Character } from '@entities/character.entity';
+import { Character } from '@Entities/character.entity';
 import { DataSource, Repository } from 'typeorm';
-import { CharacterDto } from '@dtos/character.dto';
-import { CreateCharacterRequest } from '@requests/character/create-character.request';
-import { UpdateCharacterRequest } from '@requests/character/update-character.request';
-import { FileUploadHelper } from '@helpers/file-upload.helper';
-import { FileDeleteFailedException } from '@exceptions/file/file-delete-failed.exception';
-import { NotFoundException } from '@exceptions/not-found.exception';
+import { CharacterDto } from '@Dtos/character.dto';
+import { CreateCharacterRequest } from '@Requests/character/create-character.request';
+import { UpdateCharacterRequest } from '@Requests/character/update-character.request';
+import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
+import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '@configs/app.config';
-import { Language } from '@enums/language';
+import { AppConfig } from '@Configs/app.config';
+import { Language } from '@Enums/language';
 
 @Injectable()
 export class CharacterService {

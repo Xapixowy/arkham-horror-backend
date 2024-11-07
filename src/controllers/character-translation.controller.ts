@@ -9,15 +9,15 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ResponseHelper } from '@helpers/response.helper';
-import { DataResponse } from '@custom-types/data-response.type';
-import { UserRoles } from '@decorators/user-roles.decorator';
-import { UserRole } from '@enums/user/user-role.enum';
-import { Public } from '@decorators/public.decorator';
-import { CharacterTranslationService } from '@services/character-translation.service';
-import { CharacterTranslationDto } from '@dtos/character-translation.dto';
-import { CreateCharacterTranslationRequest } from '@requests/character-translation/create-character-translation.request';
-import { UpdateCharacterTranslationRequest } from '@requests/character-translation/update-character-translation.request';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { DataResponse } from '@Types/data-response.type';
+import { UserRoles } from '@Decorators/user-roles.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { Public } from '@Decorators/public.decorator';
+import { CharacterTranslationService } from '@Services/character-translation/character-translation.service';
+import { CharacterTranslationDto } from '@Dtos/character-translation.dto';
+import { CreateCharacterTranslationRequest } from '@Requests/character-translation/create-character-translation.request';
+import { UpdateCharacterTranslationRequest } from '@Requests/character-translation/update-character-translation.request';
 
 @Controller('characters/:characterId/translations')
 export class CharacterTranslationController {

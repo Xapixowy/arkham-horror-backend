@@ -9,15 +9,15 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ResponseHelper } from '@helpers/response.helper';
-import { DataResponse } from '@custom-types/data-response.type';
-import { UserRoles } from '@decorators/user-roles.decorator';
-import { UserRole } from '@enums/user/user-role.enum';
-import { Public } from '@decorators/public.decorator';
-import { CardTranslationService } from '@services/card-translation.service';
-import { CardTranslationDto } from '@dtos/card-translation.dto';
-import { CreateCardTranslationRequest } from '@requests/card-translation/create-card-translation.request';
-import { UpdateCardTranslationRequest } from '@requests/card-translation/update-card-translation.request';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { DataResponse } from '@Types/data-response.type';
+import { UserRoles } from '@Decorators/user-roles.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { Public } from '@Decorators/public.decorator';
+import { CardTranslationService } from '@Services/card-translation/card-translation.service';
+import { CardTranslationDto } from '@Dtos/card-translation.dto';
+import { CreateCardTranslationRequest } from '@Requests/card-translation/create-card-translation.request';
+import { UpdateCardTranslationRequest } from '@Requests/card-translation/update-card-translation.request';
 
 @Controller('cards/:cardId/translations')
 export class CardTranslationController {

@@ -1,16 +1,16 @@
-import { Card } from '@entities/card.entity';
-import { StatisticModifier } from '@custom-types/card/statistic-modifier.type';
-import { Language } from '@enums/language';
-import { CardType } from '@enums/card/card.type';
-import { CardSubtype } from '@enums/card/card.subtype';
-import { DtoHelper } from '@helpers/dto.helper';
-import { CardTranslationDto } from '@dtos/card-translation.dto';
-import { CharacterDto } from '@dtos/character.dto';
-import { PlayerDto } from '@dtos/player.dto';
-import { DTOTypeMapping } from '@custom-types/dto/dto-type-mapping.type';
-import { CardTranslation } from '@entities/card-translation.entity';
-import { Character } from '@entities/character.entity';
-import { Player } from '@entities/player.entity';
+import { Card } from '@Entities/card.entity';
+import { StatisticModifier } from '@Types/card/statistic-modifier.type';
+import { Language } from '@Enums/language';
+import { CardType } from '@Enums/card/card.type';
+import { CardSubtype } from '@Enums/card/card.subtype';
+import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { CardTranslationDto } from '@Dtos/card-translation.dto';
+import { CharacterDto } from '@Dtos/character.dto';
+import { PlayerDto } from '@Dtos/player.dto';
+import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { Character } from '@Entities/character.entity';
+import { Player } from '@Entities/player.entity';
 
 export class CardDto {
   private static readonly typeMapping: DTOTypeMapping = {

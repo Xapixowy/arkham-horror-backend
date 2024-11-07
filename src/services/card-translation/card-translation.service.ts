@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@exceptions/not-found.exception';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
-import { TranslationExistsException } from '@exceptions/translation-exists.exception';
-import { AppConfig } from '@configs/app.config';
-import { LanguageNotSupportedExceptionException } from '@exceptions/language-not-supported-exception.exception';
-import { Card } from '@entities/card.entity';
-import { CardTranslationDto } from '@dtos/card-translation.dto';
-import { CreateCardTranslationRequest } from '@requests/card-translation/create-card-translation.request';
-import { CardTranslation } from '@entities/card-translation.entity';
-import { UpdateCardTranslationRequest } from '@requests/card-translation/update-card-translation.request';
+import { TranslationExistsException } from '@Exceptions/translation-exists.exception';
+import { AppConfig } from '@Configs/app.config';
+import { LanguageNotSupportedExceptionException } from '@Exceptions/language-not-supported-exception.exception';
+import { Card } from '@Entities/card.entity';
+import { CardTranslationDto } from '@Dtos/card-translation.dto';
+import { CreateCardTranslationRequest } from '@Requests/card-translation/create-card-translation.request';
+import { CardTranslation } from '@Entities/card-translation.entity';
+import { UpdateCardTranslationRequest } from '@Requests/card-translation/update-card-translation.request';
 
 @Injectable()
 export class CardTranslationService {

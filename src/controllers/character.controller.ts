@@ -12,19 +12,19 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { CharacterService } from '@services/character.service';
-import { CharacterDto } from '@dtos/character.dto';
-import { ResponseHelper } from '@helpers/response.helper';
-import { DataResponse } from '@custom-types/data-response.type';
-import { CreateCharacterRequest } from '@requests/character/create-character.request';
-import { UpdateCharacterRequest } from '@requests/character/update-character.request';
-import { FileUploadHelper } from '@helpers/file-upload.helper';
-import { UserRoles } from '@decorators/user-roles.decorator';
-import { UserRole } from '@enums/user/user-role.enum';
-import { Public } from '@decorators/public.decorator';
+import { CharacterService } from '@Services/character/character.service';
+import { CharacterDto } from '@Dtos/character.dto';
+import { ResponseHelper } from '@Helpers/response/response.helper';
+import { DataResponse } from '@Types/data-response.type';
+import { CreateCharacterRequest } from '@Requests/character/create-character.request';
+import { UpdateCharacterRequest } from '@Requests/character/update-character.request';
+import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
+import { UserRoles } from '@Decorators/user-roles.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
+import { Public } from '@Decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '@configs/app.config';
-import { RequestHelper } from '@helpers/request.helper';
+import { AppConfig } from '@Configs/app.config';
+import { RequestHelper } from '@Helpers/request/request.helper';
 
 @Controller('characters')
 export class CharacterController {
