@@ -18,56 +18,56 @@ import { CreateCharacterEquipmentRequest } from '@Requests/character/create-char
 export class UpdateCharacterRequest {
   @IsEnum(Expansion)
   @IsOptional()
-  expansion: Expansion;
+  expansion?: Expansion;
 
   @IsString()
   @MaxLength(255)
   @MinLength(3)
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  description: string;
-
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  profession: string;
+  description?: string;
 
   @IsString()
   @MaxLength(64)
   @IsOptional()
-  startingLocation: string;
+  profession?: string;
+
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  startingLocation?: string;
 
   @IsInt()
   @Min(0)
   @IsOptional()
-  sanity: number;
+  sanity?: number;
 
   @IsInt()
   @Min(0)
   @IsOptional()
-  endurance: number;
+  endurance?: number;
 
   @IsInt()
   @Min(0)
   @IsOptional()
-  concentration: number;
+  concentration?: number;
 
   @ValidateNested()
   @Type(() => CreateCharacterStatisticsRequest)
   @IsOptional()
-  statistics: CreateCharacterStatisticsRequest;
+  statistics?: CreateCharacterStatisticsRequest;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateCharacterSkillRequest)
   @IsOptional()
-  skills: CreateCharacterSkillRequest[];
+  skills?: CreateCharacterSkillRequest[];
 
   @ValidateNested()
   @Type(() => CreateCharacterEquipmentRequest)
   @IsOptional()
-  equipment: CreateCharacterEquipmentRequest;
+  equipment?: CreateCharacterEquipmentRequest;
 }

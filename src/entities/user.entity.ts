@@ -36,21 +36,20 @@ export class User {
     length: 64,
     nullable: true,
   })
-  reset_token: string;
+  reset_token?: string | null;
 
   @Column({
     type: 'varchar',
     length: 64,
     nullable: true,
   })
-  verification_token: string;
+  verification_token: string | null;
 
   @Column({
     type: 'timestamp',
     nullable: true,
-    default: null,
   })
-  verified_at: Date;
+  verified_at: Date | null;
 
   @Column({
     type: 'timestamp',

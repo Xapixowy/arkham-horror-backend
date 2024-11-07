@@ -111,13 +111,17 @@ export class CardTranslationService {
         throw new NotFoundException();
       }
 
-      manager.merge(CardTranslation, existingCardTranslation, {
-        ...cardTranslationRequest,
-        updated_at: new Date(),
-      });
+      const updatedCardTranslation = manager.merge(
+        CardTranslation,
+        existingCardTranslation,
+        {
+          ...cardTranslationRequest,
+          updated_at: new Date(),
+        },
+      );
 
       return CardTranslationDto.fromEntity(
-        await manager.save(CardTranslation, existingCardTranslation),
+        await manager.save(CardTranslation, updatedCardTranslation),
       );
     });
   }

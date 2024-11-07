@@ -53,7 +53,7 @@ export class Character {
     type: 'text',
     nullable: true,
   })
-  image_path: string;
+  image_path?: string | null;
 
   @Column({
     type: 'integer',
@@ -108,7 +108,7 @@ export class Character {
     (characterTranslation) => characterTranslation.character,
     { onDelete: 'CASCADE' },
   )
-  translations: CharacterTranslation[];
+  translations?: CharacterTranslation[];
 
   @ManyToMany(() => Card, (card) => card.characters)
   @JoinTable({
@@ -121,8 +121,8 @@ export class Character {
       referencedColumnName: 'id',
     },
   })
-  cards: Card[];
+  cards?: Card[];
 
   @OneToMany(() => Player, (player) => player.character)
-  players: Player[];
+  players?: Player[];
 }

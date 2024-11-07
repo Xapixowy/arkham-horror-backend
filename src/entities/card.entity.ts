@@ -40,31 +40,31 @@ export class Card {
     enum: CardSubtype,
     nullable: true,
   })
-  subtype: CardSubtype;
+  subtype?: CardSubtype | null;
 
   @Column({
     type: 'json',
     nullable: true,
   })
-  statistic_modifiers: StatisticModifier[];
+  statistic_modifiers?: StatisticModifier[] | null;
 
   @Column({
     type: 'integer',
     nullable: true,
   })
-  hand_usage: number;
+  hand_usage?: number | null;
 
   @Column({
     type: 'text',
     nullable: true,
   })
-  front_image_path: string;
+  front_image_path?: string | null;
 
   @Column({
     type: 'text',
     nullable: true,
   })
-  back_image_path: string;
+  back_image_path?: string | null;
 
   @Column({
     type: 'enum',
@@ -87,11 +87,11 @@ export class Card {
   @OneToMany(() => CardTranslation, (cardTranslation) => cardTranslation.card, {
     onDelete: 'CASCADE',
   })
-  translations: CardTranslation[];
+  translations?: CardTranslation[];
 
   @ManyToMany(() => Character, (character) => character.cards)
-  characters: Character[];
+  characters?: Character[];
 
   @ManyToMany(() => Player, (player) => player.cards)
-  players: Player[];
+  players?: Player[];
 }

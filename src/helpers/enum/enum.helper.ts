@@ -38,7 +38,6 @@ export class EnumHelper {
     enumObject: T,
     value: string | number,
   ): boolean {
-    console.warn(this.getValues(enumObject));
     return this.getValues(enumObject).includes(value);
   }
 

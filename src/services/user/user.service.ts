@@ -17,8 +17,14 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  async findOne(token: string): Promise<UserDto> {
-    return UserDto.fromEntity(await this.getUserByToken(token));
+  async findOne(token: string): Promise<UserDto | null> {
+    const user = await this.getUserByToken(token);
+
+    if (!user) {
+      return null;
+    }
+
+    return UserDto.fromEntity(user);
   }
 
   async getUserByToken(token: string): Promise<User | null> {

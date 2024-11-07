@@ -5,19 +5,19 @@ export class UpdateCharacterTranslationRequest {
   @MaxLength(255)
   @MinLength(3)
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  description: string;
-
-  @IsString()
-  @MaxLength(64)
-  @IsOptional()
-  profession: string;
+  description?: string;
 
   @IsString()
   @MaxLength(64)
   @IsOptional()
-  starting_location: string;
+  profession?: string;
+
+  @IsString()
+  @MaxLength(64)
+  @IsOptional()
+  starting_location?: string;
 }

@@ -48,7 +48,7 @@ export class AuthService {
       }
 
       const newUser = await manager.save(
-        this.userRepository.create({
+        manager.create(User, {
           ...user,
           password: await bcrypt.hash(
             user.password,

@@ -38,19 +38,19 @@ export class Player {
     type: 'json',
     nullable: true,
   })
-  status: Status;
+  status?: Status | null;
 
   @Column({
     type: 'json',
     nullable: true,
   })
-  equipment: Equipment;
+  equipment?: Equipment | null;
 
   @Column({
     type: 'json',
     nullable: true,
   })
-  statistics: Statistics;
+  statistics?: Statistics | null;
 
   @Column({
     type: 'timestamp',
@@ -66,11 +66,11 @@ export class Player {
 
   @ManyToOne(() => User, (user) => user.id, { nullable: true })
   @JoinColumn({ name: 'user_id' })
-  user?: User;
+  user?: User | null;
 
   @ManyToOne(() => Character, (character) => character.id, { nullable: true })
   @JoinColumn({ name: 'character_id' })
-  character?: Character;
+  character?: Character | null;
 
   @ManyToMany(() => Card, (card) => card.players, { nullable: true })
   @JoinTable({

@@ -5,9 +5,9 @@ export class UpdateCardTranslationRequest {
   @MaxLength(255)
   @MinLength(3)
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
 }

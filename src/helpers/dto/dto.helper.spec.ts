@@ -18,6 +18,7 @@ describe('DtoHelper', () => {
     user.name = 'John Doe';
     user.email = 'john@example.com';
     user.role = UserRole.USER;
+    user.verified_at = null;
     user.created_at = new Date('2023-01-01');
     user.updated_at = new Date('2023-01-02');
 
@@ -26,6 +27,7 @@ describe('DtoHelper', () => {
       user.name,
       user.email,
       user.role,
+      user.verified_at,
       user.created_at,
       user.updated_at,
     );
