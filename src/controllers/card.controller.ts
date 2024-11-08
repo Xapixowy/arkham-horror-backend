@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -23,9 +22,9 @@ import { CharacterDto } from '@Dtos/character.dto';
 import { Public } from '@Decorators/public.decorator';
 import { UserRoles } from '@Decorators/user-roles.decorator';
 import { UserRole } from '@Enums/user/user-role.enum';
-import { RequestHelper } from '@Helpers/request/request.helper';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '@Configs/app.config';
+import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { Language } from '@Enums/language';
 
 @Controller('cards')
 export class CardController {
@@ -37,13 +36,8 @@ export class CardController {
   @Get()
   @Public()
   async index(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
   ): Promise<DataResponse<CardDto[]>> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
-
     return ResponseHelper.buildResponse(
       await this.cardService.findAll(language),
     );
@@ -52,14 +46,9 @@ export class CardController {
   @Get(':id')
   @Public()
   async show(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
     @Param('id') id: string,
   ): Promise<DataResponse<CardDto>> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
-
     return ResponseHelper.buildResponse(
       await this.cardService.findOne(+id, language),
     );

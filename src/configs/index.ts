@@ -8,6 +8,7 @@ import { bcryptConfig } from './bcrypt.config';
 import { mailerConfig } from './mailer.config';
 import { appConfig } from './app.config';
 import { i18nConfig } from './i18n.config';
+import { gameSessionsConfig } from '@Configs/game_sessions.config';
 
 export const configs: ConfigFactory[] = [
   appConfig,
@@ -19,4 +20,5 @@ export const configs: ConfigFactory[] = [
   jwtConfig,
   mailerConfig,
   i18nConfig,
+  gameSessionsConfig,
 ];

@@ -85,7 +85,9 @@ export class Player {
   })
   cards?: Card[];
 
-  @ManyToOne(() => GameSession, (gameSession) => gameSession.id)
+  @ManyToOne(() => GameSession, (gameSession) => gameSession.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'game_session_id' })
   game_session: GameSession;
 }

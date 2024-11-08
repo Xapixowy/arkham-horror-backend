@@ -8,7 +8,7 @@ export class GameSession {
 
   @Column({
     type: 'varchar',
-    length: 6,
+    length: 64,
   })
   token: string;
 
@@ -24,6 +24,8 @@ export class GameSession {
   })
   updated_at: Date;
 
-  @OneToMany(() => Player, (player) => player.game_session)
+  @OneToMany(() => Player, (player) => player.game_session, {
+    onDelete: 'CASCADE',
+  })
   players: Player[];
 }

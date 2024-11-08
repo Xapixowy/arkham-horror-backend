@@ -68,6 +68,9 @@
       ],
       "@Templates/*": [
         "./src/templates/*"
+      ],
+      "@Middlewares/*": [
+        "./src/middlewares/*"
       ]
     }
   }

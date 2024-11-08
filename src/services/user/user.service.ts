@@ -18,7 +18,7 @@ export class UserService {
   ) {}
 
   async findOne(token: string): Promise<UserDto | null> {
-    const user = await this.getUserByToken(token);
+    const user = await this.getUserByJwtToken(token);
 
     if (!user) {
       return null;
@@ -27,7 +27,17 @@ export class UserService {
     return UserDto.fromEntity(user);
   }
 
-  async getUserByToken(token: string): Promise<User | null> {
+  async getUser(id: number, relations: string[] = []): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { id },
+      relations,
+    });
+  }
+
+  async getUserByJwtToken(
+    token: string,
+    relations: string[] = [],
+  ): Promise<User | null> {
     const userJwt = await this.extractUserJwt(token);
 
     if (!userJwt) {
@@ -36,6 +46,7 @@ export class UserService {
 
     return await this.userRepository.findOne({
       where: { id: userJwt.sub },
+      relations,
     });
   }
 

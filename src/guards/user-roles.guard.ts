@@ -5,16 +5,18 @@ import { ROLES_KEY } from '@Decorators/user-roles.decorator';
 
 @Injectable()
 export class UserRolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
+
     if (!requiredRoles) {
       return true;
     }
+
     const { user } = context.switchToHttp().getRequest();
 
     if (user.role === UserRole.ADMIN) {

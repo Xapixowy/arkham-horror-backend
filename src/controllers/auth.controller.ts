@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -19,9 +18,9 @@ import { LoginUserRequest } from '@Requests/user/login-user.request';
 import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
 import { ConfigService } from '@nestjs/config';
-import { RequestHelper } from '@Helpers/request/request.helper';
-import { AppConfig } from '@Configs/app.config';
 import { Public } from '@Decorators/public.decorator';
+import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { Language } from '@Enums/language';
 
 @Controller('auth')
 export class AuthController {
@@ -33,14 +32,9 @@ export class AuthController {
   @Post('register')
   @Public()
   async register(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
     @Body() user: RegisterUserRequest,
   ): Promise<DataResponse<UserDto>> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
-
     return ResponseHelper.buildResponse(
       await this.authService.register(user, language),
     );
@@ -66,13 +60,9 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Public()
   async remindPassword(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
     @Body() user: RemindPasswordRequest,
   ): Promise<void> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
     try {
       await this.authService.remindPassword(user, language);
     } catch (e) {}

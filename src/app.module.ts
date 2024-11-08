@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RoutesModule } from './routes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,14 +8,15 @@ import { FileUploadConfig } from '@Configs/file-upload.config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { I18nModule } from 'nestjs-i18n';
 import { i18nResolvers } from '@Configs/i18n.config';
-import { UserInterceptor } from '@Interceptors/user.interceptor';
-import { UserService } from '@Services/user/user.service';
-import { UserModule } from '@Modules/user.module';
-import { AuthGuard } from '@Guards/auth.guard';
-import { Reflector } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
+import { UserService } from '@Services/user/user.service';
+import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@Guards/auth.guard';
 import { UserRolesGuard } from '@Guards/user-roles.guard';
 import { PlayerRolesGuard } from '@Guards/player-roles.guard';
+import { UserModule } from '@Modules/user.module';
+import { UserMiddleware } from '@Middlewares/user.middleware';
+import { LanguageMiddleware } from '@Middlewares/language.middleware';
 
 @Module({
   imports: [
@@ -58,17 +59,10 @@ import { PlayerRolesGuard } from '@Guards/player-roles.guard';
       global: true,
       useFactory: (configService: ConfigService) => configService.get('jwt'),
     }),
-    UserModule,
     RoutesModule,
+    UserModule,
   ],
-  controllers: [],
   providers: [
-    {
-      provide: 'APP_INTERCEPTOR',
-      useFactory: (userService: UserService) =>
-        new UserInterceptor(userService),
-      inject: [UserService],
-    },
     {
       provide: 'APP_GUARD',
       useFactory: (userService: UserService, reflector: Reflector) =>
@@ -85,4 +79,9 @@ import { PlayerRolesGuard } from '@Guards/player-roles.guard';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserMiddleware).forRoutes('*');
+    consumer.apply(LanguageMiddleware).forRoutes('*');
+  }
+}

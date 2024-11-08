@@ -25,6 +25,7 @@ export class PlayerDto {
 
   constructor(
     public id: number,
+    public token: string,
     public role: PlayerRole,
     public status: Status,
     public equipment: Equipment,
@@ -49,6 +50,7 @@ export class PlayerDto {
     return DtoHelper.populateDtoWithOptionalProperties(
       new PlayerDto(
         player.id,
+        player.token,
         player.role,
         player.status,
         player.equipment,

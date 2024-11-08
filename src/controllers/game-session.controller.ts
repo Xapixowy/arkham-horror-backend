@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -7,7 +6,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  Request,
 } from '@nestjs/common';
 import { ResponseHelper } from '@Helpers/response/response.helper';
 import { DataResponse } from '@Types/data-response.type';
@@ -16,7 +14,8 @@ import { UserRole } from '@Enums/user/user-role.enum';
 import { Public } from '@Decorators/public.decorator';
 import { GameSessionService } from '@Services/game-session/game-session.service';
 import { GameSessionDto } from '@Dtos/game-session.dto';
-import { CreateGameSessionRequest } from '@Requests/game-session/create-game-session.request';
+import { RequestUser } from '@Decorators/params/request-user.decorator';
+import { User } from '@Entities/user.entity';
 
 @Controller('game-sessions')
 export class GameSessionController {
@@ -40,25 +39,15 @@ export class GameSessionController {
     );
   }
 
-  // @Post()
-  // @Public()
-  // @HttpCode(HttpStatus.CREATED)
-  // async create(
-  //   @Body() gameSession: CreateGameSessionRequest,
-  // ): Promise<DataResponse<GameSessionDto>> {
-  //   console.log();
-  //   return ResponseHelper.buildResponse(
-  //     await this.gameSessionService.add(gameSession.user_id),
-  //   );
-  // }
-
   @Post()
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Body() gameSession: CreateGameSessionRequest,
-    @Request() request,
-  ): Promise<void> {
-    console.log(gameSession, request['user']);
+    @RequestUser() user: User,
+  ): Promise<DataResponse<GameSessionDto>> {
+    return ResponseHelper.buildResponse(
+      await this.gameSessionService.add(user),
+    );
   }
 
   @Delete(':token')

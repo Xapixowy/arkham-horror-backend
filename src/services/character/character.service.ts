@@ -26,18 +26,20 @@ export class CharacterService {
     this.appLanguage = this.configService.get<AppConfig>('app').language;
   }
 
-  async findAll(language?: Language): Promise<CharacterDto[]> {
+  async findAll(language: Language): Promise<CharacterDto[]> {
     const characters = await this.characterRepository.find({
       relations: ['translations'],
     });
     return characters.map((character) =>
       CharacterDto.fromEntity(
-        language ? this.getTranslatedCharacter(character, language) : character,
+        language !== character.locale
+          ? CharacterService.getTranslatedCharacter(character, language)
+          : character,
       ),
     );
   }
 
-  async findOne(id: number, language?: Language): Promise<CharacterDto> {
+  async findOne(id: number, language: Language): Promise<CharacterDto> {
     const existingCharacter = await this.characterRepository.findOne({
       where: { id },
       relations: ['translations'],
@@ -46,8 +48,8 @@ export class CharacterService {
       throw new NotFoundException();
     }
     return CharacterDto.fromEntity(
-      language
-        ? this.getTranslatedCharacter(existingCharacter, language)
+      language !== existingCharacter.locale
+        ? CharacterService.getTranslatedCharacter(existingCharacter, language)
         : existingCharacter,
     );
   }
@@ -150,7 +152,7 @@ export class CharacterService {
     });
   }
 
-  private getTranslatedCharacter(
+  static getTranslatedCharacter(
     character: Character,
     language: Language,
   ): Character {

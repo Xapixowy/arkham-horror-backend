@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -23,8 +22,8 @@ import { UserRoles } from '@Decorators/user-roles.decorator';
 import { UserRole } from '@Enums/user/user-role.enum';
 import { Public } from '@Decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig } from '@Configs/app.config';
-import { RequestHelper } from '@Helpers/request/request.helper';
+import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { Language } from '@Enums/language';
 
 @Controller('characters')
 export class CharacterController {
@@ -36,13 +35,8 @@ export class CharacterController {
   @Get()
   @Public()
   async index(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
   ): Promise<DataResponse<CharacterDto[]>> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
-
     return ResponseHelper.buildResponse(
       await this.characterService.findAll(language),
     );
@@ -51,14 +45,9 @@ export class CharacterController {
   @Get(':id')
   @Public()
   async show(
-    @Headers() headers: Record<string, string>,
+    @RequestLanguage() language: Language,
     @Param('id') id: string,
   ): Promise<DataResponse<CharacterDto>> {
-    const language = RequestHelper.getLanguage(
-      headers,
-      this.configService.get<AppConfig>('app').language,
-    );
-
     return ResponseHelper.buildResponse(
       await this.characterService.findOne(+id, language),
     );

@@ -25,18 +25,20 @@ export class CardService {
     this.appLanguage = this.configService.get<AppConfig>('app').language;
   }
 
-  async findAll(language?: Language): Promise<CardDto[]> {
+  async findAll(language: Language): Promise<CardDto[]> {
     const cards = await this.cardRepository.find({
       relations: ['translations'],
     });
     return cards.map((card) =>
       CardDto.fromEntity(
-        language ? this.getTranslatedCard(card, language) : card,
+        language !== card.locale
+          ? CardService.getTranslatedCard(card, language)
+          : card,
       ),
     );
   }
 
-  async findOne(id: number, language?: Language): Promise<CardDto> {
+  async findOne(id: number, language: Language): Promise<CardDto> {
     const existingCard = await this.cardRepository.findOne({
       where: { id },
       relations: ['translations'],
@@ -45,7 +47,9 @@ export class CardService {
       throw new NotFoundException();
     }
     return CardDto.fromEntity(
-      language ? this.getTranslatedCard(existingCard, language) : existingCard,
+      language !== existingCard.locale
+        ? CardService.getTranslatedCard(existingCard, language)
+        : existingCard,
     );
   }
 
@@ -186,7 +190,7 @@ export class CardService {
     });
   }
 
-  private getTranslatedCard(card: Card, language: Language): Card {
+  static getTranslatedCard(card: Card, language: Language): Card {
     const isTranslation = card.translations
       .map((translation) => translation.locale)
       .includes(language);

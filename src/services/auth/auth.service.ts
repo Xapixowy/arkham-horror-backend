@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { User } from '@Entities/user.entity';
 import { RegisterUserRequest } from '@Requests/user/register-user.request';
 import { UserExistsException } from '@Exceptions/user/user-exists.exception';
@@ -25,8 +24,6 @@ import { Language } from '@Enums/language';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
     private dataSource: DataSource,
     private configService: ConfigService,
     private jwtService: JwtService,
@@ -35,7 +32,7 @@ export class AuthService {
 
   async register(
     user: RegisterUserRequest,
-    language?: Language,
+    language: Language,
   ): Promise<UserDto> {
     return this.dataSource.transaction(async (manager) => {
       if (user.password !== user.password_confirmation) {
@@ -126,7 +123,7 @@ export class AuthService {
 
   async remindPassword(
     user: RemindPasswordRequest,
-    language?: Language,
+    language: Language,
   ): Promise<UserDto> {
     return this.dataSource.transaction(async (manager) => {
       const existingUser = await manager.findOneBy(User, { email: user.email });

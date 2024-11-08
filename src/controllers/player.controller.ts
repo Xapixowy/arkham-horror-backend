@@ -1,12 +1,25 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ResponseHelper } from '@Helpers/response/response.helper';
 import { DataResponse } from '@Types/data-response.type';
-import { UserRoles } from '@Decorators/user-roles.decorator';
-import { UserRole } from '@Enums/user/user-role.enum';
 import { Public } from '@Decorators/public.decorator';
 import { GameSessionDto } from '@Dtos/game-session.dto';
 import { PlayerService } from '@Services/player/player.service';
 import { PlayerDto } from '@Dtos/player.dto';
+import { User } from '@Entities/user.entity';
+import { RequestUser } from '@Decorators/params/request-user.decorator';
+import { PlayerRoles } from '@Decorators/player-roles.decorator';
+import { PlayerRole } from '@Enums/player/player-role.enum';
+import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { Language } from '@Enums/language';
 
 @Controller('game-sessions/:gameSessionToken/players')
 export class PlayerController {
@@ -16,9 +29,22 @@ export class PlayerController {
   @Public()
   async index(
     @Param('gameSessionToken') gameSessionToken: string,
+    @RequestLanguage() language: Language,
   ): Promise<DataResponse<PlayerDto[]>> {
     return ResponseHelper.buildResponse(
-      await this.playerService.findAll(gameSessionToken),
+      await this.playerService.findAll(gameSessionToken, language),
+    );
+  }
+
+  @Get('me')
+  @Public()
+  async me(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @RequestUser() user: User,
+    @RequestLanguage() language: Language,
+  ): Promise<DataResponse<PlayerDto>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.findUserPlayer(gameSessionToken, user, language),
     );
   }
 
@@ -27,14 +53,43 @@ export class PlayerController {
   async show(
     @Param('gameSessionToken') gameSessionToken: string,
     @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
   ): Promise<DataResponse<PlayerDto>> {
     return ResponseHelper.buildResponse(
-      await this.playerService.findOne(gameSessionToken, playerToken),
+      await this.playerService.findOne(gameSessionToken, playerToken, language),
+    );
+  }
+
+  @Post()
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @RequestUser() user: User,
+    @Param('gameSessionToken') gameSessionToken: string,
+  ): Promise<DataResponse<PlayerDto>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.add(gameSessionToken, user),
+    );
+  }
+
+  @Put(':playerToken/renew-character')
+  @PlayerRoles(PlayerRole.HOST)
+  async renewCharacter(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
+  ): Promise<DataResponse<PlayerDto>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.renewCharacter(
+        gameSessionToken,
+        playerToken,
+        language,
+      ),
     );
   }
 
   @Delete(':token')
-  @UserRoles(UserRole.ADMIN)
+  @PlayerRoles(PlayerRole.HOST)
   async delete(
     @Param('token') token: string,
   ): Promise<DataResponse<GameSessionDto>> {

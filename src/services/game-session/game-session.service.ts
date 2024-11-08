@@ -8,16 +8,17 @@ import { User } from '@Entities/user.entity';
 import { StringHelper } from '@Helpers/string/string.helper';
 import { Player } from '@Entities/player.entity';
 import { PlayerService } from '../player/player.service';
+import { ConfigService } from '@nestjs/config';
+import { GameSessionsConfig } from '@Configs/game_sessions.config';
 
 @Injectable()
 export class GameSessionService {
   constructor(
     @InjectRepository(GameSession)
     private readonly gameSessionRepository: Repository<GameSession>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     private readonly dataSource: DataSource,
     private readonly playerService: PlayerService,
+    private readonly configService: ConfigService,
   ) {}
 
   async findAll(): Promise<GameSessionDto[]> {
@@ -46,7 +47,7 @@ export class GameSessionService {
     });
   }
 
-  async add(userId: number): Promise<GameSessionDto> {
+  async add(user: User | null): Promise<GameSessionDto> {
     return this.dataSource.transaction(async (manager) => {
       const token = await this.getUnusedToken();
 
@@ -59,7 +60,11 @@ export class GameSessionService {
 
       const newPlayer = manager.create(
         Player,
-        await this.playerService.generatePlayerObject(newGameSession, true),
+        await this.playerService.generatePlayerObject(
+          newGameSession,
+          true,
+          user,
+        ),
       );
 
       await manager.save(Player, newPlayer);
@@ -83,7 +88,12 @@ export class GameSessionService {
   }
 
   private async getUnusedToken(): Promise<string> {
-    const token = StringHelper.generateRandomString(6, {
+    const tokenLength =
+      this.configService.get<GameSessionsConfig>(
+        'gameSessions',
+      ).gameSessionTokenLength;
+
+    const token = StringHelper.generateRandomString(tokenLength, {
       symbols: false,
     }).toUpperCase();
 
