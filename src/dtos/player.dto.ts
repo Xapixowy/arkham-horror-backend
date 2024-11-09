@@ -4,21 +4,22 @@ import { PlayerRole } from '@Enums/player/player-role.enum';
 import { Status } from '@Types/player/status.type';
 import { UserDto } from '@Dtos/user.dto';
 import { CharacterDto } from '@Dtos/character.dto';
-import { CardDto } from '@Dtos/card.dto';
 import { Player } from '@Entities/player.entity';
 import { GameSessionDto } from '@Dtos/game-session.dto';
 import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { User } from '@Entities/user.entity';
 import { Character } from '@Entities/character.entity';
-import { Card } from '@Entities/card.entity';
 import { GameSession } from '@Entities/game-session.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { PlayerCard } from '@Entities/player-card.entity';
+import { PlayerCardDto } from '@Dtos/player-card.dto';
 
 export class PlayerDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     user: (user: User) => UserDto.fromEntity(user),
     character: (character: Character) => CharacterDto.fromEntity(character),
-    cards: (cards: Card[]) => cards.map((card) => CardDto.fromEntity(card)),
+    playerCards: (playerCards: PlayerCard[]) =>
+      playerCards.map((playerCard) => PlayerCardDto.fromEntity(playerCard)),
     game_session: (gameSession: GameSession) =>
       GameSessionDto.fromEntity(gameSession),
   };
@@ -34,7 +35,7 @@ export class PlayerDto {
     public updated_at: Date,
     public user?: UserDto,
     public character?: CharacterDto,
-    public cards?: CardDto[],
+    public playerCards?: PlayerCardDto[],
     public game_session?: GameSessionDto,
   ) {}
 
@@ -43,7 +44,7 @@ export class PlayerDto {
     properties?: {
       user?: true;
       character?: true;
-      cards?: true;
+      playerCards?: true;
       game_session?: true;
     },
   ): PlayerDto {

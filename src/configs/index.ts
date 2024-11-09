@@ -9,6 +9,7 @@ import { mailerConfig } from './mailer.config';
 import { appConfig } from './app.config';
 import { i18nConfig } from './i18n.config';
 import { gameSessionsConfig } from '@Configs/game_sessions.config';
+import { regexConfig } from '@Configs/regex.config';
 
 export const configs: ConfigFactory[] = [
   appConfig,
@@ -21,4 +22,5 @@ export const configs: ConfigFactory[] = [
   mailerConfig,
   i18nConfig,
   gameSessionsConfig,
+  regexConfig,
 ];

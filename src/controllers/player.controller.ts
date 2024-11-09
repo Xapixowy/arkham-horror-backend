@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -20,6 +21,9 @@ import { PlayerRoles } from '@Decorators/player-roles.decorator';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { RequestLanguage } from '@Decorators/params/request-language.decorator';
 import { Language } from '@Enums/language';
+import { PlayerCardDto } from '@Dtos/player-card.dto';
+import { AssignPlayerCardsRequest } from '@Requests/player/assign-player-cards.request';
+import { RemovePlayerCardsRequest } from '@Requests/player/remove-player-cards.request';
 
 @Controller('game-sessions/:gameSessionToken/players')
 export class PlayerController {
@@ -73,7 +77,7 @@ export class PlayerController {
   }
 
   @Put(':playerToken/renew-character')
-  @PlayerRoles(PlayerRole.HOST)
+  @Public()
   async renewCharacter(
     @Param('gameSessionToken') gameSessionToken: string,
     @Param('playerToken') playerToken: string,
@@ -84,6 +88,42 @@ export class PlayerController {
         gameSessionToken,
         playerToken,
         language,
+      ),
+    );
+  }
+
+  @Put(':playerToken/assign-cards')
+  @Public()
+  async assignCards(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
+    @Body() assignPlayerCardsRequest: AssignPlayerCardsRequest,
+  ): Promise<DataResponse<PlayerCardDto[]>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.assignCards(
+        gameSessionToken,
+        playerToken,
+        language,
+        assignPlayerCardsRequest.cardIds,
+      ),
+    );
+  }
+
+  @Put(':playerToken/remove-cards')
+  @Public()
+  async removeCards(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
+    @Body() removePlayerCardsRequest: RemovePlayerCardsRequest,
+  ): Promise<DataResponse<PlayerCardDto[]>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.removeCards(
+        gameSessionToken,
+        playerToken,
+        language,
+        removePlayerCardsRequest.cardIds,
       ),
     );
   }

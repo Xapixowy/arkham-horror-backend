@@ -6,7 +6,7 @@ import { Character } from '@Entities/character.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class CharacterTranslationDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     character: (character: Character) => CharacterDto.fromEntity(character),
   };
 

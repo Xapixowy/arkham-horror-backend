@@ -10,8 +10,8 @@ import { Language } from '@Enums/language';
 import { CardTranslation } from '@Entities/card-translation.entity';
 import { CardType } from '@Enums/card/card.type';
 import { CardSubtype } from '@Enums/card/card.subtype';
-import { Player } from '@Entities/player.entity';
 import { Character } from '@Entities/character.entity';
+import { PlayerCard } from '@Entities/player-card.entity';
 
 @Entity()
 export class Card {
@@ -92,6 +92,8 @@ export class Card {
   @ManyToMany(() => Character, (character) => character.cards)
   characters?: Character[];
 
-  @ManyToMany(() => Player, (player) => player.cards)
-  players?: Player[];
+  @OneToMany(() => PlayerCard, (playerCard) => playerCard.card, {
+    cascade: true,
+  })
+  playerCards?: PlayerCard[];
 }

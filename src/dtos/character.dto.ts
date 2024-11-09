@@ -14,7 +14,7 @@ import { Player } from '@Entities/player.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class CharacterDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     translations: (translations: CharacterTranslation[]) =>
       translations.map((translation) =>
         CharacterTranslationDto.fromEntity(translation),

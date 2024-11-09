@@ -6,22 +6,22 @@ import { CardSubtype } from '@Enums/card/card.subtype';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 import { CardTranslationDto } from '@Dtos/card-translation.dto';
 import { CharacterDto } from '@Dtos/character.dto';
-import { PlayerDto } from '@Dtos/player.dto';
 import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { CardTranslation } from '@Entities/card-translation.entity';
 import { Character } from '@Entities/character.entity';
-import { Player } from '@Entities/player.entity';
+import { PlayerCard } from '@Entities/player-card.entity';
+import { PlayerCardDto } from '@Dtos/player-card.dto';
 
 export class CardDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     translations: (translations: CardTranslation[]) =>
       translations.map((translation) =>
         CardTranslationDto.fromEntity(translation),
       ),
     characters: (characters: Character[]) =>
       characters.map((character) => CharacterDto.fromEntity(character)),
-    players: (players: Player[]) =>
-      players.map((player) => PlayerDto.fromEntity(player)),
+    playerCards: (playerCards: PlayerCard[]) =>
+      playerCards.map((playerCard) => PlayerCardDto.fromEntity(playerCard)),
   };
 
   constructor(
@@ -39,7 +39,7 @@ export class CardDto {
     public update_at: Date,
     public translations?: CardTranslationDto[],
     public characters?: CharacterDto[],
-    public players?: PlayerDto[],
+    public playerCards?: PlayerCardDto[],
   ) {}
 
   static fromEntity(

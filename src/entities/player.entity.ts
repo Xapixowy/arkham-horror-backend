@@ -2,19 +2,18 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '@Entities/user.entity';
 import { Character } from '@Entities/character.entity';
-import { Card } from '@Entities/card.entity';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { Equipment } from '@Types/player/equipment.type';
 import { Statistics } from '@Types/player/statistics.type';
 import { Status } from '@Types/player/status.type';
 import { GameSession } from '@Entities/game-session.entity';
+import { PlayerCard } from '@Entities/player-card.entity';
 
 @Entity()
 export class Player {
@@ -72,18 +71,10 @@ export class Player {
   @JoinColumn({ name: 'character_id' })
   character?: Character | null;
 
-  @ManyToMany(() => Card, (card) => card.players, { nullable: true })
-  @JoinTable({
-    joinColumn: {
-      name: 'player_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'card_id',
-      referencedColumnName: 'id',
-    },
+  @OneToMany(() => PlayerCard, (playerCard) => playerCard.player, {
+    cascade: true,
   })
-  cards?: Card[];
+  playerCards?: PlayerCard[];
 
   @ManyToOne(() => GameSession, (gameSession) => gameSession.id, {
     onDelete: 'CASCADE',

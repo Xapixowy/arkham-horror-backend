@@ -24,11 +24,7 @@ export class PlayerRolesGuard implements CanActivate {
 
     const { user, params } = context.switchToHttp().getRequest();
 
-    if (!params?.gameSessionToken) {
-      return false;
-    }
-
-    if (!user) {
+    if (!params?.gameSessionToken || !user) {
       return false;
     }
 

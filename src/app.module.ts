@@ -9,14 +9,13 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { I18nModule } from 'nestjs-i18n';
 import { i18nResolvers } from '@Configs/i18n.config';
 import { JwtModule } from '@nestjs/jwt';
-import { UserService } from '@Services/user/user.service';
-import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@Guards/auth.guard';
-import { UserRolesGuard } from '@Guards/user-roles.guard';
-import { PlayerRolesGuard } from '@Guards/player-roles.guard';
-import { UserModule } from '@Modules/user.module';
 import { UserMiddleware } from '@Middlewares/user.middleware';
 import { LanguageMiddleware } from '@Middlewares/language.middleware';
+import { UserModule } from '@Modules/user.module';
+import { UserRolesGuard } from '@Guards/user-roles.guard';
+import { PlayerRolesGuard } from '@Guards/player-roles.guard';
+import { PlayerOwnerGuard } from '@Guards/player-owner.guard';
 
 @Module({
   imports: [
@@ -65,9 +64,7 @@ import { LanguageMiddleware } from '@Middlewares/language.middleware';
   providers: [
     {
       provide: 'APP_GUARD',
-      useFactory: (userService: UserService, reflector: Reflector) =>
-        new AuthGuard(userService, reflector),
-      inject: [UserService, Reflector],
+      useClass: AuthGuard,
     },
     {
       provide: 'APP_GUARD',
@@ -76,6 +73,10 @@ import { LanguageMiddleware } from '@Middlewares/language.middleware';
     {
       provide: 'APP_GUARD',
       useClass: PlayerRolesGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: PlayerOwnerGuard,
     },
   ],
 })

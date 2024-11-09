@@ -9,10 +9,18 @@ import { Player } from '@Entities/player.entity';
 import { PlayerController } from '@Controllers/player.controller';
 import { Character } from '@Entities/character.entity';
 import { Card } from '@Entities/card.entity';
+import { PlayerCard } from '@Entities/player-card.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GameSession, User, Player, Character, Card]),
+    TypeOrmModule.forFeature([
+      GameSession,
+      User,
+      Player,
+      Character,
+      Card,
+      PlayerCard,
+    ]),
   ],
   controllers: [GameSessionController, PlayerController],
   providers: [GameSessionService, PlayerService],

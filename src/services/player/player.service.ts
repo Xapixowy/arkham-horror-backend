@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { NotFoundException } from '@Exceptions/not-found.exception';
 import { GameSession } from '@Entities/game-session.entity';
 import { User } from '@Entities/user.entity';
@@ -17,6 +17,11 @@ import { Language } from '@Enums/language';
 import { AppConfig } from '@Configs/app.config';
 import { CharacterService } from '@Services/character/character.service';
 import { CardService } from '@Services/card/card.service';
+import { Card } from '@Entities/card.entity';
+import { PlayerCard } from '@Entities/player-card.entity';
+import { PlayerCardDto } from '@Dtos/player-card.dto';
+import { RegexConfig } from '@Configs/regex.config';
+import { PlayerTokenInvalidException } from '@Exceptions/player/player-token-invalid.exception';
 
 @Injectable()
 export class PlayerService {
@@ -27,6 +32,8 @@ export class PlayerService {
     private readonly gameSessionRepository: Repository<GameSession>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
+    @InjectRepository(Card)
+    private readonly cardRepository: Repository<Card>,
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
   ) {}
@@ -43,8 +50,9 @@ export class PlayerService {
         'user',
         'character',
         'character.translations',
-        'cards',
-        'cards.translations',
+        'playerCards',
+        'playerCards.card',
+        'playerCards.card.translations',
       ],
     });
 
@@ -54,7 +62,7 @@ export class PlayerService {
         PlayerDto.fromEntity(player, {
           user: true,
           character: true,
-          cards: true,
+          playerCards: true,
         }),
       );
   }
@@ -72,7 +80,7 @@ export class PlayerService {
     return PlayerDto.fromEntity(translatedPlayer, {
       user: true,
       character: true,
-      cards: true,
+      playerCards: true,
     });
   }
 
@@ -187,6 +195,120 @@ export class PlayerService {
     });
   }
 
+  async assignCards(
+    gameSessionToken: string,
+    playerToken: string,
+    language: Language,
+    cardIds: number[],
+  ): Promise<PlayerCardDto[]> {
+    await this.getGameSession(gameSessionToken);
+    const existingPlayer = await this.getPlayer(playerToken);
+
+    return this.dataSource.transaction(async (manager) => {
+      const cardsToAssign = await this.cardRepository.find({
+        where: { id: In(cardIds) },
+        relations: ['translations'],
+      });
+
+      const cardsToAssignWithQuantity = cardsToAssign.map((card) => ({
+        card,
+        quantity: cardIds.filter((cardId) => cardId === card.id).length,
+      }));
+
+      const existingPlayerCardsMap = new Map(
+        existingPlayer.playerCards.map((playerCard) => [
+          playerCard.card.id,
+          playerCard,
+        ]),
+      );
+
+      const combinedPlayerCardsMap = cardsToAssignWithQuantity.map(
+        (cardToAssignWithQuantity) => {
+          const existingCard = existingPlayerCardsMap.get(
+            cardToAssignWithQuantity.card.id,
+          );
+
+          if (existingCard) {
+            existingCard.quantity += cardToAssignWithQuantity.quantity;
+            return existingCard;
+          } else {
+            return manager.create(PlayerCard, {
+              ...cardToAssignWithQuantity,
+              player: existingPlayer,
+            });
+          }
+        },
+      );
+
+      const allPlayerCards = [
+        ...combinedPlayerCardsMap,
+        ...existingPlayer.playerCards.filter(
+          (playerCard) =>
+            !combinedPlayerCardsMap.some((card) => card.id === playerCard.id),
+        ),
+      ];
+
+      await manager.save(PlayerCard, allPlayerCards);
+
+      return allPlayerCards.map((playerCard) =>
+        PlayerCardDto.fromEntity(
+          {
+            ...playerCard,
+            card: CardService.getTranslatedCard(playerCard.card, language),
+          },
+          {
+            card: true,
+          },
+        ),
+      );
+    });
+  }
+
+  async removeCards(
+    gameSessionToken: string,
+    playerToken: string,
+    language: Language,
+    cardIds: number[],
+  ): Promise<PlayerCardDto[]> {
+    await this.getGameSession(gameSessionToken);
+    const existingPlayer = await this.getPlayer(playerToken);
+
+    return this.dataSource.transaction(async (manager) => {
+      const existingPlayerCardsMap = new Map(
+        existingPlayer.playerCards.map((playerCard) => [
+          playerCard.card.id,
+          playerCard,
+        ]),
+      );
+
+      for (const cardId of cardIds) {
+        const playerCard = existingPlayerCardsMap.get(cardId);
+
+        if (playerCard && playerCard.quantity > 1) {
+          playerCard.quantity -= 1;
+          await manager.save(PlayerCard, playerCard);
+        } else if (playerCard) {
+          await manager.remove(PlayerCard, playerCard);
+          existingPlayerCardsMap.delete(cardId);
+        }
+      }
+
+      const remainingPlayerCards = Array.from(existingPlayerCardsMap.values());
+
+      return remainingPlayerCards.map((playerCard) =>
+        PlayerCardDto.fromEntity(
+          {
+            ...playerCard,
+            card: CardService.getTranslatedCard(playerCard.card, language),
+          },
+          {
+            card: true,
+          },
+        ),
+      );
+    });
+  }
+
   async generatePlayerObject(
     gameSession: GameSession,
     isHost: boolean = true,
@@ -219,10 +341,11 @@ export class PlayerService {
       );
     }
 
-    if (player.cards) {
-      translatedPlayer.cards = player.cards.map((card) =>
-        CardService.getTranslatedCard(card, language),
-      );
+    if (player.playerCards) {
+      translatedPlayer.playerCards = player.playerCards.map((playerCard) => ({
+        ...playerCard,
+        card: CardService.getTranslatedCard(playerCard.card, language),
+      }));
     }
 
     return translatedPlayer;
@@ -284,10 +407,17 @@ export class PlayerService {
       'user',
       'character',
       'character.translations',
-      'cards',
-      'cards.translations',
+      'playerCards',
+      'playerCards.card',
+      'playerCards.card.translations',
     ],
   ): Promise<Player> {
+    const uuidRegex = this.configService.get<RegexConfig>('regex').uuid;
+
+    if (!uuidRegex.test(token)) {
+      throw new PlayerTokenInvalidException();
+    }
+
     const existingPlayer = await this.playerRepository.findOne({
       where: { token },
       relations,
@@ -307,8 +437,9 @@ export class PlayerService {
       'user',
       'character',
       'character.translations',
-      'cards',
-      'cards.translations',
+      'playerCards',
+      'playerCards.card',
+      'playerCards.card.translations',
     ],
   ): Promise<Player> {
     const existingPlayer = await this.playerRepository.findOne({
