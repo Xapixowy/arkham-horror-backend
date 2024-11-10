@@ -14,7 +14,7 @@ import { UserRole } from '@Enums/user/user-role.enum';
 import { Public } from '@Decorators/public.decorator';
 import { GameSessionService } from '@Services/game-session/game-session.service';
 import { GameSessionDto } from '@Dtos/game-session.dto';
-import { RequestUser } from '@Decorators/params/request-user.decorator';
+import { RequestUser } from '@Decorators/param/request-user.decorator';
 import { User } from '@Entities/user.entity';
 
 @Controller('game-sessions')

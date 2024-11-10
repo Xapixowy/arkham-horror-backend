@@ -19,7 +19,7 @@ import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
 import { ConfigService } from '@nestjs/config';
 import { Public } from '@Decorators/public.decorator';
-import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { RequestLanguage } from '@Decorators/param/request-language.decorator';
 import { Language } from '@Enums/language';
 
 @Controller('auth')

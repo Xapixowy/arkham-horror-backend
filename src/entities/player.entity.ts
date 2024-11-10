@@ -35,21 +35,18 @@ export class Player {
 
   @Column({
     type: 'json',
-    nullable: true,
   })
-  status?: Status | null;
+  status: Status;
 
   @Column({
     type: 'json',
-    nullable: true,
   })
-  equipment?: Equipment | null;
+  equipment: Equipment;
 
   @Column({
     type: 'json',
-    nullable: true,
   })
-  statistics?: Statistics | null;
+  statistics: Statistics;
 
   @Column({
     type: 'timestamp',

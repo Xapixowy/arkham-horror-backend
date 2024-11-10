@@ -22,7 +22,7 @@ import { UserRoles } from '@Decorators/user-roles.decorator';
 import { UserRole } from '@Enums/user/user-role.enum';
 import { Public } from '@Decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
-import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { RequestLanguage } from '@Decorators/param/request-language.decorator';
 import { Language } from '@Enums/language';
 
 @Controller('characters')

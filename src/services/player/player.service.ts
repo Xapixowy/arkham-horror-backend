@@ -22,6 +22,9 @@ import { PlayerCard } from '@Entities/player-card.entity';
 import { PlayerCardDto } from '@Dtos/player-card.dto';
 import { RegexConfig } from '@Configs/regex.config';
 import { PlayerTokenInvalidException } from '@Exceptions/player/player-token-invalid.exception';
+import { PlayerObject } from '@Types/player/player-object.type';
+import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
+import { ObjectHelper } from '@Helpers/object/object.helper';
 
 @Injectable()
 export class PlayerService {
@@ -288,8 +291,8 @@ export class PlayerService {
           playerCard.quantity -= 1;
           await manager.save(PlayerCard, playerCard);
         } else if (playerCard) {
-          await manager.remove(PlayerCard, playerCard);
           existingPlayerCardsMap.delete(cardId);
+          await manager.remove(PlayerCard, playerCard);
         }
       }
 
@@ -309,18 +312,59 @@ export class PlayerService {
     });
   }
 
+  async updatePlayer(
+    gameSessionToken: string,
+    playerToken: string,
+    language: Language,
+    updatePlayerRequest: UpdatePlayerRequest,
+  ): Promise<PlayerDto> {
+    await this.getGameSession(gameSessionToken);
+    const existingPlayer = await this.getPlayer(playerToken);
+
+    return this.dataSource.transaction(async (manager) => {
+      const updatedPlayer = await manager.save(
+        Player,
+        ObjectHelper.replaceDefinedValues(existingPlayer, updatePlayerRequest),
+      );
+      return PlayerDto.fromEntity(
+        this.getTranslatedPlayer(updatedPlayer, language),
+        {
+          character: true,
+        },
+      );
+    });
+  }
+
   async generatePlayerObject(
     gameSession: GameSession,
     isHost: boolean = true,
     user: User | null,
-  ): Promise<object> {
+  ): Promise<PlayerObject> {
     const token: string = await this.getUnusedToken();
+
+    const character = await this.getUnusedCharacterInGameSession(gameSession);
 
     return {
       token,
       user: user,
       game_session: gameSession,
-      character: await this.getUnusedCharacterInGameSession(gameSession),
+      character,
+      status: {
+        endurance: character.endurance,
+        sanity: character.sanity,
+      },
+      equipment: {
+        money: character.equipment.money,
+        clues: character.equipment.clues,
+      },
+      statistics: {
+        speed: character.statistics.speed[2],
+        sneak: character.statistics.speed[2],
+        prowess: character.statistics.speed[2],
+        will: character.statistics.speed[2],
+        knowledge: character.statistics.speed[2],
+        luck: character.statistics.speed[2],
+      },
       role: isHost ? PlayerRole.HOST : PlayerRole.PLAYER,
     };
   }

@@ -16,14 +16,15 @@ import { GameSessionDto } from '@Dtos/game-session.dto';
 import { PlayerService } from '@Services/player/player.service';
 import { PlayerDto } from '@Dtos/player.dto';
 import { User } from '@Entities/user.entity';
-import { RequestUser } from '@Decorators/params/request-user.decorator';
+import { RequestUser } from '@Decorators/param/request-user.decorator';
 import { PlayerRoles } from '@Decorators/player-roles.decorator';
 import { PlayerRole } from '@Enums/player/player-role.enum';
-import { RequestLanguage } from '@Decorators/params/request-language.decorator';
+import { RequestLanguage } from '@Decorators/param/request-language.decorator';
 import { Language } from '@Enums/language';
 import { PlayerCardDto } from '@Dtos/player-card.dto';
 import { AssignPlayerCardsRequest } from '@Requests/player/assign-player-cards.request';
 import { RemovePlayerCardsRequest } from '@Requests/player/remove-player-cards.request';
+import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
 
 @Controller('game-sessions/:gameSessionToken/players')
 export class PlayerController {
@@ -124,6 +125,24 @@ export class PlayerController {
         playerToken,
         language,
         removePlayerCardsRequest.cardIds,
+      ),
+    );
+  }
+
+  @Put(':playerToken/update-player')
+  @Public()
+  async updatePlayer(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
+    @Body() updatePlayerRequest: UpdatePlayerRequest,
+  ): Promise<DataResponse<PlayerDto>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.updatePlayer(
+        gameSessionToken,
+        playerToken,
+        language,
+        updatePlayerRequest,
       ),
     );
   }

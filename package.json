@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "loc": "git ls-files | grep -vE 'package-lock.json|\\.jpg|\\.jpeg|\\.png|\\.gif|\\.svg$' | xargs wc -l | grep total",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
