@@ -13,6 +13,7 @@ import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
 import { EnumHelper } from '@Helpers/enum/enum.helper';
 import { Player } from '@Entities/player.entity';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
+import { PlayerDto } from '@Dtos/player.dto';
 
 @Injectable()
 export class GameSessionService {
@@ -109,7 +110,10 @@ export class GameSessionService {
   }
 
   async nextPhase(token: string): Promise<GameSessionDto> {
-    const gameSession = await this.getGameSession(token);
+    const gameSession = await this.getGameSession(token, [
+      'players',
+      'players.character',
+    ]);
 
     return this.dataSource.transaction(async (manager) => {
       const phases = EnumHelper.getValues(GameSessionPhase) as number[];
@@ -124,6 +128,8 @@ export class GameSessionService {
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
+      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+
       const updatedPlayers = gameSession.players.map((player) => ({
         ...player,
         statistics: {
@@ -132,9 +138,15 @@ export class GameSessionService {
         },
       }));
 
-      await manager.save(Player, updatedPlayers);
+      const updatedPlayerEntities = await manager.save(Player, updatedPlayers);
 
-      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+      updatedPlayerEntities.forEach((player) =>
+        this.gameSessionsGateway.emitPlayerUpdatedEvent(
+          PlayerDto.fromEntity(player, {
+            character: true,
+          }),
+        ),
+      );
 
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,

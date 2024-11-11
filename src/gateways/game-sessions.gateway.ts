@@ -10,6 +10,7 @@ import { WebSocketEvent } from '@Enums/websocket/websocket-event.enum';
 import { ResponseHelper } from '@Helpers/response/response.helper';
 import { forwardRef, Inject } from '@nestjs/common';
 import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
+import { PlayerDto } from '@Dtos/player.dto';
 
 @WebSocketGateway({
   namespace: new RegExp(WebSocketNamespace.GAME_SESSION),
@@ -34,8 +35,14 @@ export class GameSessionsGateway implements OnGatewayConnection {
   }
 
   emitPhaseChangedEvent(phase: GameSessionPhase): void {
-    this.emitEvent(WebSocketEvent.GAME_SESSION_PHASE_CHANGED, {
+    this.emitEvent(WebSocketEvent.GAME_SESSION_PHASE_UPDATED, {
       phase,
+    });
+  }
+
+  emitPlayerUpdatedEvent(playerDto: PlayerDto): void {
+    this.emitEvent(WebSocketEvent.PLAYER_UPDATED, {
+      player: playerDto,
     });
   }
 

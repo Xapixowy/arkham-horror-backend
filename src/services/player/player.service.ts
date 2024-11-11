@@ -26,6 +26,7 @@ import { PlayerObject } from '@Types/player/player-object.type';
 import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
 import { ObjectHelper } from '@Helpers/object/object.helper';
 import { StatisticsService } from '@Services/statistics/statistics.service';
+import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 
 @Injectable()
 export class PlayerService {
@@ -40,6 +41,7 @@ export class PlayerService {
     private readonly cardRepository: Repository<Card>,
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
+    private readonly gameSessionsGateway: GameSessionsGateway,
   ) {}
 
   async findAll(
@@ -187,6 +189,12 @@ export class PlayerService {
           characters_played: existingPlayer.statistics.characters_played + 1,
         },
       });
+
+      this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        PlayerDto.fromEntity(updatedPlayer, {
+          character: true,
+        }),
+      );
 
       const translatedPlayer = this.getTranslatedPlayer(
         updatedPlayer,
@@ -367,6 +375,13 @@ export class PlayerService {
 
     return this.dataSource.transaction(async (manager) => {
       const updatedPlayer = await manager.save(Player, newPlayer);
+
+      this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        PlayerDto.fromEntity(updatedPlayer, {
+          character: true,
+        }),
+      );
+
       return PlayerDto.fromEntity(
         this.getTranslatedPlayer(updatedPlayer, language),
         {
