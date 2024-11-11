@@ -16,6 +16,8 @@ import { UserRolesGuard } from '@Guards/user-roles.guard';
 import { PlayerRolesGuard } from '@Guards/player-roles.guard';
 import { PlayerOwnerGuard } from '@Guards/player-owner.guard';
 import { PlayerMiddleware } from '@Middlewares/player.middleware';
+import { APP_GUARD } from '@nestjs/core';
+import { UserOwnerGuard } from '@Guards/user-owner.guard';
 
 @Module({
   imports: [
@@ -62,20 +64,24 @@ import { PlayerMiddleware } from '@Middlewares/player.middleware';
   ],
   providers: [
     {
-      provide: 'APP_GUARD',
+      provide: APP_GUARD,
       useClass: AuthGuard,
     },
     {
-      provide: 'APP_GUARD',
+      provide: APP_GUARD,
       useClass: UserRolesGuard,
     },
     {
-      provide: 'APP_GUARD',
+      provide: APP_GUARD,
       useClass: PlayerRolesGuard,
     },
     {
-      provide: 'APP_GUARD',
+      provide: APP_GUARD,
       useClass: PlayerOwnerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: UserOwnerGuard,
     },
   ],
 })

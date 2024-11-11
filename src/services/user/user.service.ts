@@ -7,6 +7,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtUser } from '@Types/user/jwt-user.type';
 import { JwtConfig } from '@Configs/jwt.config';
 import { UserDto } from '@Dtos/user.dto';
+import { Statistics } from '@Types/user/statistics.type';
+import { StatisticsService } from '@Services/statistics/statistics.service';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 
 @Injectable()
 export class UserService {
@@ -17,21 +20,20 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  async findOne(token: string): Promise<UserDto | null> {
-    const user = await this.getUserByJwtToken(token);
-
-    if (!user) {
-      return null;
-    }
+  async findOne(userId: number): Promise<UserDto> {
+    const user = await this.getUser(userId);
 
     return UserDto.fromEntity(user);
   }
 
-  async getUser(id: number, relations: string[] = []): Promise<User | null> {
-    return await this.userRepository.findOne({
-      where: { id },
-      relations,
-    });
+  async getUserStatistics(userId: number): Promise<Statistics | null> {
+    const user = await this.getUser(userId, ['players']);
+
+    if (!user.players) {
+      return null;
+    }
+
+    return StatisticsService.generateUserStatistics(user.players);
   }
 
   async getUserByJwtToken(
@@ -90,5 +92,21 @@ export class UserService {
     } catch {
       return null;
     }
+  }
+
+  private async getUser(
+    userId: number,
+    relations: string[] = [],
+  ): Promise<User> {
+    const existingUser = await this.userRepository.findOne({
+      where: { id: userId },
+      relations,
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException();
+    }
+
+    return existingUser;
   }
 }

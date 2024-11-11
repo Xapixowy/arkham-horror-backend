@@ -13,7 +13,7 @@ import { GameSession } from '@Entities/game-session.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 import { PlayerCard } from '@Entities/player-card.entity';
 import { PlayerCardDto } from '@Dtos/player-card.dto';
-import { PlayerStatistics } from '@Types/player/statistics.type';
+import { Statistics } from '@Types/player/statistics.type';
 
 export class PlayerDto {
   private static readonly typeMapping: DTOTypeMapping = {
@@ -32,7 +32,7 @@ export class PlayerDto {
     public status: Status,
     public equipment: Equipment,
     public attributes: Attributes,
-    public statistics: PlayerStatistics,
+    public statistics: Statistics,
     public created_at: Date,
     public updated_at: Date,
     public user?: UserDto,

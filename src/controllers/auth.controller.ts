@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  Request,
 } from '@nestjs/common';
 import { AuthService } from '@Services/auth/auth.service';
 import { RegisterUserRequest } from '@Requests/user/register-user.request';
@@ -21,6 +20,8 @@ import { ConfigService } from '@nestjs/config';
 import { Public } from '@Decorators/public.decorator';
 import { RequestLanguage } from '@Decorators/param/request-language.decorator';
 import { Language } from '@Enums/language';
+import { RequestUser } from '@Decorators/param/request-user.decorator';
+import { User } from '@Entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -81,7 +82,7 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@Request() request): Promise<DataResponse<UserDto>> {
-    return ResponseHelper.buildResponse(request['user']);
+  async me(@RequestUser() user: User): Promise<DataResponse<UserDto>> {
+    return ResponseHelper.buildResponse(user);
   }
 }

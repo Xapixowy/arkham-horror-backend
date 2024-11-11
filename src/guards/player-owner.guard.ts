@@ -1,15 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserService } from '@Services/user/user.service';
 import { PLAYER_OWNER_KEY } from '@Decorators/player-owner.decorator';
 import { UserRole } from '@Enums/user/user-role.enum';
 
 @Injectable()
 export class PlayerOwnerGuard implements CanActivate {
-  constructor(
-    private readonly userService: UserService,
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const playerOwner = this.reflector.getAllAndOverride<boolean>(

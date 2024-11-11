@@ -11,4 +11,6 @@ export type Statistics = {
   cards_lost: number;
   phases_played: number;
   characters_played: number;
+  game_session_played: number;
+  game_session_created: number;
 };

@@ -14,7 +14,7 @@ import { Attributes } from '@Types/player/attributes.type';
 import { Status } from '@Types/player/status.type';
 import { GameSession } from '@Entities/game-session.entity';
 import { PlayerCard } from '@Entities/player-card.entity';
-import { PlayerStatistics } from '@Types/player/statistics.type';
+import { Statistics } from '@Types/player/statistics.type';
 
 @Entity()
 export class Player {
@@ -66,7 +66,7 @@ export class Player {
       characters_played: 0,
     },
   })
-  statistics: PlayerStatistics;
+  statistics: Statistics;
 
   @Column({
     type: 'timestamp',
