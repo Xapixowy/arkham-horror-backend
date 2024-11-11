@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ResponseHelper } from '@Helpers/response/response.helper';
 import { DataResponse } from '@Types/data-response.type';
@@ -16,6 +17,8 @@ import { GameSessionService } from '@Services/game-session/game-session.service'
 import { GameSessionDto } from '@Dtos/game-session.dto';
 import { RequestUser } from '@Decorators/param/request-user.decorator';
 import { User } from '@Entities/user.entity';
+import { PlayerRole } from '@Enums/player/player-role.enum';
+import { PlayerRoles } from '@Decorators/player-roles.decorator';
 
 @Controller('game-sessions')
 export class GameSessionController {
@@ -57,6 +60,39 @@ export class GameSessionController {
   ): Promise<DataResponse<GameSessionDto>> {
     return ResponseHelper.buildResponse(
       await this.gameSessionService.remove(token),
+    );
+  }
+
+  @Put(':gameSessionToken/reset-phase')
+  @Public()
+  @PlayerRoles(PlayerRole.HOST)
+  async resetPhase(
+    @Param('gameSessionToken') token: string,
+  ): Promise<DataResponse<GameSessionDto>> {
+    return ResponseHelper.buildResponse(
+      await this.gameSessionService.resetPhase(token),
+    );
+  }
+
+  @Put(':gameSessionToken/next-phase')
+  @Public()
+  @PlayerRoles(PlayerRole.HOST)
+  async nextPhase(
+    @Param('gameSessionToken') token: string,
+  ): Promise<DataResponse<GameSessionDto>> {
+    return ResponseHelper.buildResponse(
+      await this.gameSessionService.nextPhase(token),
+    );
+  }
+
+  @Put(':gameSessionToken/previous-phase')
+  @Public()
+  @PlayerRoles(PlayerRole.HOST)
+  async previousPhase(
+    @Param('gameSessionToken') token: string,
+  ): Promise<DataResponse<GameSessionDto>> {
+    return ResponseHelper.buildResponse(
+      await this.gameSessionService.previousPhase(token),
     );
   }
 }

@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   Min,
@@ -11,7 +12,7 @@ import {
 } from 'class-validator';
 import { Expansion } from '@Enums/expansion.enum';
 import { Type } from 'class-transformer';
-import { CreateCharacterStatisticsRequest } from '@Requests/character/create-character-statistics.request';
+import { CreateCharacterAttributesRequest } from '@Requests/character/create-character-attributes.request';
 import { CreateCharacterSkillRequest } from '@Requests/character/create-character-skill.request';
 import { CreateCharacterEquipmentRequest } from '@Requests/character/create-character-equipment.request';
 
@@ -48,9 +49,9 @@ export class CreateCharacterRequest {
   concentration: number;
 
   @ValidateNested()
-  @Type(() => CreateCharacterStatisticsRequest)
+  @Type(() => CreateCharacterAttributesRequest)
   @IsNotEmpty()
-  statistics: CreateCharacterStatisticsRequest;
+  attributes: CreateCharacterAttributesRequest;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -62,4 +63,9 @@ export class CreateCharacterRequest {
   @Type(() => CreateCharacterEquipmentRequest)
   @IsNotEmpty()
   equipment: CreateCharacterEquipmentRequest;
+
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  cardIds: number[];
 }

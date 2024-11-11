@@ -1,17 +1,11 @@
-import {
-  Column,
-  Entity,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { StatisticModifier } from '@Types/card/statistic-modifier.type';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { AttributeModifier } from '@Types/card/attribute-modifier.type';
 import { Language } from '@Enums/language';
 import { CardTranslation } from '@Entities/card-translation.entity';
 import { CardType } from '@Enums/card/card.type';
 import { CardSubtype } from '@Enums/card/card.subtype';
-import { Character } from '@Entities/character.entity';
 import { PlayerCard } from '@Entities/player-card.entity';
+import { CharacterCard } from '@Entities/character-card.entity';
 
 @Entity()
 export class Card {
@@ -46,7 +40,7 @@ export class Card {
     type: 'json',
     nullable: true,
   })
-  statistic_modifiers?: StatisticModifier[] | null;
+  attribute_modifiers?: AttributeModifier[] | null;
 
   @Column({
     type: 'integer',
@@ -89,8 +83,10 @@ export class Card {
   })
   translations?: CardTranslation[];
 
-  @ManyToMany(() => Character, (character) => character.cards)
-  characters?: Character[];
+  @OneToMany(() => CharacterCard, (characterCard) => characterCard.card, {
+    cascade: true,
+  })
+  characterCards?: CharacterCard[];
 
   @OneToMany(() => PlayerCard, (playerCard) => playerCard.card, {
     cascade: true,

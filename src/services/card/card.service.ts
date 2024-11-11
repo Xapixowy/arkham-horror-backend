@@ -28,6 +28,9 @@ export class CardService {
   async findAll(language: Language): Promise<CardDto[]> {
     const cards = await this.cardRepository.find({
       relations: ['translations'],
+      order: {
+        id: 'ASC',
+      },
     });
     return cards.map((card) =>
       CardDto.fromEntity(

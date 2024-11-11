@@ -3,7 +3,7 @@ import { GameSession } from '@Entities/game-session.entity';
 import { Character } from '@Entities/character.entity';
 import { Status } from '@Types/player/status.type';
 import { Equipment } from '@Types/player/equipment.type';
-import { Statistics } from '@Types/player/statistics.type';
+import { Attributes } from '@Types/player/attributes.type';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 
 export type PlayerObject = {
@@ -13,6 +13,6 @@ export type PlayerObject = {
   character: Character;
   status: Status;
   equipment: Equipment;
-  statistics: Statistics;
+  attributes: Attributes;
   role: PlayerRole;
 };

@@ -10,10 +10,11 @@ import { User } from '@Entities/user.entity';
 import { Character } from '@Entities/character.entity';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { Equipment } from '@Types/player/equipment.type';
-import { Statistics } from '@Types/player/statistics.type';
+import { Attributes } from '@Types/player/attributes.type';
 import { Status } from '@Types/player/status.type';
 import { GameSession } from '@Entities/game-session.entity';
 import { PlayerCard } from '@Entities/player-card.entity';
+import { PlayerStatistics } from '@Types/player/statistics.type';
 
 @Entity()
 export class Player {
@@ -46,7 +47,26 @@ export class Player {
   @Column({
     type: 'json',
   })
-  statistics: Statistics;
+  attributes: Attributes;
+
+  @Column({
+    type: 'json',
+    default: {
+      money_acquired: 0,
+      money_lost: 0,
+      clues_acquired: 0,
+      clues_lost: 0,
+      endurance_acquired: 0,
+      endurance_lost: 0,
+      sanity_acquired: 0,
+      sanity_lost: 0,
+      cards_acquired: 0,
+      cards_lost: 0,
+      phases_played: 0,
+      characters_played: 0,
+    },
+  })
+  statistics: PlayerStatistics;
 
   @Column({
     type: 'timestamp',

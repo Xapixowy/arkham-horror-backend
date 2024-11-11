@@ -1,31 +1,31 @@
 import { Card } from '@Entities/card.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
-import { PlayerDto } from '@Dtos/player.dto';
 import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
-import { Player } from '@Entities/player.entity';
-import { PlayerCard } from '@Entities/player-card.entity';
 import { CardDto } from '@Dtos/card.dto';
+import { Character } from '@Entities/character.entity';
+import { CharacterDto } from '@Dtos/character.dto';
+import { CharacterCard } from '@Entities/character-card.entity';
 
-export class PlayerCardDto {
+export class CharacterCardDto {
   private static readonly typeMapping: DTOTypeMapping = {
-    player: (player: Player) => PlayerDto.fromEntity(player),
+    character: (character: Character) => CharacterDto.fromEntity(character),
     card: (card: Card) => CardDto.fromEntity(card),
   };
 
   constructor(
     public id: number,
     public quantity: number,
-    public player?: PlayerDto,
+    public character?: CharacterDto,
     public card?: CardDto,
   ) {}
 
   static fromEntity(
-    playerCard: PlayerCard,
-    properties?: { player?: true; card?: true },
-  ): PlayerCardDto {
+    characterCard: CharacterCard,
+    properties?: { character?: true; card?: true },
+  ): CharacterCardDto {
     return DtoHelper.populateDtoWithOptionalProperties(
-      new PlayerCardDto(playerCard.id, playerCard.quantity),
-      playerCard,
+      new CharacterCardDto(characterCard.id, characterCard.quantity),
+      characterCard,
       this.typeMapping,
       properties,
     );

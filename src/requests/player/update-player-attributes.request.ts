@@ -1,9 +1,9 @@
 import { IsNumber, ValidateIf } from 'class-validator';
-import { Statistics } from '@Types/player/statistics.type';
+import { Attributes } from '@Types/player/attributes.type';
 import { ValidatorHelper } from '@Helpers/validator/validator.helper';
 import { IsGroupDefined } from '@Decorators/validation/is-group-defined.decorator';
 
-export class UpdatePlayerStatisticsRequest implements Partial<Statistics> {
+export class UpdatePlayerAttributesRequest implements Partial<Attributes> {
   @ValidateIf((obj) => !ValidatorHelper.isGroupDefined(obj, 'speed', 'sneak'))
   @IsGroupDefined(['speed', 'sneak'])
   @IsNumber()

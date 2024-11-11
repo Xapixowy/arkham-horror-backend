@@ -24,5 +24,6 @@ import { PlayerCard } from '@Entities/player-card.entity';
   ],
   controllers: [GameSessionController, PlayerController],
   providers: [GameSessionService, PlayerService],
+  exports: [GameSessionService, PlayerService],
 })
 export class GameSessionModule {}

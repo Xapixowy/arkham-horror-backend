@@ -1,4 +1,4 @@
-export enum CardStatisticModifierEnum {
+export enum CardAttributeModifierEnum {
   // Test Modifiers
   COMBAT_TEST = 'combat_test',
   SPELL_TEST = 'spell_test',

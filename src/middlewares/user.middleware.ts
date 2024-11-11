@@ -13,7 +13,10 @@ export class UserMiddleware implements NestMiddleware {
     );
 
     req['user'] = token
-      ? await this.userService.getUserByJwtToken(token)
+      ? await this.userService.getUserByJwtToken(token, [
+          'players',
+          'players.game_session',
+        ])
       : null;
 
     next();

@@ -8,9 +8,12 @@ import { CharacterTranslation } from '@Entities/character-translation.entity';
 import { CharacterTranslationService } from '@Services/character-translation/character-translation.service';
 import { CharacterTranslationController } from '@Controllers/character-translation.controller';
 import { User } from '@Entities/user.entity';
+import { Card } from '@Entities/card.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Character, CharacterTranslation, User])],
+  imports: [
+    TypeOrmModule.forFeature([Character, CharacterTranslation, User, Card]),
+  ],
   controllers: [CharacterController, CharacterTranslationController],
   providers: [CharacterService, CharacterTranslationService, FileUploadHelper],
 })

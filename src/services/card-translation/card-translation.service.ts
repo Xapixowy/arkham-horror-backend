@@ -25,6 +25,9 @@ export class CardTranslationService {
     const card = await this.cardRepository.findOne({
       where: { id: cardId },
       relations: ['translations'],
+      order: {
+        id: 'ASC',
+      },
     });
     if (!card) {
       throw new NotFoundException();

@@ -6,10 +6,12 @@ import { GameSession } from '@Entities/game-session.entity';
 import { GameSessionDto } from '@Dtos/game-session.dto';
 import { User } from '@Entities/user.entity';
 import { StringHelper } from '@Helpers/string/string.helper';
-import { Player } from '@Entities/player.entity';
 import { PlayerService } from '../player/player.service';
 import { ConfigService } from '@nestjs/config';
 import { GameSessionsConfig } from '@Configs/game_sessions.config';
+import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
+import { EnumHelper } from '@Helpers/enum/enum.helper';
+import { Player } from '@Entities/player.entity';
 
 @Injectable()
 export class GameSessionService {
@@ -25,6 +27,9 @@ export class GameSessionService {
     return this.dataSource.transaction(async (manager) => {
       const gameSessions = await manager.find(GameSession, {
         relations: ['players'],
+        order: {
+          id: 'ASC',
+        },
       });
       return gameSessions.map((gameSession) =>
         GameSessionDto.fromEntity(gameSession, {
@@ -35,13 +40,8 @@ export class GameSessionService {
   }
 
   async findOne(token: string): Promise<GameSessionDto> {
-    const existingGameSession = await this.gameSessionRepository.findOne({
-      where: { token },
-      relations: ['players'],
-    });
-    if (!existingGameSession) {
-      throw new NotFoundException();
-    }
+    const existingGameSession = await this.getGameSession(token);
+
     return GameSessionDto.fromEntity(existingGameSession, {
       players: true,
     });
@@ -58,18 +58,20 @@ export class GameSessionService {
         }),
       );
 
-      const newPlayer = manager.create(
-        Player,
-        await this.playerService.generatePlayerObject(
+      const newGameSessionDto = GameSessionDto.fromEntity(newGameSession, {
+        players: true,
+      });
+
+      newGameSessionDto.players = [
+        await this.playerService.addPlayerToGameSession(
           newGameSession,
+          manager,
           true,
           user,
         ),
-      );
+      ];
 
-      await manager.save(Player, newPlayer);
-
-      return GameSessionDto.fromEntity(newGameSession);
+      return newGameSessionDto;
     });
   }
 
@@ -84,6 +86,75 @@ export class GameSessionService {
       return GameSessionDto.fromEntity(
         await manager.remove(GameSession, existingGameSession),
       );
+    });
+  }
+
+  async resetPhase(token: string): Promise<GameSessionDto> {
+    const gameSessionConfig =
+      this.configService.get<GameSessionsConfig>('gameSessions');
+    const gameSession = await this.getGameSession(token);
+
+    return this.dataSource.transaction(async (manager) => {
+      gameSession.phase = gameSessionConfig.defaultPhase;
+      const updatedGameSession = await manager.save(GameSession, gameSession);
+
+      return GameSessionDto.fromEntity(updatedGameSession, {
+        players: true,
+      });
+    });
+  }
+
+  async nextPhase(token: string): Promise<GameSessionDto> {
+    const gameSession = await this.getGameSession(token);
+
+    return this.dataSource.transaction(async (manager) => {
+      const phases = EnumHelper.getValues(GameSessionPhase) as number[];
+      const maxPhaseValue = Math.max(...phases);
+      const minPhaseValue = Math.min(...phases);
+      const theoreticalNextPhaseValue = gameSession.phase + 1;
+
+      gameSession.phase =
+        theoreticalNextPhaseValue > maxPhaseValue
+          ? minPhaseValue
+          : theoreticalNextPhaseValue;
+
+      const updatedGameSession = await manager.save(GameSession, gameSession);
+
+      const updatedPlayers = gameSession.players.map((player) => ({
+        ...player,
+        statistics: {
+          ...player.statistics,
+          phases_played: player.statistics.phases_played + 1,
+        },
+      }));
+
+      await manager.save(Player, updatedPlayers);
+
+      return GameSessionDto.fromEntity(updatedGameSession, {
+        players: true,
+      });
+    });
+  }
+
+  async previousPhase(token: string): Promise<GameSessionDto> {
+    const gameSession = await this.getGameSession(token);
+
+    return this.dataSource.transaction(async (manager) => {
+      const phases = EnumHelper.getValues(GameSessionPhase) as number[];
+      const maxPhaseValue = Math.max(...phases);
+      const minPhaseValue = Math.min(...phases);
+      const theoreticalPreviousPhaseValue = gameSession.phase - 1;
+
+      gameSession.phase =
+        theoreticalPreviousPhaseValue < minPhaseValue
+          ? maxPhaseValue
+          : theoreticalPreviousPhaseValue;
+
+      const updatedGameSession = await manager.save(GameSession, gameSession);
+
+      return GameSessionDto.fromEntity(updatedGameSession, {
+        players: true,
+      });
     });
   }
 
@@ -106,5 +177,18 @@ export class GameSessionService {
     }
 
     return token;
+  }
+
+  private async getGameSession(token: string): Promise<GameSession> {
+    const existingGameSession = await this.gameSessionRepository.findOne({
+      where: { token },
+      relations: ['players'],
+    });
+
+    if (!existingGameSession) {
+      throw new NotFoundException();
+    }
+
+    return existingGameSession;
   }
 }

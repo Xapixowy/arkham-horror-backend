@@ -1,19 +1,12 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Statistics } from '@Types/character/statistics.type';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Attributes } from '@Types/character/attributes.type';
 import { Skill } from '@Types/character/skill.type';
 import { Equipment } from '@Types/character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
 import { Language } from '@Enums/language';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
-import { Card } from '@Entities/card.entity';
 import { Player } from '@Entities/player.entity';
+import { CharacterCard } from '@Entities/character-card.entity';
 
 @Entity()
 export class Character {
@@ -73,7 +66,7 @@ export class Character {
   @Column({
     type: 'json',
   })
-  statistics: Statistics;
+  attributes: Attributes;
 
   @Column({
     type: 'json',
@@ -110,18 +103,10 @@ export class Character {
   )
   translations?: CharacterTranslation[];
 
-  @ManyToMany(() => Card, (card) => card.characters)
-  @JoinTable({
-    joinColumn: {
-      name: 'character_id',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'card_id',
-      referencedColumnName: 'id',
-    },
+  @OneToMany(() => CharacterCard, (characterCard) => characterCard.character, {
+    cascade: true,
   })
-  cards?: Card[];
+  characterCards?: CharacterCard[];
 
   @OneToMany(() => Player, (player) => player.character)
   players?: Player[];

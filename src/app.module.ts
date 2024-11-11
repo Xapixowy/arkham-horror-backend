@@ -12,10 +12,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from '@Guards/auth.guard';
 import { UserMiddleware } from '@Middlewares/user.middleware';
 import { LanguageMiddleware } from '@Middlewares/language.middleware';
-import { UserModule } from '@Modules/user.module';
 import { UserRolesGuard } from '@Guards/user-roles.guard';
 import { PlayerRolesGuard } from '@Guards/player-roles.guard';
 import { PlayerOwnerGuard } from '@Guards/player-owner.guard';
+import { PlayerMiddleware } from '@Middlewares/player.middleware';
 
 @Module({
   imports: [
@@ -59,7 +59,6 @@ import { PlayerOwnerGuard } from '@Guards/player-owner.guard';
       useFactory: (configService: ConfigService) => configService.get('jwt'),
     }),
     RoutesModule,
-    UserModule,
   ],
   providers: [
     {
@@ -84,5 +83,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserMiddleware).forRoutes('*');
     consumer.apply(LanguageMiddleware).forRoutes('*');
+    consumer.apply(PlayerMiddleware).forRoutes('*');
   }
 }

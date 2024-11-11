@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { NotFoundException } from '@Exceptions/not-found.exception';
 import { GameSession } from '@Entities/game-session.entity';
 import { User } from '@Entities/user.entity';
@@ -25,6 +25,7 @@ import { PlayerTokenInvalidException } from '@Exceptions/player/player-token-inv
 import { PlayerObject } from '@Types/player/player-object.type';
 import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
 import { ObjectHelper } from '@Helpers/object/object.helper';
+import { StatisticsService } from '@Services/statistics/statistics.service';
 
 @Injectable()
 export class PlayerService {
@@ -57,6 +58,9 @@ export class PlayerService {
         'playerCards.card',
         'playerCards.card.translations',
       ],
+      order: {
+        id: 'ASC',
+      },
     });
 
     return players
@@ -139,24 +143,13 @@ export class PlayerService {
     if (playersInGameSessionCount >= maxPlayersInGameSession) {
       throw new PlayersLimitReachedException();
     }
-
     return this.dataSource.transaction(async (manager) => {
-      const newPlayer = await manager.save(
-        Player,
-        manager.create(
-          Player,
-          await this.generatePlayerObject(
-            existingGameSession,
-            !isHostInGameSession,
-            user,
-          ),
-        ),
+      return await this.addPlayerToGameSession(
+        existingGameSession,
+        manager,
+        !isHostInGameSession,
+        user,
       );
-
-      return PlayerDto.fromEntity(newPlayer, {
-        user: true,
-        character: true,
-      });
     });
   }
 
@@ -187,8 +180,16 @@ export class PlayerService {
         await this.getUnusedCharacterInGameSession(existingGameSession);
       existingPlayer.updated_at = new Date();
 
+      const updatedPlayer = await manager.save(Player, {
+        ...existingPlayer,
+        statistics: {
+          ...existingPlayer.statistics,
+          characters_played: existingPlayer.statistics.characters_played + 1,
+        },
+      });
+
       const translatedPlayer = this.getTranslatedPlayer(
-        await manager.save(Player, existingPlayer),
+        updatedPlayer,
         language,
       );
 
@@ -253,6 +254,24 @@ export class PlayerService {
 
       await manager.save(PlayerCard, allPlayerCards);
 
+      const acquiredCardCount = cardsToAssignWithQuantity.reduce(
+        (acc, card) => acc + card.quantity,
+        0,
+      );
+
+      const updatedPlayer = await manager.findOneBy(Player, {
+        id: existingPlayer.id,
+      });
+
+      await manager.save(Player, {
+        ...updatedPlayer,
+        statistics: {
+          ...updatedPlayer.statistics,
+          cards_acquired:
+            updatedPlayer.statistics.cards_acquired + acquiredCardCount,
+        },
+      });
+
       return allPlayerCards.map((playerCard) =>
         PlayerCardDto.fromEntity(
           {
@@ -284,17 +303,34 @@ export class PlayerService {
         ]),
       );
 
+      let lostCardCount = 0;
+
       for (const cardId of cardIds) {
         const playerCard = existingPlayerCardsMap.get(cardId);
 
-        if (playerCard && playerCard.quantity > 1) {
-          playerCard.quantity -= 1;
-          await manager.save(PlayerCard, playerCard);
-        } else if (playerCard) {
-          existingPlayerCardsMap.delete(cardId);
-          await manager.remove(PlayerCard, playerCard);
+        if (playerCard) {
+          lostCardCount += 1;
+          if (playerCard.quantity > 1) {
+            playerCard.quantity -= 1;
+            await manager.save(PlayerCard, playerCard);
+          } else {
+            existingPlayerCardsMap.delete(cardId);
+            await manager.remove(PlayerCard, playerCard);
+          }
         }
       }
+
+      const updatedPlayer = await manager.findOneBy(Player, {
+        id: existingPlayer.id,
+      });
+
+      await manager.save(Player, {
+        ...updatedPlayer,
+        statistics: {
+          ...updatedPlayer.statistics,
+          cards_lost: updatedPlayer.statistics.cards_lost + lostCardCount,
+        },
+      });
 
       const remainingPlayerCards = Array.from(existingPlayerCardsMap.values());
 
@@ -320,12 +356,17 @@ export class PlayerService {
   ): Promise<PlayerDto> {
     await this.getGameSession(gameSessionToken);
     const existingPlayer = await this.getPlayer(playerToken);
+    const newStatistics = StatisticsService.generateUpdatedPlayerStatistics(
+      existingPlayer,
+      updatePlayerRequest,
+    );
+    const newPlayer = {
+      ...ObjectHelper.replaceDefinedValues(existingPlayer, updatePlayerRequest),
+      statistics: newStatistics,
+    };
 
     return this.dataSource.transaction(async (manager) => {
-      const updatedPlayer = await manager.save(
-        Player,
-        ObjectHelper.replaceDefinedValues(existingPlayer, updatePlayerRequest),
-      );
+      const updatedPlayer = await manager.save(Player, newPlayer);
       return PlayerDto.fromEntity(
         this.getTranslatedPlayer(updatedPlayer, language),
         {
@@ -357,16 +398,51 @@ export class PlayerService {
         money: character.equipment.money,
         clues: character.equipment.clues,
       },
-      statistics: {
-        speed: character.statistics.speed[2],
-        sneak: character.statistics.speed[2],
-        prowess: character.statistics.speed[2],
-        will: character.statistics.speed[2],
-        knowledge: character.statistics.speed[2],
-        luck: character.statistics.speed[2],
+      attributes: {
+        speed: character.attributes.speed[2],
+        sneak: character.attributes.speed[2],
+        prowess: character.attributes.speed[2],
+        will: character.attributes.speed[2],
+        knowledge: character.attributes.speed[2],
+        luck: character.attributes.speed[2],
       },
       role: isHost ? PlayerRole.HOST : PlayerRole.PLAYER,
     };
+  }
+
+  async addPlayerToGameSession(
+    gameSession: GameSession,
+    manager: EntityManager,
+    isHost: boolean = true,
+    user: User | null,
+  ): Promise<PlayerDto> {
+    const newPlayerObject = await this.generatePlayerObject(
+      gameSession,
+      isHost,
+      user,
+    );
+
+    const newPlayer = await manager.save(
+      Player,
+      manager.create(Player, newPlayerObject),
+    );
+
+    const playerCards = newPlayer.character.characterCards.map(
+      (characterCard) =>
+        ({
+          player: newPlayer,
+          card: characterCard.card,
+          quantity: characterCard.quantity,
+        }) as PlayerCard,
+    );
+
+    newPlayer.playerCards = await manager.save(PlayerCard, playerCards);
+
+    return PlayerDto.fromEntity(newPlayer, {
+      user: true,
+      character: true,
+      playerCards: true,
+    });
   }
 
   getTranslatedPlayer(player: Player, language: Language): Player {
@@ -395,6 +471,10 @@ export class PlayerService {
     return translatedPlayer;
   }
 
+  async getPlayerByToken(token: string): Promise<Player | null> {
+    return await this.getPlayer(token, ['game_session']);
+  }
+
   private async getUnusedToken(): Promise<string> {
     const token = crypto.randomUUID();
 
@@ -413,7 +493,7 @@ export class PlayerService {
     gameSession: GameSession,
   ): Promise<Character> {
     const characters = await this.characterRepository.find({
-      relations: ['translations'],
+      relations: ['translations', 'characterCards', 'characterCards.card'],
     });
 
     const randomCharacter = ArrayHelper.randomElement(characters);

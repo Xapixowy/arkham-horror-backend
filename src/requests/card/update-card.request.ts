@@ -13,7 +13,7 @@ import {
 import { CardType } from '@Enums/card/card.type';
 import { CardSubtype } from '@Enums/card/card.subtype';
 import { Type } from 'class-transformer';
-import { CreateStatisticModifierRequest } from '@Requests/statistic-modifier/create-statistic-modifier.request';
+import { CreateAttributeModifierRequest } from '@Requests/attribute-modifier/create-attribute-modifier.request';
 
 export class UpdateCardRequest {
   @IsString()
@@ -37,8 +37,8 @@ export class UpdateCardRequest {
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => CreateStatisticModifierRequest)
-  statisticModifiers: CreateStatisticModifierRequest[];
+  @Type(() => CreateAttributeModifierRequest)
+  attributeModifiers: CreateAttributeModifierRequest[];
 
   @IsInt()
   @IsOptional()

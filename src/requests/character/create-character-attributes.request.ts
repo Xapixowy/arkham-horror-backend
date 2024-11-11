@@ -1,6 +1,6 @@
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsInt } from 'class-validator';
 
-export class CreateCharacterStatisticsRequest {
+export class CreateCharacterAttributesRequest {
   @IsArray()
   @ArrayMinSize(4)
   @ArrayMaxSize(4)

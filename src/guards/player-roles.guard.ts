@@ -2,15 +2,11 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '@Decorators/player-roles.decorator';
 import { PlayerRole } from '@Enums/player/player-role.enum';
-import { UserService } from '@Services/user/user.service';
 import { UserRole } from '@Enums/user/user-role.enum';
 
 @Injectable()
 export class PlayerRolesGuard implements CanActivate {
-  constructor(
-    private readonly userService: UserService,
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<PlayerRole[]>(
@@ -22,34 +18,45 @@ export class PlayerRolesGuard implements CanActivate {
       return true;
     }
 
-    const { user, params } = context.switchToHttp().getRequest();
+    const { user, player, params } = context.switchToHttp().getRequest();
 
-    if (!params?.gameSessionToken || !user) {
+    if (!user && !player) {
       return false;
     }
 
-    if (user.role === UserRole.ADMIN) {
+    if (!params?.gameSessionToken) {
+      return false;
+    }
+
+    if (user?.role === UserRole.ADMIN) {
       return true;
     }
 
-    const userPlayersInCurrentGameSession = (
-      await this.userService.getUser(user.id, [
-        'players',
-        'players.game_session',
-      ])
-    ).players.filter(
-      (player) => player.game_session.token === params.gameSessionToken,
-    );
+    if (user) {
+      const userPlayersInGameSession = user.players.filter(
+        (player) => player.game_session.token === params.gameSessionToken,
+      );
 
-    const userPlayersRolesInCurrentGameSession =
-      userPlayersInCurrentGameSession.map((player) => player.role);
-
-    if (userPlayersRolesInCurrentGameSession.includes(PlayerRole.HOST)) {
-      return true;
+      return requiredRoles.some((role) =>
+        userPlayersInGameSession.some((player) => player.role === role),
+      );
     }
 
-    return requiredRoles.some((role) =>
-      userPlayersRolesInCurrentGameSession.includes(role),
-    );
+    if (player) {
+      const isPlayerInGameSession =
+        player.game_session.token === params.gameSessionToken;
+
+      if (isPlayerInGameSession && player.role === PlayerRole.HOST) {
+        return true;
+      }
+
+      const hasPlayerRequestedRole = requiredRoles.some(
+        (role) => player.role === role,
+      );
+
+      return isPlayerInGameSession && hasPlayerRequestedRole;
+    }
+
+    return false;
   }
 }

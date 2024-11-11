@@ -6,7 +6,7 @@ import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { Card } from '@Entities/card.entity';
 
 export class CardTranslationDto {
-  static readonly typeMapping: DTOTypeMapping = {
+  private static readonly typeMapping: DTOTypeMapping = {
     card: (card: Card) => CardDto.fromEntity(card),
   };
 

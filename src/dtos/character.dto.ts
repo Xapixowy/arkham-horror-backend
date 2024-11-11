@@ -1,25 +1,28 @@
 import { Character } from '@Entities/character.entity';
-import { Statistics } from '@Types/character/statistics.type';
+import { Attributes } from '@Types/character/attributes.type';
 import { Skill } from '@Types/character/skill.type';
 import { Equipment } from '@Types/character/equipment.type';
 import { Expansion } from '@Enums/expansion.enum';
 import { Language } from '@Enums/language';
 import { CharacterTranslationDto } from '@Dtos/character-translation.dto';
-import { CardDto } from '@Dtos/card.dto';
 import { PlayerDto } from '@Dtos/player.dto';
 import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
-import { Card } from '@Entities/card.entity';
 import { Player } from '@Entities/player.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { CharacterCard } from '@Entities/character-card.entity';
+import { CharacterCardDto } from '@Dtos/character-card.dto';
 
 export class CharacterDto {
-  static readonly typeMapping: DTOTypeMapping = {
+  private static readonly typeMapping: DTOTypeMapping = {
     translations: (translations: CharacterTranslation[]) =>
       translations.map((translation) =>
         CharacterTranslationDto.fromEntity(translation),
       ),
-    cards: (cards: Card[]) => cards.map((card) => CardDto.fromEntity(card)),
+    characterCards: (characterCards: CharacterCard[]) =>
+      characterCards.map((characterCard) =>
+        CharacterCardDto.fromEntity(characterCard),
+      ),
     players: (players: Player[]) =>
       players.map((player) => PlayerDto.fromEntity(player)),
   };
@@ -35,14 +38,14 @@ export class CharacterDto {
     public sanity: number,
     public endurance: number,
     public concentration: number,
-    public statistics: Statistics,
+    public attributes: Attributes,
     public skills: Skill[],
     public equipment: Equipment,
     public locale: Language,
     public created_at: Date,
     public updated_at: Date,
     public translations?: CharacterTranslationDto[],
-    public cards?: CardDto[],
+    public characterCards?: CharacterCardDto[],
     public players?: PlayerDto[],
   ) {}
 
@@ -50,7 +53,7 @@ export class CharacterDto {
     character: Character,
     properties?: {
       translations?: true;
-      cards?: true;
+      characterCards?: true;
       players?: true;
     },
   ): CharacterDto {
@@ -66,7 +69,7 @@ export class CharacterDto {
         character.sanity,
         character.endurance,
         character.concentration,
-        character.statistics,
+        character.attributes,
         character.skills,
         character.equipment,
         character.locale,

@@ -25,6 +25,7 @@ import { PlayerCardDto } from '@Dtos/player-card.dto';
 import { AssignPlayerCardsRequest } from '@Requests/player/assign-player-cards.request';
 import { RemovePlayerCardsRequest } from '@Requests/player/remove-player-cards.request';
 import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
+import { PlayerOwner } from '@Decorators/player-owner.decorator';
 
 @Controller('game-sessions/:gameSessionToken/players')
 export class PlayerController {
@@ -79,6 +80,7 @@ export class PlayerController {
 
   @Put(':playerToken/renew-character')
   @Public()
+  @PlayerOwner()
   async renewCharacter(
     @Param('gameSessionToken') gameSessionToken: string,
     @Param('playerToken') playerToken: string,
@@ -95,6 +97,7 @@ export class PlayerController {
 
   @Put(':playerToken/assign-cards')
   @Public()
+  @PlayerOwner()
   async assignCards(
     @Param('gameSessionToken') gameSessionToken: string,
     @Param('playerToken') playerToken: string,
@@ -113,6 +116,7 @@ export class PlayerController {
 
   @Put(':playerToken/remove-cards')
   @Public()
+  @PlayerOwner()
   async removeCards(
     @Param('gameSessionToken') gameSessionToken: string,
     @Param('playerToken') playerToken: string,

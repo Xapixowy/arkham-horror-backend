@@ -6,7 +6,7 @@ import { Player } from '@Entities/player.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 
 export class UserDto {
-  static readonly typeMapping: DTOTypeMapping = {
+  private static readonly typeMapping: DTOTypeMapping = {
     players: (players: Player[]) =>
       players.map((player) => PlayerDto.fromEntity(player)),
   };

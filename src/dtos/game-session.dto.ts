@@ -3,9 +3,10 @@ import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { Player } from '@Entities/player.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 import { GameSession } from '@Entities/game-session.entity';
+import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
 
 export class GameSessionDto {
-  static readonly typeMapping: DTOTypeMapping = {
+  private static readonly typeMapping: DTOTypeMapping = {
     players: (players: Player[]) =>
       players.map((player) =>
         PlayerDto.fromEntity(player, {
@@ -18,6 +19,7 @@ export class GameSessionDto {
   constructor(
     public id: number,
     public token: string,
+    public phase: GameSessionPhase,
     public created_at: Date,
     public updated_at: Date,
     public players?: PlayerDto[],
@@ -31,6 +33,7 @@ export class GameSessionDto {
       new GameSessionDto(
         gameSession.id,
         gameSession.token,
+        gameSession.phase,
         gameSession.created_at,
         gameSession.updated_at,
       ),

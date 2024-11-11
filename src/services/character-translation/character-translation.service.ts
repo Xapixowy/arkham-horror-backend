@@ -25,6 +25,9 @@ export class CharacterTranslationService {
     const character = await this.characterRepository.findOne({
       where: { id: characterId },
       relations: ['translations'],
+      order: {
+        id: 'ASC',
+      },
     });
     if (!character) {
       throw new NotFoundException();

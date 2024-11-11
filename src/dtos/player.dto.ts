@@ -1,4 +1,4 @@
-import { Statistics } from '@Types/player/statistics.type';
+import { Attributes } from '@Types/player/attributes.type';
 import { Equipment } from '@Types/player/equipment.type';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { Status } from '@Types/player/status.type';
@@ -13,9 +13,10 @@ import { GameSession } from '@Entities/game-session.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
 import { PlayerCard } from '@Entities/player-card.entity';
 import { PlayerCardDto } from '@Dtos/player-card.dto';
+import { PlayerStatistics } from '@Types/player/statistics.type';
 
 export class PlayerDto {
-  static readonly typeMapping: DTOTypeMapping = {
+  private static readonly typeMapping: DTOTypeMapping = {
     user: (user: User) => UserDto.fromEntity(user),
     character: (character: Character) => CharacterDto.fromEntity(character),
     playerCards: (playerCards: PlayerCard[]) =>
@@ -30,7 +31,8 @@ export class PlayerDto {
     public role: PlayerRole,
     public status: Status,
     public equipment: Equipment,
-    public statistics: Statistics,
+    public attributes: Attributes,
+    public statistics: PlayerStatistics,
     public created_at: Date,
     public updated_at: Date,
     public user?: UserDto,
@@ -55,6 +57,7 @@ export class PlayerDto {
         player.role,
         player.status,
         player.equipment,
+        player.attributes,
         player.statistics,
         player.created_at,
         player.updated_at,

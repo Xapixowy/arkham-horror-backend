@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UserService } from '@Services/user/user.service';
 import { PLAYER_OWNER_KEY } from '@Decorators/player-owner.decorator';
+import { UserRole } from '@Enums/user/user-role.enum';
 
 @Injectable()
 export class PlayerOwnerGuard implements CanActivate {
@@ -20,21 +21,37 @@ export class PlayerOwnerGuard implements CanActivate {
       return true;
     }
 
-    const { user, params } = context.switchToHttp().getRequest();
+    const { user, player, params } = context.switchToHttp().getRequest();
 
-    if (!params?.gameSessionToken || !params?.playerToken || !user) {
+    if (user?.role === UserRole.ADMIN) {
+      return true;
+    }
+
+    if (
+      !params?.gameSessionToken ||
+      !params?.playerToken ||
+      (!user && !player)
+    ) {
       return false;
     }
 
-    const userPlayersInCurrentGameSession = (
-      await this.userService.getUser(user.id, [
-        'players',
-        'players.game_session',
-      ])
-    ).players;
+    if (user) {
+      const userPlayersInCurrentGameSession = user.players.filter(
+        (player) => player.game_session.token === params.gameSessionToken,
+      );
 
-    return userPlayersInCurrentGameSession
-      .filter((player) => player.game_session.token === params.gameSessionToken)
-      .some((player) => player.token === params.playerToken);
+      return userPlayersInCurrentGameSession.some(
+        (player) => player.token === params.playerToken,
+      );
+    }
+
+    if (player) {
+      const isUserPlayerInGameSession =
+        player.game_session.token === params.gameSessionToken;
+
+      return isUserPlayerInGameSession && player.token === params.playerToken;
+    }
+
+    return false;
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Character } from '@Entities/character.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { CharacterDto } from '@Dtos/character.dto';
 import { CreateCharacterRequest } from '@Requests/character/create-character.request';
 import { UpdateCharacterRequest } from '@Requests/character/update-character.request';
@@ -11,6 +11,10 @@ import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig } from '@Configs/app.config';
 import { Language } from '@Enums/language';
+import { Card } from '@Entities/card.entity';
+import { CharacterCard } from '@Entities/character-card.entity';
+import { CharacterCardDto } from '@Dtos/character-card.dto';
+import { CardService } from '@Services/card/card.service';
 
 @Injectable()
 export class CharacterService {
@@ -19,6 +23,8 @@ export class CharacterService {
   constructor(
     @InjectRepository(Character)
     private characterRepository: Repository<Character>,
+    @InjectRepository(Card)
+    private cardRepository: Repository<Card>,
     private dataSource: DataSource,
     private fileUploadHelper: FileUploadHelper,
     private configService: ConfigService,
@@ -28,29 +34,27 @@ export class CharacterService {
 
   async findAll(language: Language): Promise<CharacterDto[]> {
     const characters = await this.characterRepository.find({
-      relations: ['translations'],
+      relations: [
+        'translations',
+        'characterCards',
+        'characterCards.card',
+        'characterCards.card.translations',
+      ],
+      order: {
+        id: 'ASC',
+      },
     });
     return characters.map((character) =>
-      CharacterDto.fromEntity(
-        language !== character.locale
-          ? CharacterService.getTranslatedCharacter(character, language)
-          : character,
-      ),
+      this.mapCharacterToTranslatedCharacterDto(character, language),
     );
   }
 
   async findOne(id: number, language: Language): Promise<CharacterDto> {
-    const existingCharacter = await this.characterRepository.findOne({
-      where: { id },
-      relations: ['translations'],
-    });
-    if (!existingCharacter) {
-      throw new NotFoundException();
-    }
-    return CharacterDto.fromEntity(
-      language !== existingCharacter.locale
-        ? CharacterService.getTranslatedCharacter(existingCharacter, language)
-        : existingCharacter,
+    const existingCharacter = await this.getCharacter(id);
+
+    return this.mapCharacterToTranslatedCharacterDto(
+      existingCharacter,
+      language,
     );
   }
 
@@ -61,7 +65,27 @@ export class CharacterService {
         locale: this.appLanguage,
       });
 
-      return CharacterDto.fromEntity(await manager.save(character));
+      const characterEntity = await manager.save(Character, character);
+
+      const characterCards = await this.assignCardsToCharacter(
+        characterEntity,
+        characterRequest.cardIds,
+        manager,
+      );
+
+      const characterCardDtos = characterCards.map((characterCardEntity) =>
+        CharacterCardDto.fromEntity(characterCardEntity, {
+          card: true,
+        }),
+      );
+
+      const characterDto = CharacterDto.fromEntity(characterEntity, {
+        characterCards: true,
+      });
+
+      characterDto.characterCards = characterCardDtos;
+
+      return characterDto;
     });
   }
 
@@ -69,20 +93,35 @@ export class CharacterService {
     id: number,
     characterRequest: UpdateCharacterRequest,
   ): Promise<CharacterDto> {
+    const existingCharacter = await this.getCharacter(id);
+
     return await this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOne(Character, {
-        where: { id },
-      });
-      if (!existingCharacter) {
-        throw new NotFoundException();
-      }
       manager.merge(Character, existingCharacter, {
         ...characterRequest,
         updated_at: new Date(),
       });
-      return CharacterDto.fromEntity(
-        await manager.save(Character, existingCharacter),
+
+      const updatedCharacter = await manager.save(Character, existingCharacter);
+
+      const characterCards = await this.assignCardsToCharacter(
+        updatedCharacter,
+        characterRequest.cardIds,
+        manager,
       );
+
+      const characterCardDtos = characterCards.map((characterCardEntity) =>
+        CharacterCardDto.fromEntity(characterCardEntity, {
+          card: true,
+        }),
+      );
+
+      const characterDto = CharacterDto.fromEntity(updatedCharacter, {
+        characterCards: true,
+      });
+
+      characterDto.characterCards = characterCardDtos;
+
+      return characterDto;
     });
   }
 
@@ -172,5 +211,98 @@ export class CharacterService {
     }
 
     return character;
+  }
+
+  private async assignCardsToCharacter(
+    character: Character,
+    cardIds: number[] | undefined,
+    manager: EntityManager,
+  ): Promise<CharacterCard[]> {
+    if (cardIds === undefined && character.characterCards === undefined) {
+      return [];
+    }
+
+    if (cardIds === undefined) {
+      return character.characterCards;
+    }
+
+    const characterCards: CharacterCard[] = character.characterCards || [];
+
+    characterCards.forEach((characterCard) => {
+      manager.remove(CharacterCard, characterCard);
+    });
+
+    const cardsToAssign = await this.cardRepository.find({
+      where: { id: In(cardIds) },
+    });
+
+    const cardsToAssignWithQuantity = cardsToAssign.map((card) => ({
+      card,
+      quantity: cardIds.filter((cardId) => cardId === card.id).length,
+    }));
+
+    return await manager.save(
+      CharacterCard,
+      cardsToAssignWithQuantity.map((cardToAssignWithQuantity) => ({
+        ...cardToAssignWithQuantity,
+        character,
+      })),
+    );
+  }
+
+  private async getCharacter(
+    id: number,
+    relations: string[] = [
+      'translations',
+      'characterCards',
+      'characterCards.card',
+      'characterCards.card.translations',
+    ],
+  ): Promise<Character> {
+    const existingCharacter = await this.characterRepository.findOne({
+      where: { id },
+      relations,
+    });
+
+    if (!existingCharacter) {
+      throw new NotFoundException();
+    }
+
+    return existingCharacter;
+  }
+
+  private mapCharacterToTranslatedCharacterDto(
+    character: Character,
+    language: Language,
+  ): CharacterDto {
+    const translatedCharacter = CharacterService.getTranslatedCharacter(
+      character,
+      language,
+    );
+
+    const characterDto = CharacterDto.fromEntity(translatedCharacter, {
+      characterCards: true,
+    });
+
+    characterDto.characterCards = character.characterCards.map(
+      (characterCard) => {
+        const translatedCard = CardService.getTranslatedCard(
+          characterCard.card,
+          language,
+        );
+
+        return CharacterCardDto.fromEntity(
+          {
+            ...characterCard,
+            card: translatedCard,
+          },
+          {
+            card: true,
+          },
+        );
+      },
+    );
+
+    return characterDto;
   }
 }

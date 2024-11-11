@@ -1,4 +1,4 @@
-export type Statistics = {
+export type Attributes = {
   speed: [number, number, number, number];
   sneak: [number, number, number, number];
   prowess: [number, number, number, number];
