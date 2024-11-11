@@ -10,6 +10,7 @@ import { PlayerController } from '@Controllers/player.controller';
 import { Character } from '@Entities/character.entity';
 import { Card } from '@Entities/card.entity';
 import { PlayerCard } from '@Entities/player-card.entity';
+import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { PlayerCard } from '@Entities/player-card.entity';
     ]),
   ],
   controllers: [GameSessionController, PlayerController],
-  providers: [GameSessionService, PlayerService],
+  providers: [GameSessionService, PlayerService, GameSessionsGateway],
   exports: [GameSessionService, PlayerService],
 })
 export class GameSessionModule {}

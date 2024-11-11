@@ -12,6 +12,7 @@ import { GameSessionsConfig } from '@Configs/game_sessions.config';
 import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
 import { EnumHelper } from '@Helpers/enum/enum.helper';
 import { Player } from '@Entities/player.entity';
+import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 
 @Injectable()
 export class GameSessionService {
@@ -21,6 +22,7 @@ export class GameSessionService {
     private readonly dataSource: DataSource,
     private readonly playerService: PlayerService,
     private readonly configService: ConfigService,
+    private readonly gameSessionsGateway: GameSessionsGateway,
   ) {}
 
   async findAll(): Promise<GameSessionDto[]> {
@@ -98,6 +100,8 @@ export class GameSessionService {
       gameSession.phase = gameSessionConfig.defaultPhase;
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
+      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,
       });
@@ -130,6 +134,8 @@ export class GameSessionService {
 
       await manager.save(Player, updatedPlayers);
 
+      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,
       });
@@ -151,6 +157,8 @@ export class GameSessionService {
           : theoreticalPreviousPhaseValue;
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
+
+      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
 
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,
@@ -179,10 +187,13 @@ export class GameSessionService {
     return token;
   }
 
-  private async getGameSession(token: string): Promise<GameSession> {
+  async getGameSession(
+    token: string,
+    relations: string[] = ['players'],
+  ): Promise<GameSession> {
     const existingGameSession = await this.gameSessionRepository.findOne({
       where: { token },
-      relations: ['players'],
+      relations,
     });
 
     if (!existingGameSession) {

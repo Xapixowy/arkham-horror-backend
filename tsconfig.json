@@ -71,6 +71,9 @@
       ],
       "@Middlewares/*": [
         "./src/middlewares/*"
+      ],
+      "@Gateways/*": [
+        "./src/gateways/*"
       ]
     }
   }
