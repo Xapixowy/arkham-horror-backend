@@ -130,7 +130,7 @@ export class GameSessionService {
 
       this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
 
-      const updatedPlayers = gameSession.players.map((player) => ({
+      const updatedPlayers: Player[] = gameSession.players.map((player) => ({
         ...player,
         statistics: {
           ...player.statistics,
@@ -138,7 +138,10 @@ export class GameSessionService {
         },
       }));
 
-      const updatedPlayerEntities = await manager.save(Player, updatedPlayers);
+      const updatedPlayerEntities: Player[] = await manager.save(
+        Player,
+        updatedPlayers,
+      );
 
       updatedPlayerEntities.forEach((player) =>
         this.gameSessionsGateway.emitPlayerUpdatedEvent(
@@ -178,6 +181,22 @@ export class GameSessionService {
     });
   }
 
+  async getGameSession(
+    token: string,
+    relations: string[] = ['players'],
+  ): Promise<GameSession> {
+    const existingGameSession = await this.gameSessionRepository.findOne({
+      where: { token },
+      relations,
+    });
+
+    if (!existingGameSession) {
+      throw new NotFoundException();
+    }
+
+    return existingGameSession;
+  }
+
   private async getUnusedToken(): Promise<string> {
     const tokenLength =
       this.configService.get<GameSessionsConfig>(
@@ -197,21 +216,5 @@ export class GameSessionService {
     }
 
     return token;
-  }
-
-  async getGameSession(
-    token: string,
-    relations: string[] = ['players'],
-  ): Promise<GameSession> {
-    const existingGameSession = await this.gameSessionRepository.findOne({
-      where: { token },
-      relations,
-    });
-
-    if (!existingGameSession) {
-      throw new NotFoundException();
-    }
-
-    return existingGameSession;
   }
 }

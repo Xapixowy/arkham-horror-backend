@@ -17,6 +17,8 @@ module.exports = {
     '^@Guards/(.*)$': '<rootDir>/guards/$1',
     '^@Decorators/(.*)$': '<rootDir>/decorators/$1',
     '^@Templates/(.*)$': '<rootDir>/templates/$1',
+    '^@Middlewares/(.*)$': '<rootDir>/middlewares/$1',
+    '^@Gateways/(.*)$': '<rootDir>/gateways/$1',
   },
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',

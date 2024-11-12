@@ -453,6 +453,8 @@ export class PlayerService {
 
     newPlayer.playerCards = await manager.save(PlayerCard, playerCards);
 
+    console.log(newPlayer);
+
     return PlayerDto.fromEntity(newPlayer, {
       user: true,
       character: true,
