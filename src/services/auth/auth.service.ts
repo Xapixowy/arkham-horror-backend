@@ -177,4 +177,8 @@ export class AuthService {
       return UserDto.fromEntity(await manager.save(User, existingUser));
     });
   }
+
+  me(user: User): UserDto {
+    return UserDto.fromEntity(user);
+  }
 }

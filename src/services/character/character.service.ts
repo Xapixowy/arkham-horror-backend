@@ -44,6 +44,7 @@ export class CharacterService {
         id: 'ASC',
       },
     });
+
     return characters.map((character) =>
       this.mapCharacterToTranslatedCharacterDto(character, language),
     );

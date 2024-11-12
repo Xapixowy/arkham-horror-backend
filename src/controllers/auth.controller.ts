@@ -83,6 +83,6 @@ export class AuthController {
 
   @Get('me')
   async me(@RequestUser() user: User): Promise<DataResponse<UserDto>> {
-    return ResponseHelper.buildResponse(user);
+    return ResponseHelper.buildResponse(this.authService.me(user));
   }
 }

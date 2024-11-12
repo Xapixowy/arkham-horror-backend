@@ -8,7 +8,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtUser } from '@Types/user/jwt-user.type';
 import { JwtConfig } from '@Configs/jwt.config';
 import { UserDto } from '@Dtos/user.dto';
-import { UserRole } from '@Enums/user/user-role.enum';
+import { StatisticsService } from '@Services/statistics/statistics.service';
+import { Statistics } from '@Types/user/statistics.type';
+import { NotFoundException } from '@Exceptions/not-found.exception';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -32,6 +34,12 @@ describe('UserService', () => {
             }),
           },
         },
+        {
+          provide: StatisticsService,
+          useValue: {
+            generateUserStatistics: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -41,99 +49,82 @@ describe('UserService', () => {
   });
 
   describe('findOne', () => {
-    it('should return UserDto if user is found by token', async () => {
-      const token = 'test-token';
+    it('should return UserDto if user is found by id', async () => {
       const user = { id: 1, email: 'test@example.com' } as User;
-      jest.spyOn(userService, 'getUserByToken').mockResolvedValue(user);
+      userService['getUser'] = jest.fn().mockResolvedValue(user);
 
-      const result = await userService.findOne(token);
+      const result = await userService.findOne(1);
 
       expect(result).toEqual(UserDto.fromEntity(user));
-      expect(userService.getUserByToken).toHaveBeenCalledWith(token);
     });
 
-    it('should return null if user is not found by token', async () => {
-      const token = 'invalid-token';
-      jest.spyOn(userService, 'getUserByToken').mockResolvedValue(null);
+    it('should throw NotFoundException if user is not found by id', async () => {
+      userService['getUser'] = jest
+        .fn()
+        .mockRejectedValue(new NotFoundException());
 
-      const result = await userService.findOne(token);
+      await expect(userService.findOne(1)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('getUserStatistics', () => {
+    it('should return user statistics if user has players', async () => {
+      const user = { id: 1, players: [{}] } as User;
+      userService['getUser'] = jest.fn().mockResolvedValue(user);
+      const statistics = { totalGames: 10 } as unknown as Statistics;
+      jest
+        .spyOn(StatisticsService, 'generateUserStatistics')
+        .mockReturnValue(statistics);
+
+      const result = await userService.getUserStatistics(1);
+
+      expect(result).toEqual(statistics);
+      expect(StatisticsService.generateUserStatistics).toHaveBeenCalledWith(
+        user.players,
+      );
+    });
+
+    it('should return null if user has no players', async () => {
+      const user = { id: 1, players: null } as User;
+      userService['getUser'] = jest.fn().mockResolvedValue(user);
+
+      const result = await userService.getUserStatistics(1);
 
       expect(result).toBeNull();
     });
   });
 
-  describe('getUserByToken', () => {
-    let jwtPayload: JwtUser;
-    let user: User;
-
-    beforeEach(() => {
-      jwtPayload = {
-        sub: 1,
-        email: 'test@example.com',
-        username: 'Test User',
-        role: UserRole.USER,
-      };
-      user = { id: 1, email: 'test@example.com' } as User;
-    });
-
+  describe('getUserByJwtToken', () => {
     it('should return user if JWT is valid and user is found', async () => {
       const token = 'valid-token';
+      const jwtPayload = { sub: 1 } as JwtUser;
+      const user = { id: 1, email: 'test@example.com' } as User;
 
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(jwtPayload);
+      userService['extractUserJwt'] = jest.fn().mockResolvedValue(jwtPayload);
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
 
-      const result = await userService.getUserByToken(token);
+      const result = await userService.getUserByJwtToken(token);
 
       expect(result).toEqual(user);
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith(token, {
-        secret: 'test-secret',
-      });
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { id: jwtPayload.sub },
+        relations: [],
       });
     });
 
     it('should return null if JWT is invalid', async () => {
       const token = 'invalid-token';
-      jest
-        .spyOn(jwtService, 'verifyAsync')
-        .mockRejectedValue(new Error('Invalid token'));
+      userService['extractUserJwt'] = jest.fn().mockResolvedValue(null);
 
-      const result = await userService.getUserByToken(token);
-
-      expect(result).toBeNull();
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith(token, {
-        secret: 'test-secret',
-      });
-    });
-
-    it('should return null if user is not found', async () => {
-      const token = 'valid-token';
-
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(jwtPayload);
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-
-      const result = await userService.getUserByToken(token);
+      const result = await userService.getUserByJwtToken(token);
 
       expect(result).toBeNull();
     });
   });
 
   describe('isUserExist', () => {
-    let jwtPayload: JwtUser;
-    let user: User;
-
-    beforeEach(() => {
-      jwtPayload = {
-        sub: 1,
-        email: 'test@example.com',
-        username: 'Test User',
-        role: UserRole.USER,
-      };
-      user = { id: 1, email: 'test@example.com' } as User;
-    });
-
     it('should return true if user exists by id', async () => {
+      const user = { id: 1 } as User;
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
 
       const result = await userService.isUserExist({ id: 1 });
@@ -145,6 +136,7 @@ describe('UserService', () => {
     });
 
     it('should return true if user exists by email', async () => {
+      const user = { email: 'test@example.com' } as User;
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
 
       const result = await userService.isUserExist({
@@ -159,16 +151,15 @@ describe('UserService', () => {
 
     it('should return true if user exists by token', async () => {
       const token = 'valid-token';
+      const jwtPayload = { sub: 1 } as JwtUser;
+      const user = { id: 1 } as User;
 
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(jwtPayload);
+      userService['extractUserJwt'] = jest.fn().mockResolvedValue(jwtPayload);
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(user);
 
       const result = await userService.isUserExist({ token });
 
       expect(result).toBe(true);
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith(token, {
-        secret: 'test-secret',
-      });
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { id: jwtPayload.sub },
       });
@@ -176,7 +167,6 @@ describe('UserService', () => {
 
     it('should return false if user does not exist by id, email, or token', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(null);
 
       const resultById = await userService.isUserExist({ id: 999 });
       const resultByEmail = await userService.isUserExist({

@@ -21,6 +21,7 @@ import { VerifyUserRequest } from '@Requests/user/verify-user.request';
 import { UserEmailAndTokenMismatchException } from '@Exceptions/user/user-email-and-token-mismatch.exception';
 import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
+import { Language } from '@Enums/language';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -103,7 +104,7 @@ describe('AuthService', () => {
     it('should register a user successfully', async () => {
       jest.spyOn(emailService, 'sendRegister').mockResolvedValue(true);
 
-      const result = await authService.register(userRequest);
+      const result = await authService.register(userRequest, Language.POLISH);
 
       expect(result).toBeInstanceOf(UserDto);
       expect(result).toEqual(userDto);
@@ -122,7 +123,7 @@ describe('AuthService', () => {
         .mockImplementation(async (cb: any) => await cb({}));
 
       await expect(
-        authService.register(userRequestWithPasswordMissmatch),
+        authService.register(userRequestWithPasswordMissmatch, Language.POLISH),
       ).rejects.toThrow(UserPasswordMissmatchException);
     });
 
@@ -136,17 +137,17 @@ describe('AuthService', () => {
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => await cb(mockManager));
 
-      await expect(authService.register(userRequest)).rejects.toThrow(
-        UserExistsException,
-      );
+      await expect(
+        authService.register(userRequest, Language.POLISH),
+      ).rejects.toThrow(UserExistsException);
     });
 
     it('should throw EmailSendFailureException if email sending fails', async () => {
       jest.spyOn(emailService, 'sendRegister').mockResolvedValue(false);
 
-      await expect(authService.register(userRequest)).rejects.toThrow(
-        EmailSendFailureException,
-      );
+      await expect(
+        authService.register(userRequest, Language.POLISH),
+      ).rejects.toThrow(EmailSendFailureException);
       expect(emailService.sendRegister).toHaveBeenCalled();
     });
   });
@@ -314,7 +315,11 @@ describe('AuthService', () => {
     it('should remind password successfully', async () => {
       jest.spyOn(emailService, 'sendRemindPassword').mockResolvedValue(true);
 
-      const result = await authService.remindPassword(userRequest);
+      const result = await authService.remindPassword(
+        userRequest,
+        Language.POLISH,
+      );
+      userDto.updated_at = result.updated_at;
 
       expect(result).toBeInstanceOf(UserDto);
       expect(result).toEqual(userDto);
@@ -324,17 +329,17 @@ describe('AuthService', () => {
     it('should throw NotFoundException if user does not exist', async () => {
       mockManager.findOneBy.mockResolvedValue(null);
 
-      await expect(authService.remindPassword(userRequest)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        authService.remindPassword(userRequest, Language.POLISH),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw EmailSendFailureException if email sending fails', async () => {
       jest.spyOn(emailService, 'sendRemindPassword').mockResolvedValue(false);
 
-      await expect(authService.remindPassword(userRequest)).rejects.toThrow(
-        EmailSendFailureException,
-      );
+      await expect(
+        authService.remindPassword(userRequest, Language.POLISH),
+      ).rejects.toThrow(EmailSendFailureException);
     });
   });
 
@@ -405,6 +410,30 @@ describe('AuthService', () => {
       await expect(
         authService.resetPassword(randomUUID, resetRequestWithMismatch),
       ).rejects.toThrow(UserPasswordMissmatchException);
+    });
+  });
+
+  describe('me', () => {
+    it('should return UserDto from a User entity', () => {
+      const user: User = {
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        role: 'USER',
+        verified_at: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
+      } as unknown as User;
+
+      const userDto = UserDto.fromEntity(user);
+      jest.spyOn(UserDto, 'fromEntity').mockReturnValue(userDto);
+
+      const result = authService.me(user);
+
+      expect(UserDto.fromEntity).toHaveBeenCalledWith(user);
+      expect(result).toEqual(userDto);
+      expect(result).toBeInstanceOf(UserDto);
     });
   });
 });

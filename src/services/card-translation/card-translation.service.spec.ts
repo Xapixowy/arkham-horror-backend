@@ -65,6 +65,9 @@ describe('CardTranslationService', () => {
       expect(findOneSpy).toHaveBeenCalledWith({
         where: { id: 1 },
         relations: ['translations'],
+        order: {
+          id: 'ASC',
+        },
       });
       expect(result).toEqual(
         card.translations.map((t) => CardTranslationDto.fromEntity(t)),

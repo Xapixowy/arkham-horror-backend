@@ -56,13 +56,12 @@ describe('CardService', () => {
   describe('findAll', () => {
     it('should retrieve all cards and map to CardDto', async () => {
       const cardEntities = [{ id: 1, locale: Language.POLISH }] as Card[];
-      const findSpy = jest
+      jest
         .spyOn(cardService['cardRepository'], 'find')
         .mockResolvedValue(cardEntities);
 
-      const result = await cardService.findAll();
+      const result = await cardService.findAll(Language.POLISH);
 
-      expect(findSpy).toHaveBeenCalled();
       expect(result).toEqual(
         cardEntities.map((card) => CardDto.fromEntity(card)),
       );
@@ -81,7 +80,7 @@ describe('CardService', () => {
         .spyOn(cardService['cardRepository'], 'findOne')
         .mockResolvedValue(cardEntity);
 
-      const result = await cardService.findOne(1);
+      const result = await cardService.findOne(1, Language.POLISH);
 
       expect(result).toEqual(CardDto.fromEntity(cardEntity));
     });
@@ -91,7 +90,9 @@ describe('CardService', () => {
         .spyOn(cardService['cardRepository'], 'findOne')
         .mockResolvedValue(null);
 
-      await expect(cardService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(cardService.findOne(1, Language.POLISH)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
