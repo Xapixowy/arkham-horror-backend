@@ -4,7 +4,6 @@ import { Character } from '@Entities/character.entity';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { TranslationExistsException } from '@Exceptions/translation-exists.exception';
 import { LanguageNotSupportedExceptionException } from '@Exceptions/language-not-supported-exception.exception';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -13,6 +12,8 @@ import { CreateCharacterTranslationRequest } from '@Requests/character-translati
 import { UpdateCharacterTranslationRequest } from '@Requests/character-translation/update-character-translation.request';
 import { AppConfig } from '@Configs/app.config';
 import { Language } from '@Enums/language';
+import { CharacterNotFoundException } from '@Exceptions/character/character-not-found.exception';
+import { CharacterTranslationNotFoundException } from '@Exceptions/character-translation/character-translation-not-found.exception';
 
 describe('CharacterTranslationService', () => {
   let characterTranslationService: CharacterTranslationService;
@@ -76,13 +77,13 @@ describe('CharacterTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if character does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
         .spyOn(characterTranslationService['characterRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(characterTranslationService.findAll(1)).rejects.toThrow(
-        NotFoundException,
+        CharacterNotFoundException,
       );
     });
   });
@@ -107,14 +108,14 @@ describe('CharacterTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if character or translation does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
         .spyOn(characterTranslationService['characterRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(
         characterTranslationService.findOne(1, Language.ENGLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CharacterNotFoundException);
     });
   });
 
@@ -218,12 +219,23 @@ describe('CharacterTranslationService', () => {
       expect(mockManager.save).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if character or translation does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       mockManager.findOne.mockResolvedValue(null);
 
       await expect(
         characterTranslationService.edit(1, Language.ENGLISH, updateRequest),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CharacterNotFoundException);
+    });
+
+    it('should throw CharacterTranslationNotFoundException if character translation does not exist', async () => {
+      mockManager.findOne.mockResolvedValue({
+        ...characterEntity,
+        translations: [],
+      });
+
+      await expect(
+        characterTranslationService.edit(1, Language.ENGLISH, updateRequest),
+      ).rejects.toThrow(CharacterTranslationNotFoundException);
     });
   });
 
@@ -264,12 +276,23 @@ describe('CharacterTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if character or translation does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       mockManager.findOne.mockResolvedValue(null);
 
       await expect(
         characterTranslationService.delete(1, Language.ENGLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CharacterNotFoundException);
+    });
+
+    it('should throw CharacterTranslationNotFoundException if character translation does not exist', async () => {
+      mockManager.findOne.mockResolvedValue({
+        ...characterEntity,
+        translations: [],
+      });
+
+      await expect(
+        characterTranslationService.delete(1, Language.ENGLISH),
+      ).rejects.toThrow(CharacterTranslationNotFoundException);
     });
   });
 });

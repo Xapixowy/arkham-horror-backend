@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Character } from '@Entities/character.entity';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
 import { CreateCharacterTranslationRequest } from '@Requests/character-translation/create-character-translation.request';
 import { CharacterTranslation } from '@Entities/character-translation.entity';
@@ -11,6 +10,8 @@ import { CharacterTranslationDto } from '@Dtos/character-translation.dto';
 import { AppConfig } from '@Configs/app.config';
 import { LanguageNotSupportedExceptionException } from '@Exceptions/language-not-supported-exception.exception';
 import { UpdateCharacterTranslationRequest } from '@Requests/character-translation/update-character-translation.request';
+import { CharacterNotFoundException } from '@Exceptions/character/character-not-found.exception';
+import { CharacterTranslationNotFoundException } from '@Exceptions/character-translation/character-translation-not-found.exception';
 
 @Injectable()
 export class CharacterTranslationService {
@@ -30,7 +31,7 @@ export class CharacterTranslationService {
       },
     });
     if (!character) {
-      throw new NotFoundException();
+      throw new CharacterNotFoundException();
     }
     return character.translations.map((translation) =>
       CharacterTranslationDto.fromEntity(translation),
@@ -46,13 +47,13 @@ export class CharacterTranslationService {
       relations: ['translations'],
     });
     if (!character) {
-      throw new NotFoundException();
+      throw new CharacterNotFoundException();
     }
     const translation = character.translations.find(
       (translation) => translation.locale === locale,
     );
     if (!translation) {
-      throw new NotFoundException();
+      throw new CharacterTranslationNotFoundException();
     }
     return CharacterTranslationDto.fromEntity(translation);
   }
@@ -67,7 +68,7 @@ export class CharacterTranslationService {
         relations: ['translations'],
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
 
       const availableLanguages = this.configService
@@ -109,14 +110,14 @@ export class CharacterTranslationService {
         relations: ['translations'],
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
 
       const existingCharacterTranslation = existingCharacter.translations.find(
         (translation) => translation.locale === locale,
       );
       if (!existingCharacterTranslation) {
-        throw new NotFoundException();
+        throw new CharacterTranslationNotFoundException();
       }
 
       manager.merge(CharacterTranslation, existingCharacterTranslation, {
@@ -140,14 +141,14 @@ export class CharacterTranslationService {
         relations: ['translations'],
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
 
       const existingCharacterTranslation = existingCharacter.translations.find(
         (translation) => translation.locale === locale,
       );
       if (!existingCharacterTranslation) {
-        throw new NotFoundException();
+        throw new CharacterTranslationNotFoundException();
       }
 
       return CharacterTranslationDto.fromEntity(

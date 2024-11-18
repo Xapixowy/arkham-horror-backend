@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, In, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { GameSession } from '@Entities/game-session.entity';
 import { User } from '@Entities/user.entity';
 import { Player } from '@Entities/player.entity';
@@ -27,6 +26,9 @@ import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
 import { ObjectHelper } from '@Helpers/object/object.helper';
 import { StatisticsService } from '@Services/statistics/statistics.service';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
+import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
+import { PlayerNotFoundException } from '@Exceptions/player/player-not-found.exception';
 
 @Injectable()
 export class PlayerService {
@@ -99,7 +101,7 @@ export class PlayerService {
     language: Language,
   ): Promise<PlayerDto> {
     if (!user) {
-      throw new NotFoundException();
+      throw new UserNotFoundException();
     }
 
     const existingGameSession = await this.getGameSession(gameSessionToken);
@@ -453,8 +455,6 @@ export class PlayerService {
 
     newPlayer.playerCards = await manager.save(PlayerCard, playerCards);
 
-    console.log(newPlayer);
-
     return PlayerDto.fromEntity(newPlayer, {
       user: true,
       character: true,
@@ -536,7 +536,7 @@ export class PlayerService {
     });
 
     if (!existingGameSession) {
-      throw new NotFoundException();
+      throw new GameSessionNotFoundException();
     }
 
     return existingGameSession;
@@ -565,7 +565,7 @@ export class PlayerService {
     });
 
     if (!existingPlayer) {
-      throw new NotFoundException();
+      throw new PlayerNotFoundException();
     }
 
     return existingPlayer;
@@ -589,7 +589,7 @@ export class PlayerService {
     });
 
     if (!existingPlayer) {
-      throw new NotFoundException();
+      throw new PlayerNotFoundException();
     }
 
     return existingPlayer;

@@ -14,7 +14,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '@Enums/user/user-role.enum';
 import { LoginUserRequest } from '@Requests/user/login-user.request';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { UserNotVerifiedException } from '@Exceptions/user/user-not-verified.exception';
 import { UserWrongPasswordException } from '@Exceptions/user/user-wrong-password.exception';
 import { VerifyUserRequest } from '@Requests/user/verify-user.request';
@@ -22,6 +21,7 @@ import { UserEmailAndTokenMismatchException } from '@Exceptions/user/user-email-
 import { RemindPasswordRequest } from '@Requests/user/remind-password.request';
 import { ResetUserPasswordRequest } from '@Requests/user/reset-user-password.request';
 import { Language } from '@Enums/language';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -193,11 +193,11 @@ describe('AuthService', () => {
       expect(mockManager.save).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if user with token does not exist', async () => {
+    it('should throw UserNotFoundException if user with token does not exist', async () => {
       mockManager.findOneBy.mockResolvedValue(null);
 
       await expect(authService.verify(randomUUID, userRequest)).rejects.toThrow(
-        NotFoundException,
+        UserNotFoundException,
       );
     });
 
@@ -252,11 +252,11 @@ describe('AuthService', () => {
       expect(result.access_token).toEqual(jwtToken);
     });
 
-    it('should throw NotFoundException if user does not exist', async () => {
+    it('should throw UserNotFoundException if user does not exist', async () => {
       mockManager.findOneBy.mockResolvedValue(null);
 
       await expect(authService.login(userRequest)).rejects.toThrow(
-        NotFoundException,
+        UserNotFoundException,
       );
     });
 
@@ -326,12 +326,12 @@ describe('AuthService', () => {
       expect(mockManager.save).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if user does not exist', async () => {
+    it('should throw UserNotFoundException if user does not exist', async () => {
       mockManager.findOneBy.mockResolvedValue(null);
 
       await expect(
         authService.remindPassword(userRequest, Language.POLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(UserNotFoundException);
     });
 
     it('should throw EmailSendFailureException if email sending fails', async () => {
@@ -385,12 +385,12 @@ describe('AuthService', () => {
       expect(mockManager.save).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if user with reset token does not exist', async () => {
+    it('should throw UserNotFoundException if user with reset token does not exist', async () => {
       mockManager.findOneBy.mockResolvedValue(null);
 
       await expect(
         authService.resetPassword(randomUUID, userRequest),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(UserNotFoundException);
     });
 
     it('should throw UserEmailAndTokenMismatchException if email does not match', async () => {

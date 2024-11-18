@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { GameSessionService } from './game-session.service';
 import { GameSession } from '@Entities/game-session.entity';
 import { GameSessionDto } from '@Dtos/game-session.dto';
@@ -9,6 +8,7 @@ import { PlayerService } from '../player/player.service';
 import { ConfigService } from '@nestjs/config';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -83,13 +83,13 @@ describe('GameSessionService', () => {
       );
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       jest
         .spyOn(service, 'getGameSession')
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(service.findOne('invalidToken')).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
     });
   });
@@ -163,7 +163,7 @@ describe('GameSessionService', () => {
       expect(result).toEqual(GameSessionDto.fromEntity(gameSession));
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) =>
@@ -171,7 +171,7 @@ describe('GameSessionService', () => {
         );
 
       await expect(service.remove('invalidToken')).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
     });
   });
@@ -196,13 +196,13 @@ describe('GameSessionService', () => {
       expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(0);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       jest
         .spyOn(service, 'getGameSession')
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(service.resetPhase('invalidToken')).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
     });
   });
@@ -255,13 +255,13 @@ describe('GameSessionService', () => {
       expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(2);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       jest
         .spyOn(service, 'getGameSession')
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(service.nextPhase('invalidToken')).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
     });
   });
@@ -281,17 +281,17 @@ describe('GameSessionService', () => {
 
       const result = await service.previousPhase(token);
 
-      expect(result.phase).toBe(1); // assuming 1 is the previous phase
+      expect(result.phase).toBe(1);
       expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(1);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       jest
         .spyOn(service, 'getGameSession')
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(service.previousPhase('invalidToken')).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
     });
   });
@@ -314,13 +314,13 @@ describe('GameSessionService', () => {
       });
     });
 
-    it('should throw NotFoundException if the game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if the game session does not exist', async () => {
       const token = 'nonExistingToken';
 
       jest.spyOn(gameSessionRepository, 'findOne').mockResolvedValue(null);
 
       await expect(service.getGameSession(token)).rejects.toThrow(
-        NotFoundException,
+        GameSessionNotFoundException,
       );
       expect(gameSessionRepository.findOne).toHaveBeenCalledWith({
         where: { token },

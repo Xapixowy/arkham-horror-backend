@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { GameSession } from '@Entities/game-session.entity';
 import { GameSessionDto } from '@Dtos/game-session.dto';
 import { User } from '@Entities/user.entity';
@@ -14,6 +13,7 @@ import { EnumHelper } from '@Helpers/enum/enum.helper';
 import { Player } from '@Entities/player.entity';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { PlayerDto } from '@Dtos/player.dto';
+import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 
 @Injectable()
 export class GameSessionService {
@@ -84,7 +84,7 @@ export class GameSessionService {
         where: { token },
       });
       if (!existingGameSession) {
-        throw new NotFoundException();
+        throw new GameSessionNotFoundException();
       }
       return GameSessionDto.fromEntity(
         await manager.remove(GameSession, existingGameSession),
@@ -191,7 +191,7 @@ export class GameSessionService {
     });
 
     if (!existingGameSession) {
-      throw new NotFoundException();
+      throw new GameSessionNotFoundException();
     }
 
     return existingGameSession;

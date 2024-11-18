@@ -7,13 +7,13 @@ import { CharacterDto } from '@Dtos/character.dto';
 import { CreateCharacterRequest } from '@Requests/character/create-character.request';
 import { UpdateCharacterRequest } from '@Requests/character/update-character.request';
 import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Language } from '@Enums/language';
 import { Card } from '@Entities/card.entity';
 import { CharacterCard } from '@Entities/character-card.entity';
 import { CharacterCardDto } from '@Dtos/character-card.dto';
+import { CharacterNotFoundException } from '@Exceptions/character/character-not-found.exception';
 
 describe('CharacterService', () => {
   let characterService: CharacterService;
@@ -104,14 +104,14 @@ describe('CharacterService', () => {
       );
     });
 
-    it('should throw NotFoundException if character does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
         .spyOn(characterService['characterRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(
         characterService.findOne(1, Language.POLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CharacterNotFoundException);
     });
   });
 
@@ -214,13 +214,13 @@ describe('CharacterService', () => {
       expect(mockManager.save).toHaveBeenCalledWith(Character, characterEntity);
     });
 
-    it('should throw NotFoundException if character does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
         .spyOn(characterService['characterRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(characterService.edit(1, characterRequest)).rejects.toThrow(
-        NotFoundException,
+        CharacterNotFoundException,
       );
     });
   });
@@ -251,11 +251,11 @@ describe('CharacterService', () => {
       );
     });
 
-    it('should throw NotFoundException if character does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       await expect(characterService.remove(1)).rejects.toThrow(
-        NotFoundException,
+        CharacterNotFoundException,
       );
     });
   });
@@ -287,11 +287,11 @@ describe('CharacterService', () => {
       expect(mockManager.save).toHaveBeenCalledWith(Character, characterEntity);
     });
 
-    it('should throw NotFoundException if character does not exist', async () => {
+    it('should throw CharacterNotFoundException if character does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       await expect(characterService.setPhoto(1, file)).rejects.toThrow(
-        NotFoundException,
+        CharacterNotFoundException,
       );
     });
   });

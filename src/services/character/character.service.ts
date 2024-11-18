@@ -7,7 +7,6 @@ import { CreateCharacterRequest } from '@Requests/character/create-character.req
 import { UpdateCharacterRequest } from '@Requests/character/update-character.request';
 import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
 import { AppConfig } from '@Configs/app.config';
 import { Language } from '@Enums/language';
@@ -15,6 +14,7 @@ import { Card } from '@Entities/card.entity';
 import { CharacterCard } from '@Entities/character-card.entity';
 import { CharacterCardDto } from '@Dtos/character-card.dto';
 import { CardService } from '@Services/card/card.service';
+import { CharacterNotFoundException } from '@Exceptions/character/character-not-found.exception';
 
 @Injectable()
 export class CharacterService {
@@ -132,7 +132,7 @@ export class CharacterService {
         where: { id },
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
       return CharacterDto.fromEntity(
         await manager.remove(Character, existingCharacter),
@@ -146,7 +146,7 @@ export class CharacterService {
         where: { id },
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
 
       const savedFilePath = this.fileUploadHelper.saveFile(
@@ -170,7 +170,7 @@ export class CharacterService {
         where: { id },
       });
       if (!existingCharacter) {
-        throw new NotFoundException();
+        throw new CharacterNotFoundException();
       }
 
       if (existingCharacter.image_path) {
@@ -266,7 +266,7 @@ export class CharacterService {
     });
 
     if (!existingCharacter) {
-      throw new NotFoundException();
+      throw new CharacterNotFoundException();
     }
 
     return existingCharacter;

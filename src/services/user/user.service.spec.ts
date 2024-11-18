@@ -10,7 +10,7 @@ import { JwtConfig } from '@Configs/jwt.config';
 import { UserDto } from '@Dtos/user.dto';
 import { StatisticsService } from '@Services/statistics/statistics.service';
 import { Statistics } from '@Types/user/statistics.type';
-import { NotFoundException } from '@Exceptions/not-found.exception';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -58,12 +58,14 @@ describe('UserService', () => {
       expect(result).toEqual(UserDto.fromEntity(user));
     });
 
-    it('should throw NotFoundException if user is not found by id', async () => {
+    it('should throw UserNotFoundException if user is not found by id', async () => {
       userService['getUser'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new UserNotFoundException());
 
-      await expect(userService.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(userService.findOne(1)).rejects.toThrow(
+        UserNotFoundException,
+      );
     });
   });
 

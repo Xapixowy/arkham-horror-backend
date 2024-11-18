@@ -19,8 +19,6 @@ export class UserOwnerGuard implements CanActivate {
 
     const { user, params } = context.switchToHttp().getRequest();
 
-    console.log('🔥', user, params);
-
     if (!params?.userId) {
       return false;
     }

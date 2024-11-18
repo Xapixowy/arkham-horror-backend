@@ -3,13 +3,13 @@ import { CardService } from './card.service';
 import { Card } from '@Entities/card.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { CardDto } from '@Dtos/card.dto';
 import { CreateCardRequest } from '@Requests/card/create-card.request';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
 import { Language } from '@Enums/language';
+import { CardNotFoundException } from '@Exceptions/card/card-not-found.exception';
 
 describe('CardService', () => {
   let cardService: CardService;
@@ -85,13 +85,13 @@ describe('CardService', () => {
       expect(result).toEqual(CardDto.fromEntity(cardEntity));
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       jest
         .spyOn(cardService['cardRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(cardService.findOne(1, Language.POLISH)).rejects.toThrow(
-        NotFoundException,
+        CardNotFoundException,
       );
     });
   });
@@ -161,11 +161,11 @@ describe('CardService', () => {
       expect(mockManager.save).toHaveBeenCalledWith(Card, cardEntity);
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       await expect(cardService.edit(1, cardRequest)).rejects.toThrow(
-        NotFoundException,
+        CardNotFoundException,
       );
     });
   });
@@ -196,14 +196,16 @@ describe('CardService', () => {
       expect(mockManager.remove).toHaveBeenCalledWith(Card, cardEntity);
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
 
-      await expect(cardService.remove(1)).rejects.toThrow(NotFoundException);
+      await expect(cardService.remove(1)).rejects.toThrow(
+        CardNotFoundException,
+      );
     });
   });
 
@@ -238,11 +240,11 @@ describe('CardService', () => {
       expect(mockManager.save).toHaveBeenCalledWith(Card, cardEntity);
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       await expect(cardService.setFrontPhoto(1, file)).rejects.toThrow(
-        NotFoundException,
+        CardNotFoundException,
       );
     });
   });
@@ -314,11 +316,11 @@ describe('CardService', () => {
       expect(mockManager.save).toHaveBeenCalledWith(Card, cardEntity);
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne = jest.fn().mockResolvedValue(null);
 
       await expect(cardService.setBackPhoto(1, file)).rejects.toThrow(
-        NotFoundException,
+        CardNotFoundException,
       );
     });
   });

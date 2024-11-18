@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from '@Entities/card.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CardDto } from '@Dtos/card.dto';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { FileUploadHelper } from '@Helpers/file-upload/file-upload.helper';
 import { FileDeleteFailedException } from '@Exceptions/file/file-delete-failed.exception';
 import { Language } from '@Enums/language';
 import { AppConfig } from '@Configs/app.config';
 import { ConfigService } from '@nestjs/config';
+import { CardNotFoundException } from '@Exceptions/card/card-not-found.exception';
 
 @Injectable()
 export class CardService {
@@ -47,7 +47,7 @@ export class CardService {
       relations: ['translations'],
     });
     if (!existingCard) {
-      throw new NotFoundException();
+      throw new CardNotFoundException();
     }
     return CardDto.fromEntity(
       language !== existingCard.locale
@@ -73,7 +73,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
       manager.merge(Card, existingCard, {
         ...cardRequest,
@@ -89,7 +89,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
       return CardDto.fromEntity(await manager.remove(Card, existingCard));
     });
@@ -101,7 +101,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       const savedFilePath = this.fileUploadHelper.saveFile(
@@ -123,7 +123,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       if (existingCard.front_image_path) {
@@ -151,7 +151,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       const savedFilePath = this.fileUploadHelper.saveFile(
@@ -173,7 +173,7 @@ export class CardService {
         where: { id },
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       if (existingCard.back_image_path) {

@@ -13,7 +13,7 @@ async function bootstrap() {
       configService.get<ValidationPipeConfig>('validationPipe'),
     ),
   );
-
+  app.enableCors();
   await app.listen(process.env.APP_PORT);
 }
 

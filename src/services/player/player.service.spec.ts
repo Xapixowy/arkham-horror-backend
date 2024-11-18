@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { PlayerService } from './player.service';
 import { Player } from '@Entities/player.entity';
 import { GameSession } from '@Entities/game-session.entity';
@@ -21,6 +20,9 @@ import { UpdatePlayerRequest } from '@Requests/player/update-player.request';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { CharacterCard } from '@Entities/character-card.entity';
 import { CharacterService } from '@Services/character/character.service';
+import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
+import { PlayerNotFoundException } from '@Exceptions/player/player-not-found.exception';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 
 describe('PlayerService', () => {
   let service: PlayerService;
@@ -98,14 +100,14 @@ describe('PlayerService', () => {
       );
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       service['getGameSession'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(
         service.findAll('invalidToken', Language.POLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(GameSessionNotFoundException);
     });
   });
 
@@ -134,15 +136,15 @@ describe('PlayerService', () => {
       );
     });
 
-    it('should throw NotFoundException if player or session does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(
         service.findOne('sessionToken', 'invalidPlayerToken', Language.POLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(PlayerNotFoundException);
     });
   });
 
@@ -169,17 +171,30 @@ describe('PlayerService', () => {
       );
     });
 
-    it('should throw NotFoundException if user or player does not exist', async () => {
+    it('should throw UserNotFoundException if user does not exist', async () => {
       const user = new User();
 
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getUserPlayerInGameSession'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new UserNotFoundException());
 
       await expect(
         service.findUserPlayer('sessionToken', user, Language.POLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(UserNotFoundException);
+    });
+
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
+      const user = new User();
+
+      service['getGameSession'] = jest.fn().mockResolvedValue({});
+      service['getUserPlayerInGameSession'] = jest
+        .fn()
+        .mockRejectedValue(new PlayerNotFoundException());
+
+      await expect(
+        service.findUserPlayer('sessionToken', user, Language.POLISH),
+      ).rejects.toThrow(PlayerNotFoundException);
     });
   });
 
@@ -247,13 +262,13 @@ describe('PlayerService', () => {
       expect(result).toEqual(PlayerDto.fromEntity(player));
     });
 
-    it('should throw NotFoundException if player does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(service.remove('invalidPlayerToken')).rejects.toThrow(
-        NotFoundException,
+        PlayerNotFoundException,
       );
     });
   });
@@ -300,17 +315,15 @@ describe('PlayerService', () => {
         language,
       );
 
-      console.log(result);
-
       expect(result).toBeDefined();
       expect(result.character.id).toBe(2);
     });
 
-    it('should throw NotFoundException if player or session does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(
         service.renewCharacter(
@@ -318,7 +331,22 @@ describe('PlayerService', () => {
           'invalidPlayerToken',
           Language.POLISH,
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(PlayerNotFoundException);
+    });
+
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
+      service['getGameSession'] = jest.fn().mockResolvedValue({});
+      service['getPlayer'] = jest
+        .fn()
+        .mockRejectedValue(new GameSessionNotFoundException());
+
+      await expect(
+        service.renewCharacter(
+          'sessionToken',
+          'invalidPlayerToken',
+          Language.POLISH,
+        ),
+      ).rejects.toThrow(GameSessionNotFoundException);
     });
   });
 
@@ -381,7 +409,7 @@ describe('PlayerService', () => {
       expect(result.length).toEqual(cards.length);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       service['getPlayer'] = jest.fn().mockResolvedValue({});
       jest
         .spyOn(service['gameSessionRepository'], 'findOne')
@@ -394,14 +422,14 @@ describe('PlayerService', () => {
           Language.POLISH,
           [1],
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(GameSessionNotFoundException);
     });
 
-    it('should throw NotFoundException if player does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(
         service.assignCards(
@@ -410,7 +438,7 @@ describe('PlayerService', () => {
           Language.POLISH,
           [1],
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(PlayerNotFoundException);
     });
   });
 
@@ -459,10 +487,10 @@ describe('PlayerService', () => {
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       service['getGameSession'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(
         service.removeCards(
@@ -471,14 +499,14 @@ describe('PlayerService', () => {
           Language.POLISH,
           [1],
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(GameSessionNotFoundException);
     });
 
-    it('should throw NotFoundException if player does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(
         service.removeCards(
@@ -487,7 +515,7 @@ describe('PlayerService', () => {
           Language.POLISH,
           [1],
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(PlayerNotFoundException);
     });
   });
 
@@ -539,10 +567,10 @@ describe('PlayerService', () => {
       expect(result).toBeInstanceOf(PlayerDto);
     });
 
-    it('should throw NotFoundException if game session does not exist', async () => {
+    it('should throw GameSessionNotFoundException if game session does not exist', async () => {
       service['getGameSession'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(
         service.updatePlayer(
@@ -551,14 +579,14 @@ describe('PlayerService', () => {
           Language.POLISH,
           {} as UpdatePlayerRequest,
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(GameSessionNotFoundException);
     });
 
-    it('should throw NotFoundException if player does not exist', async () => {
+    it('should throw PlayerNotFoundException if player does not exist', async () => {
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(
         service.updatePlayer(
@@ -567,7 +595,7 @@ describe('PlayerService', () => {
           Language.POLISH,
           {} as UpdatePlayerRequest,
         ),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(PlayerNotFoundException);
     });
   });
 
@@ -723,15 +751,15 @@ describe('PlayerService', () => {
       expect(result).toEqual(player);
     });
 
-    it('should throw NotFoundException if the player with the given token does not exist', async () => {
+    it('should throw PlayerNotFoundException if the player with the given token does not exist', async () => {
       const token = 'invalidToken';
 
       service['getPlayer'] = jest
         .fn()
-        .mockRejectedValue(new NotFoundException());
+        .mockRejectedValue(new PlayerNotFoundException());
 
       await expect(service.getPlayerByToken(token)).rejects.toThrow(
-        NotFoundException,
+        PlayerNotFoundException,
       );
     });
   });

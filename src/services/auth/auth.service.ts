@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { UserRole } from '@Enums/user/user-role.enum';
 import { UserDto } from '@Dtos/user.dto';
 import { VerifyUserRequest } from '@Requests/user/verify-user.request';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { UserEmailAndTokenMismatchException } from '@Exceptions/user/user-email-and-token-mismatch.exception';
 import { LoginUserRequest } from '@Requests/user/login-user.request';
 import { UserNotVerifiedException } from '@Exceptions/user/user-not-verified.exception';
@@ -20,6 +19,7 @@ import { UserPasswordMissmatchException } from '@Exceptions/user/user-password-m
 import { EmailService } from '../email/email.service';
 import { EmailSendFailureException } from '@Exceptions/email-send-failure.exception';
 import { Language } from '@Enums/language';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 
 @Injectable()
 export class AuthService {
@@ -77,7 +77,7 @@ export class AuthService {
         verification_token: token,
       });
       if (!existingUser) {
-        throw new NotFoundException();
+        throw new UserNotFoundException();
       }
 
       if (existingUser.email !== user.email) {
@@ -96,7 +96,7 @@ export class AuthService {
     return this.dataSource.transaction(async (manager) => {
       const existingUser = await manager.findOneBy(User, { email: user.email });
       if (!existingUser) {
-        throw new NotFoundException();
+        throw new UserNotFoundException();
       }
 
       if (!existingUser.verified_at) {
@@ -128,7 +128,7 @@ export class AuthService {
     return this.dataSource.transaction(async (manager) => {
       const existingUser = await manager.findOneBy(User, { email: user.email });
       if (!existingUser) {
-        throw new NotFoundException();
+        throw new UserNotFoundException();
       }
 
       existingUser.reset_token = crypto.randomUUID();
@@ -160,7 +160,7 @@ export class AuthService {
         reset_token: token,
       });
       if (!existingUser) {
-        throw new NotFoundException();
+        throw new UserNotFoundException();
       }
 
       if (existingUser.email !== user.email) {

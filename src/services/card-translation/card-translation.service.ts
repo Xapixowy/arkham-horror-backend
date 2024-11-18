@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { ConfigService } from '@nestjs/config';
 import { TranslationExistsException } from '@Exceptions/translation-exists.exception';
 import { AppConfig } from '@Configs/app.config';
@@ -11,6 +10,8 @@ import { CardTranslationDto } from '@Dtos/card-translation.dto';
 import { CreateCardTranslationRequest } from '@Requests/card-translation/create-card-translation.request';
 import { CardTranslation } from '@Entities/card-translation.entity';
 import { UpdateCardTranslationRequest } from '@Requests/card-translation/update-card-translation.request';
+import { CardNotFoundException } from '@Exceptions/card/card-not-found.exception';
+import { CardTranslationNotFoundException } from '@Exceptions/card-translation/card-translation-not-found.exception';
 
 @Injectable()
 export class CardTranslationService {
@@ -30,7 +31,7 @@ export class CardTranslationService {
       },
     });
     if (!card) {
-      throw new NotFoundException();
+      throw new CardNotFoundException();
     }
     return card.translations.map((translation) =>
       CardTranslationDto.fromEntity(translation),
@@ -43,13 +44,13 @@ export class CardTranslationService {
       relations: ['translations'],
     });
     if (!card) {
-      throw new NotFoundException();
+      throw new CardNotFoundException();
     }
     const translation = card.translations.find(
       (translation) => translation.locale === locale,
     );
     if (!translation) {
-      throw new NotFoundException();
+      throw new CardTranslationNotFoundException();
     }
     return CardTranslationDto.fromEntity(translation);
   }
@@ -64,7 +65,7 @@ export class CardTranslationService {
         relations: ['translations'],
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       const availableLanguages = this.configService
@@ -104,14 +105,14 @@ export class CardTranslationService {
         relations: ['translations'],
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       const existingCardTranslation = existingCard.translations.find(
         (translation) => translation.locale === locale,
       );
       if (!existingCardTranslation) {
-        throw new NotFoundException();
+        throw new CardTranslationNotFoundException();
       }
 
       const updatedCardTranslation = manager.merge(
@@ -136,14 +137,14 @@ export class CardTranslationService {
         relations: ['translations'],
       });
       if (!existingCard) {
-        throw new NotFoundException();
+        throw new CardNotFoundException();
       }
 
       const existingCardTranslation = existingCard.translations.find(
         (translation) => translation.locale === locale,
       );
       if (!existingCardTranslation) {
-        throw new NotFoundException();
+        throw new CardTranslationNotFoundException();
       }
 
       return CardTranslationDto.fromEntity(

@@ -9,7 +9,7 @@ import { JwtConfig } from '@Configs/jwt.config';
 import { UserDto } from '@Dtos/user.dto';
 import { Statistics } from '@Types/user/statistics.type';
 import { StatisticsService } from '@Services/statistics/statistics.service';
-import { NotFoundException } from '@Exceptions/not-found.exception';
+import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 
 @Injectable()
 export class UserService {
@@ -104,7 +104,7 @@ export class UserService {
     });
 
     if (!existingUser) {
-      throw new NotFoundException();
+      throw new UserNotFoundException();
     }
 
     return existingUser;

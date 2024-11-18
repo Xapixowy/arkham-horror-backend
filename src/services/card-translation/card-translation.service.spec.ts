@@ -4,7 +4,6 @@ import { Card } from '@Entities/card.entity';
 import { CardTranslation } from '@Entities/card-translation.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { NotFoundException } from '@Exceptions/not-found.exception';
 import { TranslationExistsException } from '@Exceptions/translation-exists.exception';
 import { LanguageNotSupportedExceptionException } from '@Exceptions/language-not-supported-exception.exception';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -13,6 +12,8 @@ import { CreateCardTranslationRequest } from '@Requests/card-translation/create-
 import { UpdateCardTranslationRequest } from '@Requests/card-translation/update-card-translation.request';
 import { AppConfig } from '@Configs/app.config';
 import { Language } from '@Enums/language';
+import { CardNotFoundException } from '@Exceptions/card/card-not-found.exception';
+import { CardTranslationNotFoundException } from '@Exceptions/card-translation/card-translation-not-found.exception';
 
 describe('CardTranslationService', () => {
   let cardTranslationService: CardTranslationService;
@@ -74,13 +75,13 @@ describe('CardTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if card does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       jest
         .spyOn(cardTranslationService['cardRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(cardTranslationService.findAll(1)).rejects.toThrow(
-        NotFoundException,
+        CardNotFoundException,
       );
     });
   });
@@ -102,14 +103,14 @@ describe('CardTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if card or translation does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       jest
         .spyOn(cardTranslationService['cardRepository'], 'findOne')
         .mockResolvedValue(null);
 
       await expect(
         cardTranslationService.findOne(1, Language.ENGLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CardNotFoundException);
     });
   });
 
@@ -209,12 +210,23 @@ describe('CardTranslationService', () => {
       expect(mockManager.save).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if card or translation does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne.mockResolvedValue(null);
 
       await expect(
         cardTranslationService.edit(1, Language.ENGLISH, updateRequest),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CardNotFoundException);
+    });
+
+    it('should throw CardTranslationNotFoundException if card translation does not exist', async () => {
+      mockManager.findOne.mockResolvedValue({
+        ...cardEntity,
+        translations: [],
+      });
+
+      await expect(
+        cardTranslationService.edit(1, Language.ENGLISH, updateRequest),
+      ).rejects.toThrow(CardTranslationNotFoundException);
     });
   });
 
@@ -252,12 +264,23 @@ describe('CardTranslationService', () => {
       );
     });
 
-    it('should throw NotFoundException if card or translation does not exist', async () => {
+    it('should throw CardNotFoundException if card does not exist', async () => {
       mockManager.findOne.mockResolvedValue(null);
 
       await expect(
         cardTranslationService.delete(1, Language.ENGLISH),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(CardNotFoundException);
+    });
+
+    it('should throw CardTranslationNotFoundException if card translation does not exist', async () => {
+      mockManager.findOne.mockResolvedValue({
+        ...cardEntity,
+        translations: [],
+      });
+
+      await expect(
+        cardTranslationService.delete(1, Language.ENGLISH),
+      ).rejects.toThrow(CardTranslationNotFoundException);
     });
   });
 });
