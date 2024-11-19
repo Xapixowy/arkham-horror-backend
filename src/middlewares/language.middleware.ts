@@ -10,6 +10,16 @@ export class LanguageMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction): Promise<void> {
     const defaultLanguage = this.configService.get<Language>('app.language');
+
+    const isOriginalLanguageRequested =
+      req.query['originalLanguage'] === 'true';
+
+    if (isOriginalLanguageRequested) {
+      req['language'] = defaultLanguage;
+      next();
+      return;
+    }
+
     const headerLanguages = req.headers['accept-language']?.split(',') ?? [];
     const validHeaderLanguages = headerLanguages.filter((language) =>
       EnumHelper.isEnumContainsValue(Language, language),
@@ -19,7 +29,6 @@ export class LanguageMiddleware implements NestMiddleware {
     req['language'] = hasValidHeaderLanguages
       ? EnumHelper.getEnumByValue(Language, validHeaderLanguages[0])
       : defaultLanguage;
-
     next();
   }
 }
