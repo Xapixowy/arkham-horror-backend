@@ -79,17 +79,20 @@ export class Card {
   updated_at: Date;
 
   @OneToMany(() => CardTranslation, (cardTranslation) => cardTranslation.card, {
+    cascade: true,
     onDelete: 'CASCADE',
   })
   translations?: CardTranslation[];
 
   @OneToMany(() => CharacterCard, (characterCard) => characterCard.card, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   characterCards?: CharacterCard[];
 
   @OneToMany(() => PlayerCard, (playerCard) => playerCard.card, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   playerCards?: PlayerCard[];
 }

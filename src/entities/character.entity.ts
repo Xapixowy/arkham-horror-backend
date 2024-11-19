@@ -99,12 +99,16 @@ export class Character {
   @OneToMany(
     () => CharacterTranslation,
     (characterTranslation) => characterTranslation.character,
-    { onDelete: 'CASCADE' },
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
   )
   translations?: CharacterTranslation[];
 
   @OneToMany(() => CharacterCard, (characterCard) => characterCard.character, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   characterCards?: CharacterCard[];
 

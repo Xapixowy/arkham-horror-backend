@@ -90,6 +90,7 @@ export class Player {
 
   @OneToMany(() => PlayerCard, (playerCard) => playerCard.player, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   playerCards?: PlayerCard[];
 

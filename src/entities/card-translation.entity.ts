@@ -42,7 +42,9 @@ export class CardTranslation {
   })
   updated_at: Date;
 
-  @ManyToOne(() => Card, (card) => card.translations)
+  @ManyToOne(() => Card, (card) => card.translations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'card_id' })
   card: Card;
 }

@@ -54,7 +54,9 @@ export class CharacterTranslation {
   })
   updated_at: Date;
 
-  @ManyToOne(() => Character, (character) => character.translations)
+  @ManyToOne(() => Character, (character) => character.translations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'character_id' })
   character: Character;
 }
