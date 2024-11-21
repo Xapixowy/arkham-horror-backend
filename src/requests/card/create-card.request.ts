@@ -35,11 +35,11 @@ export class CreateCardRequest {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateAttributeModifierRequest)
-  attributeModifiers: CreateAttributeModifierRequest[];
+  attribute_modifiers: CreateAttributeModifierRequest[];
 
   @IsInt()
   @IsOptional()
   @Min(0)
   @Max(2)
-  handUsage: number;
+  hand_usage: number;
 }

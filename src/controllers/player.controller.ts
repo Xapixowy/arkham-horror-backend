@@ -109,7 +109,7 @@ export class PlayerController {
         gameSessionToken,
         playerToken,
         language,
-        assignPlayerCardsRequest.cardIds,
+        assignPlayerCardsRequest.card_ids,
       ),
     );
   }
@@ -128,7 +128,7 @@ export class PlayerController {
         gameSessionToken,
         playerToken,
         language,
-        removePlayerCardsRequest.cardIds,
+        removePlayerCardsRequest.card_ids,
       ),
     );
   }
