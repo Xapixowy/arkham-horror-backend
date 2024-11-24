@@ -13,6 +13,7 @@ import { CardNotFoundException } from '@Exceptions/card/card-not-found.exception
 
 describe('CardService', () => {
   let cardService: CardService;
+  let cardRepository: Repository<Card>;
   let dataSource: DataSource;
   let fileUploadHelper: FileUploadHelper;
 
@@ -20,7 +21,12 @@ describe('CardService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CardService,
-        { provide: getRepositoryToken(Card), useClass: Repository },
+        {
+          provide: getRepositoryToken(Card),
+          useValue: {
+            find: jest.fn(),
+          },
+        },
         { provide: DataSource, useValue: { transaction: jest.fn() } },
         {
           provide: FileUploadHelper,
@@ -49,6 +55,7 @@ describe('CardService', () => {
     }).compile();
 
     cardService = module.get<CardService>(CardService);
+    cardRepository = module.get<Repository<Card>>(getRepositoryToken(Card));
     dataSource = module.get<DataSource>(DataSource);
     fileUploadHelper = module.get<FileUploadHelper>(FileUploadHelper);
   });
@@ -56,9 +63,7 @@ describe('CardService', () => {
   describe('findAll', () => {
     it('should retrieve all cards and map to CardDto', async () => {
       const cardEntities = [{ id: 1, locale: Language.POLISH }] as Card[];
-      jest
-        .spyOn(cardService['cardRepository'], 'find')
-        .mockResolvedValue(cardEntities);
+      jest.spyOn(cardRepository, 'find').mockResolvedValue(cardEntities);
 
       const result = await cardService.findAll(Language.POLISH);
 
@@ -73,13 +78,10 @@ describe('CardService', () => {
 
     beforeEach(() => {
       cardEntity = { id: 1, locale: Language.POLISH, translations: [] } as Card;
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
     });
 
     it('should retrieve one card by id', async () => {
-      jest
-        .spyOn(cardService['cardRepository'], 'findOne')
-        .mockResolvedValue(cardEntity);
-
       const result = await cardService.findOne(1, Language.POLISH);
 
       expect(result).toEqual(CardDto.fromEntity(cardEntity));
@@ -87,8 +89,8 @@ describe('CardService', () => {
 
     it('should throw CardNotFoundException if card does not exist', async () => {
       jest
-        .spyOn(cardService['cardRepository'], 'findOne')
-        .mockResolvedValue(null);
+        .spyOn(cardService as any, 'getCard')
+        .mockRejectedValue(new CardNotFoundException());
 
       await expect(cardService.findOne(1, Language.POLISH)).rejects.toThrow(
         CardNotFoundException,
@@ -118,6 +120,7 @@ describe('CardService', () => {
         save: jest.fn().mockResolvedValue(cardEntity),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -149,6 +152,7 @@ describe('CardService', () => {
         merge: jest.fn(),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -162,7 +166,9 @@ describe('CardService', () => {
     });
 
     it('should throw CardNotFoundException if card does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(cardService as any, 'getCard')
+        .mockRejectedValue(new CardNotFoundException());
 
       await expect(cardService.edit(1, cardRequest)).rejects.toThrow(
         CardNotFoundException,
@@ -184,6 +190,7 @@ describe('CardService', () => {
         remove: jest.fn().mockResolvedValue(cardEntity),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -197,7 +204,9 @@ describe('CardService', () => {
     });
 
     it('should throw CardNotFoundException if card does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(cardService as any, 'getCard')
+        .mockRejectedValue(new CardNotFoundException());
 
       jest
         .spyOn(dataSource, 'transaction')
@@ -227,6 +236,7 @@ describe('CardService', () => {
         save: jest.fn().mockResolvedValue(cardEntity),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest.spyOn(fileUploadHelper, 'saveFile').mockReturnValue(savedFilePath);
       jest
         .spyOn(dataSource, 'transaction')
@@ -241,7 +251,9 @@ describe('CardService', () => {
     });
 
     it('should throw CardNotFoundException if card does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(cardService as any, 'getCard')
+        .mockRejectedValue(new CardNotFoundException());
 
       await expect(cardService.setFrontPhoto(1, file)).rejects.toThrow(
         CardNotFoundException,
@@ -263,6 +275,7 @@ describe('CardService', () => {
         save: jest.fn().mockResolvedValue(cardEntity),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -303,6 +316,8 @@ describe('CardService', () => {
         findOne: jest.fn().mockResolvedValue(cardEntity),
         save: jest.fn().mockResolvedValue(cardEntity),
       };
+
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -317,7 +332,9 @@ describe('CardService', () => {
     });
 
     it('should throw CardNotFoundException if card does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(cardService as any, 'getCard')
+        .mockRejectedValue(new CardNotFoundException());
 
       await expect(cardService.setBackPhoto(1, file)).rejects.toThrow(
         CardNotFoundException,
@@ -339,6 +356,7 @@ describe('CardService', () => {
         save: jest.fn().mockResolvedValue(cardEntity),
       };
 
+      jest.spyOn(cardService as any, 'getCard').mockResolvedValue(cardEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));

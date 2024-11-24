@@ -127,13 +127,9 @@ export class CharacterService {
   }
 
   async remove(id: number): Promise<CharacterDto> {
+    const existingCharacter = await this.getCharacter(id);
+
     return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOne(Character, {
-        where: { id },
-      });
-      if (!existingCharacter) {
-        throw new CharacterNotFoundException();
-      }
       return CharacterDto.fromEntity(
         await manager.remove(Character, existingCharacter),
       );

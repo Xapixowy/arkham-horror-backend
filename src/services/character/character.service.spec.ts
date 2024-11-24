@@ -92,7 +92,7 @@ describe('CharacterService', () => {
         characterCards: [],
       } as Character;
       jest
-        .spyOn(characterService['characterRepository'], 'findOne')
+        .spyOn(characterService as any, 'getCharacter')
         .mockResolvedValue(characterEntity);
 
       const result = await characterService.findOne(1, Language.POLISH);
@@ -106,8 +106,8 @@ describe('CharacterService', () => {
 
     it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
-        .spyOn(characterService['characterRepository'], 'findOne')
-        .mockResolvedValue(null);
+        .spyOn(characterService as any, 'getCharacter')
+        .mockRejectedValue(new CharacterNotFoundException());
 
       await expect(
         characterService.findOne(1, Language.POLISH),
@@ -195,9 +195,11 @@ describe('CharacterService', () => {
       };
 
       jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockResolvedValue(characterEntity);
+      jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
-
       jest
         .spyOn(characterService['characterRepository'], 'findOne')
         .mockResolvedValue(characterEntity);
@@ -216,8 +218,8 @@ describe('CharacterService', () => {
 
     it('should throw CharacterNotFoundException if character does not exist', async () => {
       jest
-        .spyOn(characterService['characterRepository'], 'findOne')
-        .mockResolvedValue(null);
+        .spyOn(characterService as any, 'getCharacter')
+        .mockRejectedValue(new CharacterNotFoundException());
 
       await expect(characterService.edit(1, characterRequest)).rejects.toThrow(
         CharacterNotFoundException,
@@ -237,6 +239,9 @@ describe('CharacterService', () => {
       };
 
       jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockResolvedValue(characterEntity);
+      jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
     });
@@ -252,7 +257,9 @@ describe('CharacterService', () => {
     });
 
     it('should throw CharacterNotFoundException if character does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockRejectedValue(new CharacterNotFoundException());
 
       await expect(characterService.remove(1)).rejects.toThrow(
         CharacterNotFoundException,
@@ -267,13 +274,16 @@ describe('CharacterService', () => {
     const savedFilePath = 'saved/path/to/file.jpg';
 
     beforeEach(() => {
-      characterEntity = { id: 1 } as Character;
+      characterEntity = { id: 1, characterCards: [] } as Character;
       file = { filename: 'test.jpg' } as Express.Multer.File;
       mockManager = {
         findOne: jest.fn().mockResolvedValue(characterEntity),
         save: jest.fn().mockResolvedValue(characterEntity),
       };
 
+      jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockResolvedValue(characterEntity);
       jest.spyOn(fileUploadHelper, 'saveFile').mockReturnValue(savedFilePath);
       jest
         .spyOn(dataSource, 'transaction')
@@ -283,12 +293,18 @@ describe('CharacterService', () => {
     it('should set the photo path', async () => {
       const result = await characterService.setPhoto(1, file);
 
-      expect(result).toEqual(CharacterDto.fromEntity(characterEntity));
+      expect(result).toEqual(
+        CharacterDto.fromEntity(characterEntity, {
+          characterCards: true,
+        }),
+      );
       expect(mockManager.save).toHaveBeenCalledWith(Character, characterEntity);
     });
 
     it('should throw CharacterNotFoundException if character does not exist', async () => {
-      mockManager.findOne = jest.fn().mockResolvedValue(null);
+      jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockRejectedValue(new CharacterNotFoundException());
 
       await expect(characterService.setPhoto(1, file)).rejects.toThrow(
         CharacterNotFoundException,
@@ -301,12 +317,19 @@ describe('CharacterService', () => {
     let mockManager: { findOne: jest.Mock; save: jest.Mock };
 
     beforeEach(() => {
-      characterEntity = { id: 1, image_path: 'path/to/image.jpg' } as Character;
+      characterEntity = {
+        id: 1,
+        image_path: 'path/to/image.jpg',
+        characterCards: [],
+      } as Character;
       mockManager = {
         findOne: jest.fn().mockResolvedValue(characterEntity),
         save: jest.fn().mockResolvedValue(characterEntity),
       };
 
+      jest
+        .spyOn(characterService as any, 'getCharacter')
+        .mockResolvedValue(characterEntity);
       jest
         .spyOn(dataSource, 'transaction')
         .mockImplementation(async (cb: any) => cb(mockManager));
@@ -317,7 +340,11 @@ describe('CharacterService', () => {
 
       const result = await characterService.deletePhoto(1);
 
-      expect(result).toEqual(CharacterDto.fromEntity(characterEntity));
+      expect(result).toEqual(
+        CharacterDto.fromEntity(characterEntity, {
+          characterCards: true,
+        }),
+      );
       expect(mockManager.save).toHaveBeenCalledWith(Character, characterEntity);
     });
 

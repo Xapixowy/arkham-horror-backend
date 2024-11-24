@@ -134,6 +134,12 @@ describe('CharacterTranslationService', () => {
         description: 'Translation Description',
         profession: 'Translation Profession',
         starting_location: 'Translation Starting Location',
+        skills: [
+          {
+            name: 'Skill name',
+            description: 'Skill description',
+          },
+        ],
       };
       characterEntity = { id: 1, translations: [] } as Character;
       mockManager = {

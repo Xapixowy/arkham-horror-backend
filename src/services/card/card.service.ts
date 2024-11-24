@@ -42,7 +42,7 @@ export class CardService {
   }
 
   async findOne(id: number, language: Language): Promise<CardDto> {
-    const existingCard = await this.getCardById(id, ['translations']);
+    const existingCard = await this.getCard(id, ['translations']);
 
     return CardDto.fromEntity(
       language !== existingCard.locale
@@ -63,7 +63,7 @@ export class CardService {
   }
 
   async edit(id: number, cardRequest: CreateCardRequest): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
 
     return await this.dataSource.transaction(async (manager) => {
       manager.merge(Card, existingCard, {
@@ -75,7 +75,7 @@ export class CardService {
   }
 
   async remove(id: number): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
     return this.dataSource.transaction(async (manager) => {
       await manager.remove(Card, existingCard);
 
@@ -84,7 +84,7 @@ export class CardService {
   }
 
   async setFrontPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
 
     return this.dataSource.transaction(async (manager) => {
       const savedFilePath = this.fileUploadHelper.saveFile(
@@ -101,7 +101,7 @@ export class CardService {
   }
 
   async deleteFrontPhoto(id: number): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
 
     return this.dataSource.transaction(async (manager) => {
       if (existingCard.front_image_path) {
@@ -124,7 +124,7 @@ export class CardService {
   }
 
   async setBackPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
 
     return this.dataSource.transaction(async (manager) => {
       const savedFilePath = this.fileUploadHelper.saveFile(
@@ -141,7 +141,7 @@ export class CardService {
   }
 
   async deleteBackPhoto(id: number): Promise<CardDto> {
-    const existingCard = await this.getCardById(id);
+    const existingCard = await this.getCard(id);
 
     return this.dataSource.transaction(async (manager) => {
       if (existingCard.back_image_path) {
@@ -161,7 +161,7 @@ export class CardService {
     });
   }
 
-  async getCardById(
+  private async getCard(
     id: number,
     relations: string[] = ['translations'],
   ): Promise<Card> {

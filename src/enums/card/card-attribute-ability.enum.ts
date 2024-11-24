@@ -36,4 +36,5 @@ export enum CardAttributeAbility {
 
   // Restrictions
   CANNOT_SPEND_MORE_THAN_2_HINT_TOKENS_FOR_WILL_TEST = 'cannot_spend_more_than_2_hint_tokens_for_will_test',
+  ONE_ATTRIBUTE_FIELD_CHANGE_PER_TURN = 'one_attribute_field_change_per_turn',
 }
