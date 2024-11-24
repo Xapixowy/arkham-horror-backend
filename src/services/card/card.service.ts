@@ -26,11 +26,6 @@ export class CardService {
   }
 
   async findAll(language: Language): Promise<CardDto[]> {
-    const schema = await this.dataSource
-      .getRepository(Card)
-      .query('SHOW CREATE TABLE card;');
-    console.log(schema);
-
     const cards = await this.cardRepository.find({
       relations: ['translations'],
       order: {

@@ -220,6 +220,7 @@ export class CharacterService {
       character.description = translation.description;
       character.profession = translation.profession;
       character.starting_location = translation.starting_location;
+      character.skills = translation.skills;
       character.locale = translation.locale;
     }
 

@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Language } from '@Enums/language';
 import { Character } from '@Entities/character.entity';
+import { Skill } from '@Types/character/skill.type';
 
 @Entity()
 export class CharacterTranslation {
@@ -35,6 +36,11 @@ export class CharacterTranslation {
     length: 64,
   })
   starting_location: string;
+
+  @Column({
+    type: 'json',
+  })
+  skills: Skill[];
 
   @Column({
     type: 'enum',

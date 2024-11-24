@@ -4,6 +4,7 @@ import { CharacterDto } from '@Dtos/character.dto';
 import { DTOTypeMapping } from '@Types/dto/dto-type-mapping.type';
 import { Character } from '@Entities/character.entity';
 import { DtoHelper } from '@Helpers/dto/dto.helper';
+import { Skill } from '@Types/character/skill.type';
 
 export class CharacterTranslationDto {
   private static readonly typeMapping: DTOTypeMapping = {
@@ -16,6 +17,7 @@ export class CharacterTranslationDto {
     public description: string,
     public profession: string,
     public starting_location: string,
+    public skills: Skill[],
     public locale: Language,
     public created_at: Date,
     public updated_at: Date,
@@ -35,6 +37,7 @@ export class CharacterTranslationDto {
         characterTranslation.description,
         characterTranslation.profession,
         characterTranslation.starting_location,
+        characterTranslation.skills,
         characterTranslation.locale,
         characterTranslation.created_at,
         characterTranslation.updated_at,
