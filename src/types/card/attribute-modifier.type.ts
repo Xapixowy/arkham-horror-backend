@@ -1,6 +1,6 @@
-import { CardAttributeModifierEnum } from '@Enums/card/card-attribute-modifier.enum';
+import { CardAttribute } from '@Enums/card/card-attribute.enum';
 
 export type AttributeModifier = {
-  modifier: CardAttributeModifierEnum;
+  modifier: CardAttribute;
   value: number;
 };

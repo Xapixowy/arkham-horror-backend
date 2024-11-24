@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, Min, ValidateNested } from 'class-validator';
 import { CreateCharacterEquipmentRandomRequest } from '@Requests/character/create-character-equipment-random.request';
 import { Type } from 'class-transformer';
 
@@ -21,8 +15,4 @@ export class CreateCharacterEquipmentRequest {
   @Type(() => CreateCharacterEquipmentRandomRequest)
   @IsNotEmpty()
   random: CreateCharacterEquipmentRandomRequest;
-
-  @IsArray()
-  @IsInt({ each: true })
-  static: number[];
 }

@@ -38,7 +38,7 @@ export class UpdateCharacterRequest {
   @IsString()
   @MaxLength(64)
   @IsOptional()
-  startingLocation?: string;
+  starting_location?: string;
 
   @IsInt()
   @Min(0)
@@ -74,5 +74,5 @@ export class UpdateCharacterRequest {
   @IsArray()
   @IsInt({ each: true })
   @IsOptional()
-  cardIds: number[];
+  card_ids: number[];
 }

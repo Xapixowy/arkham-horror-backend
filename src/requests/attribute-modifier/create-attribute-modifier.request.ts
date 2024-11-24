@@ -1,10 +1,10 @@
 import { AttributeModifier } from '@Types/card/attribute-modifier.type';
 import { IsEnum, IsInt } from 'class-validator';
-import { CardAttributeModifierEnum } from '@Enums/card/card-attribute-modifier.enum';
+import { CardAttribute } from '@Enums/card/card-attribute.enum';
 
 export class CreateAttributeModifierRequest implements AttributeModifier {
-  @IsEnum(CardAttributeModifierEnum)
-  modifier: CardAttributeModifierEnum;
+  @IsEnum(CardAttribute)
+  modifier: CardAttribute;
 
   @IsInt()
   value: number;

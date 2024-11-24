@@ -67,5 +67,5 @@ export class CreateCharacterRequest {
   @IsArray()
   @IsInt({ each: true })
   @IsOptional()
-  cardIds: number[];
+  card_ids: number[];
 }

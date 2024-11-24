@@ -70,7 +70,7 @@ export class CharacterService {
 
       const characterCards = await this.assignCardsToCharacter(
         characterEntity,
-        characterRequest.cardIds,
+        characterRequest.card_ids,
         manager,
       );
 
@@ -106,7 +106,7 @@ export class CharacterService {
 
       const characterCards = await this.assignCardsToCharacter(
         updatedCharacter,
-        characterRequest.cardIds,
+        characterRequest.card_ids,
         manager,
       );
 
@@ -141,14 +141,9 @@ export class CharacterService {
   }
 
   async setPhoto(id: number, file: Express.Multer.File): Promise<CharacterDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOne(Character, {
-        where: { id },
-      });
-      if (!existingCharacter) {
-        throw new CharacterNotFoundException();
-      }
+    const existingCharacter = await this.getCharacter(id);
 
+    return this.dataSource.transaction(async (manager) => {
       const savedFilePath = this.fileUploadHelper.saveFile(
         file,
         this.fileUploadHelper.generateDestinationPath(`characters/${id}`, true),
@@ -158,21 +153,27 @@ export class CharacterService {
         this.fileUploadHelper.localToRemotePath(savedFilePath);
       existingCharacter.updated_at = new Date();
 
-      return CharacterDto.fromEntity(
-        await manager.save(Character, existingCharacter),
+      const updatedCharacter = await manager.save(Character, existingCharacter);
+
+      const characterDto = CharacterDto.fromEntity(updatedCharacter, {
+        characterCards: true,
+      });
+
+      characterDto.characterCards = existingCharacter.characterCards.map(
+        (characterCardEntity) =>
+          CharacterCardDto.fromEntity(characterCardEntity, {
+            card: true,
+          }),
       );
+
+      return characterDto;
     });
   }
 
   async deletePhoto(id: number): Promise<CharacterDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCharacter = await manager.findOne(Character, {
-        where: { id },
-      });
-      if (!existingCharacter) {
-        throw new CharacterNotFoundException();
-      }
+    const existingCharacter = await this.getCharacter(id);
 
+    return this.dataSource.transaction(async (manager) => {
       if (existingCharacter.image_path) {
         const isFileDeleted = this.fileUploadHelper.deleteFile(
           this.fileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
@@ -186,9 +187,20 @@ export class CharacterService {
         existingCharacter.updated_at = new Date();
       }
 
-      return CharacterDto.fromEntity(
-        await manager.save(Character, existingCharacter),
+      const updatedCharacter = await manager.save(Character, existingCharacter);
+
+      const characterDto = CharacterDto.fromEntity(updatedCharacter, {
+        characterCards: true,
+      });
+
+      characterDto.characterCards = existingCharacter.characterCards.map(
+        (characterCardEntity) =>
+          CharacterCardDto.fromEntity(characterCardEntity, {
+            card: true,
+          }),
       );
+
+      return characterDto;
     });
   }
 
