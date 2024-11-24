@@ -182,7 +182,6 @@ export class PlayerService {
     return this.dataSource.transaction(async (manager) => {
       existingPlayer.character =
         await this.getUnusedCharacterInGameSession(existingGameSession);
-      existingPlayer.updated_at = new Date();
 
       const updatedPlayer = await manager.save(Player, {
         ...existingPlayer,
@@ -275,6 +274,7 @@ export class PlayerService {
 
       await manager.save(Player, {
         ...updatedPlayer,
+        updated_at: new Date(),
         statistics: {
           ...updatedPlayer.statistics,
           cards_acquired:
@@ -336,6 +336,7 @@ export class PlayerService {
 
       await manager.save(Player, {
         ...updatedPlayer,
+        updated_at: new Date(),
         statistics: {
           ...updatedPlayer.statistics,
           cards_lost: updatedPlayer.statistics.cards_lost + lostCardCount,
@@ -373,6 +374,7 @@ export class PlayerService {
     const newPlayer = {
       ...ObjectHelper.replaceDefinedValues(existingPlayer, updatePlayerRequest),
       statistics: newStatistics,
+      updated_at: new Date(),
     };
 
     return this.dataSource.transaction(async (manager) => {

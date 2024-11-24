@@ -99,6 +99,8 @@ export class GameSessionService {
 
     return this.dataSource.transaction(async (manager) => {
       gameSession.phase = gameSessionConfig.defaultPhase;
+      gameSession.updated_at = new Date();
+
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
       this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
@@ -125,6 +127,7 @@ export class GameSessionService {
         theoreticalNextPhaseValue > maxPhaseValue
           ? minPhaseValue
           : theoreticalNextPhaseValue;
+      gameSession.updated_at = new Date();
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
@@ -132,6 +135,7 @@ export class GameSessionService {
 
       const updatedPlayers: Player[] = gameSession.players.map((player) => ({
         ...player,
+        updated_at: new Date(),
         statistics: {
           ...player.statistics,
           phases_played: player.statistics.phases_played + 1,
@@ -170,6 +174,7 @@ export class GameSessionService {
         theoreticalPreviousPhaseValue < minPhaseValue
           ? maxPhaseValue
           : theoreticalPreviousPhaseValue;
+      gameSession.updated_at = new Date();
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 

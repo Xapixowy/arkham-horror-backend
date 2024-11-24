@@ -67,13 +67,13 @@ export class Card {
   locale: Language;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   created_at: Date;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;

@@ -53,8 +53,6 @@ export class AuthService {
           ),
           role: UserRole.USER,
           verification_token: crypto.randomUUID(),
-          created_at: new Date(),
-          updated_at: new Date(),
         }),
       );
 

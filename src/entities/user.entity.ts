@@ -46,19 +46,19 @@ export class User {
   verification_token: string | null;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: true,
   })
   verified_at: Date | null;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   created_at: Date;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;

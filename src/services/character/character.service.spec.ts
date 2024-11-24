@@ -124,7 +124,7 @@ describe('CharacterService', () => {
     beforeEach(() => {
       characterRequest = {
         name: 'Test Character',
-        cardIds: [1, 2],
+        card_ids: [1, 2],
       } as CreateCharacterRequest;
       characterEntity = {
         id: 1,

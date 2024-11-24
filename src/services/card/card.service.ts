@@ -26,6 +26,11 @@ export class CardService {
   }
 
   async findAll(language: Language): Promise<CardDto[]> {
+    const schema = await this.dataSource
+      .getRepository(Card)
+      .query('SHOW CREATE TABLE card;');
+    console.log(schema);
+
     const cards = await this.cardRepository.find({
       relations: ['translations'],
       order: {
@@ -42,13 +47,8 @@ export class CardService {
   }
 
   async findOne(id: number, language: Language): Promise<CardDto> {
-    const existingCard = await this.cardRepository.findOne({
-      where: { id },
-      relations: ['translations'],
-    });
-    if (!existingCard) {
-      throw new CardNotFoundException();
-    }
+    const existingCard = await this.getCardById(id, ['translations']);
+
     return CardDto.fromEntity(
       language !== existingCard.locale
         ? CardService.getTranslatedCard(existingCard, language)
@@ -68,13 +68,9 @@ export class CardService {
   }
 
   async edit(id: number, cardRequest: CreateCardRequest): Promise<CardDto> {
+    const existingCard = await this.getCardById(id);
+
     return await this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
       manager.merge(Card, existingCard, {
         ...cardRequest,
         updated_at: new Date(),
@@ -84,26 +80,18 @@ export class CardService {
   }
 
   async remove(id: number): Promise<CardDto> {
+    const existingCard = await this.getCardById(id);
     return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
-      return CardDto.fromEntity(await manager.remove(Card, existingCard));
+      await manager.remove(Card, existingCard);
+
+      return CardDto.fromEntity(existingCard);
     });
   }
 
   async setFrontPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
+    const existingCard = await this.getCardById(id);
 
+    return this.dataSource.transaction(async (manager) => {
       const savedFilePath = this.fileUploadHelper.saveFile(
         file,
         this.fileUploadHelper.generateDestinationPath(`cards/${id}`, true),
@@ -118,14 +106,9 @@ export class CardService {
   }
 
   async deleteFrontPhoto(id: number): Promise<CardDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
+    const existingCard = await this.getCardById(id);
 
+    return this.dataSource.transaction(async (manager) => {
       if (existingCard.front_image_path) {
         const isFileDeleted = this.fileUploadHelper.deleteFile(
           this.fileUploadHelper.remoteToLocalPath(
@@ -146,14 +129,9 @@ export class CardService {
   }
 
   async setBackPhoto(id: number, file: Express.Multer.File): Promise<CardDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
+    const existingCard = await this.getCardById(id);
 
+    return this.dataSource.transaction(async (manager) => {
       const savedFilePath = this.fileUploadHelper.saveFile(
         file,
         this.fileUploadHelper.generateDestinationPath(`cards/${id}`, true),
@@ -168,14 +146,9 @@ export class CardService {
   }
 
   async deleteBackPhoto(id: number): Promise<CardDto> {
-    return this.dataSource.transaction(async (manager) => {
-      const existingCard = await manager.findOne(Card, {
-        where: { id },
-      });
-      if (!existingCard) {
-        throw new CardNotFoundException();
-      }
+    const existingCard = await this.getCardById(id);
 
+    return this.dataSource.transaction(async (manager) => {
       if (existingCard.back_image_path) {
         const isFileDeleted = this.fileUploadHelper.deleteFile(
           this.fileUploadHelper.remoteToLocalPath(existingCard.back_image_path),
@@ -191,6 +164,22 @@ export class CardService {
 
       return CardDto.fromEntity(await manager.save(Card, existingCard));
     });
+  }
+
+  async getCardById(
+    id: number,
+    relations: string[] = ['translations'],
+  ): Promise<Card> {
+    const existingCard = this.cardRepository.findOne({
+      where: { id },
+      relations,
+    });
+
+    if (!existingCard) {
+      throw new CardNotFoundException();
+    }
+
+    return existingCard;
   }
 
   static getTranslatedCard(card: Card, language: Language): Card {
