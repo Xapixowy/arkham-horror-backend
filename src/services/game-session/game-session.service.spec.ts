@@ -310,7 +310,7 @@ describe('GameSessionService', () => {
       expect(result).toEqual(gameSession);
       expect(gameSessionRepository.findOne).toHaveBeenCalledWith({
         where: { token },
-        relations: ['players'],
+        relations: ['players', 'players.character', 'players.user'],
       });
     });
 
@@ -324,7 +324,7 @@ describe('GameSessionService', () => {
       );
       expect(gameSessionRepository.findOne).toHaveBeenCalledWith({
         where: { token },
-        relations: ['players'],
+        relations: ['players', 'players.character', 'players.user'],
       });
     });
   });

@@ -29,7 +29,7 @@ export class GameSessionService {
   async findAll(): Promise<GameSessionDto[]> {
     return this.dataSource.transaction(async (manager) => {
       const gameSessions = await manager.find(GameSession, {
-        relations: ['players'],
+        relations: ['players', 'players.character', 'players.user'],
         order: {
           id: 'ASC',
         },
@@ -188,7 +188,7 @@ export class GameSessionService {
 
   async getGameSession(
     token: string,
-    relations: string[] = ['players'],
+    relations: string[] = ['players', 'players.character', 'players.user'],
   ): Promise<GameSession> {
     const existingGameSession = await this.gameSessionRepository.findOne({
       where: { token },
