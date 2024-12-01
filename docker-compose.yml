@@ -25,6 +25,7 @@ services:
       - .env
     volumes:
       - ./public:/usr/src/app/public
+      - ./database:/usr/src/app/database
     depends_on:
       - database
     networks:
