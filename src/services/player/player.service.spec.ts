@@ -23,6 +23,10 @@ import { CharacterService } from '@Services/character/character.service';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 import { PlayerNotFoundException } from '@Exceptions/player/player-not-found.exception';
 import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
+import { QuantityCard } from '@Types/card/quantity-card.type';
+import { PlayerCard } from '@Entities/player-card.entity';
+import { ArrayHelper } from '@Helpers/array/array.helper';
+import { CardType } from '@Enums/card/card.type';
 
 describe('PlayerService', () => {
   let service: PlayerService;
@@ -623,6 +627,248 @@ describe('PlayerService', () => {
     });
   });
 
+  describe('assignQuantityCardsToPlayer', () => {
+    let manager: EntityManager;
+    let player: Player;
+    let quantityCards: QuantityCard[];
+
+    beforeEach(() => {
+      player = {
+        id: 1,
+        playerCards: [
+          { id: 1, card: { id: 1 }, quantity: 1 } as PlayerCard,
+          { id: 2, card: { id: 2 }, quantity: 2 } as PlayerCard,
+        ],
+      } as Player;
+
+      quantityCards = [
+        { card: { id: 1 }, quantity: 2 },
+        { card: { id: 3 }, quantity: 1 },
+      ] as QuantityCard[];
+
+      manager = {
+        create: jest.fn().mockImplementation((_, entity) => entity),
+        save: jest.fn().mockResolvedValue(null),
+      } as unknown as EntityManager;
+    });
+
+    it('should update quantities for existing cards and add new cards', async () => {
+      const result = await service.assignQuantityCardsToPlayer(
+        player,
+        quantityCards,
+        manager,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.length).toEqual(3);
+
+      const updatedCard1 = result.find((card) => card.card.id === 1);
+      const newCard3 = result.find((card) => card.card.id === 3);
+
+      expect(updatedCard1).toBeDefined();
+      expect(updatedCard1.quantity).toEqual(3);
+
+      expect(newCard3).toBeDefined();
+      expect(newCard3.quantity).toEqual(1);
+
+      expect(manager.create).toHaveBeenCalledTimes(1); // New card created
+      expect(manager.save).toHaveBeenCalledWith(PlayerCard, expect.any(Array));
+    });
+
+    it('should retain other cards not updated or added', async () => {
+      const result = await service.assignQuantityCardsToPlayer(
+        player,
+        quantityCards,
+        manager,
+      );
+
+      const retainedCard = result.find((card) => card.card.id === 2);
+      expect(retainedCard).toBeDefined();
+      expect(retainedCard.quantity).toEqual(2);
+    });
+
+    it('should handle empty quantityCards without errors', async () => {
+      const result = await service.assignQuantityCardsToPlayer(
+        player,
+        [],
+        manager,
+      );
+
+      expect(result).toEqual(player.playerCards);
+      expect(manager.save).toHaveBeenCalledWith(PlayerCard, player.playerCards);
+    });
+  });
+
+  describe('assignCharacterRandomCardsToPlayer', () => {
+    let manager: EntityManager;
+    let player: Player;
+
+    beforeEach(() => {
+      player = {
+        id: 1,
+        character: {
+          equipment: {
+            random: {
+              common_items: 2,
+              unique_items: 1,
+              spells: 0,
+              abilities: 1,
+              allies: 1,
+            },
+          },
+        },
+        playerCards: [],
+      } as Player;
+
+      manager = {
+        find: jest.fn().mockResolvedValue([
+          { id: 1, type: CardType.COMMON_ITEM },
+          { id: 2, type: CardType.COMMON_ITEM },
+          { id: 3, type: CardType.UNIQUE_ITEM },
+          { id: 4, type: CardType.ABILITY },
+          { id: 5, type: CardType.ALLY },
+        ]),
+      } as unknown as EntityManager;
+
+      jest
+        .spyOn(ArrayHelper, 'randomElements')
+        .mockImplementation((array, count) => array.slice(0, count));
+
+      jest
+        .spyOn(service, 'assignQuantityCardsToPlayer')
+        .mockResolvedValue([
+          { id: 1, card: { id: 1 } as Card, quantity: 1, player } as PlayerCard,
+          { id: 3, card: { id: 3 } as Card, quantity: 1, player } as PlayerCard,
+        ]);
+    });
+
+    it('should assign random cards to the player based on character equipment', async () => {
+      const result = await service.assignCharacterRandomCardsToPlayer(
+        player,
+        manager,
+      );
+
+      expect(manager.find).toHaveBeenCalledWith(Card, {
+        relations: ['translations'],
+      });
+
+      expect(ArrayHelper.randomElements).toHaveBeenCalledTimes(5); // For each card type
+      expect(service.assignQuantityCardsToPlayer).toHaveBeenCalled();
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+      expect(result[0]).toHaveProperty('card.id');
+    });
+
+    it('should handle character with no random equipment specified', async () => {
+      player.character.equipment.random = {
+        common_items: 0,
+        unique_items: 0,
+        spells: 0,
+        abilities: 0,
+        allies: 0,
+      };
+
+      const result = await service.assignCharacterRandomCardsToPlayer(
+        player,
+        manager,
+      );
+
+      expect(result).toEqual([]);
+      expect(service.assignQuantityCardsToPlayer).not.toHaveBeenCalled();
+    });
+
+    it('should handle empty card repository gracefully', async () => {
+      manager.find = jest.fn().mockResolvedValue([]);
+
+      const result = await service.assignCharacterRandomCardsToPlayer(
+        player,
+        manager,
+      );
+
+      expect(result).toEqual([]);
+      expect(service.assignQuantityCardsToPlayer).not.toHaveBeenCalled();
+    });
+
+    it('should assign correct number of cards for each type', async () => {
+      await service.assignCharacterRandomCardsToPlayer(player, manager);
+
+      expect(ArrayHelper.randomElements).toHaveBeenCalledWith(
+        expect.arrayContaining([{ id: 1, type: CardType.COMMON_ITEM }]),
+        2,
+      );
+      expect(ArrayHelper.randomElements).toHaveBeenCalledWith(
+        expect.arrayContaining([{ id: 3, type: CardType.UNIQUE_ITEM }]),
+        1,
+      );
+    });
+  });
+
+  describe('generateQuantityCards', () => {
+    it('should group cards by their IDs and calculate quantities', () => {
+      const cards = [
+        { id: 1, name: 'Card 1' } as Card,
+        { id: 2, name: 'Card 2' } as Card,
+        { id: 1, name: 'Card 1' } as Card,
+        { id: 3, name: 'Card 3' } as Card,
+        { id: 2, name: 'Card 2' } as Card,
+        { id: 1, name: 'Card 1' } as Card,
+      ];
+
+      const result = service.generateQuantityCards(cards);
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(3);
+
+      const card1 = result.find((qc) => qc.card.id === 1);
+      const card2 = result.find((qc) => qc.card.id === 2);
+      const card3 = result.find((qc) => qc.card.id === 3);
+
+      expect(card1).toBeDefined();
+      expect(card1.quantity).toBe(3);
+
+      expect(card2).toBeDefined();
+      expect(card2.quantity).toBe(2);
+
+      expect(card3).toBeDefined();
+      expect(card3.quantity).toBe(1);
+    });
+
+    it('should return an empty array if no cards are provided', () => {
+      const result = service.generateQuantityCards([]);
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle a single card correctly', () => {
+      const cards = [{ id: 1, name: 'Card 1' } as Card];
+
+      const result = service.generateQuantityCards(cards);
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(1);
+      expect(result[0].quantity).toBe(1);
+      expect(result[0].card.id).toBe(1);
+    });
+
+    it('should handle cards with unique IDs without merging quantities', () => {
+      const cards = [
+        { id: 1, name: 'Card 1' } as Card,
+        { id: 2, name: 'Card 2' } as Card,
+        { id: 3, name: 'Card 3' } as Card,
+      ];
+
+      const result = service.generateQuantityCards(cards);
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(3);
+
+      result.forEach((qc) => {
+        expect(qc.quantity).toBe(1);
+      });
+    });
+  });
+
   describe('generatePlayerObject', () => {
     it('should generate a player object with the correct properties', async () => {
       const gameSession = new GameSession();
@@ -805,6 +1051,69 @@ describe('PlayerService', () => {
       await expect(service.getPlayerByToken(token)).rejects.toThrow(
         PlayerNotFoundException,
       );
+    });
+  });
+
+  describe('createPlayerDtoFromEntity', () => {
+    it('should create a PlayerDto from a Player entity with nested properties', () => {
+      const playerEntity = {
+        id: 1,
+        user: { id: 10, name: 'User 1' },
+        character: { id: 20, name: 'Character 1' },
+        playerCards: [
+          { id: 30, card: { id: 40, name: 'Card 1' } } as PlayerCard,
+          { id: 31, card: { id: 41, name: 'Card 2' } } as PlayerCard,
+        ],
+      } as Player;
+
+      const result = PlayerService.createPlayerDtoFromEntity(playerEntity);
+
+      expect(result).toBeDefined();
+      expect(result).toBeInstanceOf(PlayerDto);
+
+      // Validate main properties
+      expect(result.id).toBe(playerEntity.id);
+      expect(result.user).toEqual(playerEntity.user);
+      expect(result.character).toEqual(playerEntity.character);
+
+      // Validate playerCards transformation
+      expect(result.playerCards).toBeDefined();
+      expect(result.playerCards.length).toBe(2);
+
+      result.playerCards.forEach((playerCardDto, index) => {
+        const correspondingPlayerCard = playerEntity.playerCards[index];
+        expect(playerCardDto).toBeDefined();
+        expect(playerCardDto.id).toBe(correspondingPlayerCard.id);
+        expect(playerCardDto.card).toEqual(correspondingPlayerCard.card);
+      });
+    });
+
+    it('should handle empty playerCards array gracefully', () => {
+      const playerEntity = {
+        id: 1,
+        user: { id: 10, name: 'User 1' },
+        character: { id: 20, name: 'Character 1' },
+        playerCards: [],
+      } as Player;
+
+      const result = PlayerService.createPlayerDtoFromEntity(playerEntity);
+
+      expect(result).toBeDefined();
+      expect(result.playerCards).toEqual([]);
+    });
+
+    it('should handle null or undefined playerCards gracefully', () => {
+      const playerEntity = {
+        id: 1,
+        user: { id: 10, name: 'User 1' },
+        character: { id: 20, name: 'Character 1' },
+        playerCards: null,
+      } as unknown as Player;
+
+      const result = PlayerService.createPlayerDtoFromEntity(playerEntity);
+
+      expect(result).toBeDefined();
+      expect(result.playerCards).toEqual(undefined);
     });
   });
 });

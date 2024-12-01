@@ -411,6 +411,7 @@ export class PlayerService {
     const allCards = await manager.find(Card, {
       relations: ['translations'],
     });
+
     const characterEquipment = player.character.equipment.random;
 
     const randomCards = {
@@ -444,6 +445,10 @@ export class PlayerService {
     const quantityCards = this.generateQuantityCards(
       Object.values(randomCards).flat(),
     );
+
+    if (quantityCards.length === 0) {
+      return [];
+    }
 
     return await this.assignQuantityCardsToPlayer(
       player,
