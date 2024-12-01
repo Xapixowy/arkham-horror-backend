@@ -29,6 +29,17 @@ import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 import { PlayerNotFoundException } from '@Exceptions/player/player-not-found.exception';
+import { QuantityCard } from '@Types/card/quantity-card.type';
+import { CardType } from '@Enums/card/card.type';
+
+const DEFAULT_PLAYER_RELATIONS: string[] = [
+  'user',
+  'character',
+  'character.translations',
+  'playerCards',
+  'playerCards.card',
+  'playerCards.card.translations',
+];
 
 @Injectable()
 export class PlayerService {
@@ -54,14 +65,7 @@ export class PlayerService {
 
     const players = await this.playerRepository.find({
       where: { game_session: { id: existingGameSession.id } },
-      relations: [
-        'user',
-        'character',
-        'character.translations',
-        'playerCards',
-        'playerCards.card',
-        'playerCards.card.translations',
-      ],
+      relations: DEFAULT_PLAYER_RELATIONS,
       order: {
         id: 'ASC',
       },
@@ -171,13 +175,19 @@ export class PlayerService {
       existingPlayer.status.endurance = existingPlayer.character.endurance;
       existingPlayer.equipment.money = existingPlayer.character.equipment.money;
       existingPlayer.equipment.clues = existingPlayer.character.equipment.clues;
+      existingPlayer.playerCards = [];
 
       const updatedPlayer = await manager.save(Player, {
         ...existingPlayer,
+        playerCards: await this.assignCharacterRandomCardsToPlayer(
+          existingPlayer,
+          manager,
+        ),
         statistics: {
           ...existingPlayer.statistics,
           characters_played: existingPlayer.statistics.characters_played + 1,
         },
+        updated_at: new Date(),
       });
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
@@ -210,45 +220,18 @@ export class PlayerService {
         relations: ['translations'],
       });
 
-      const cardsToAssignWithQuantity = cardsToAssign.map((card) => ({
-        card,
-        quantity: cardIds.filter((cardId) => cardId === card.id).length,
-      }));
-
-      const existingPlayerCardsMap = new Map(
-        existingPlayer.playerCards.map((playerCard) => [
-          playerCard.card.id,
-          playerCard,
-        ]),
+      const cardsToAssignWithQuantity: QuantityCard[] = cardsToAssign.map(
+        (card) => ({
+          card,
+          quantity: cardIds.filter((cardId) => cardId === card.id).length,
+        }),
       );
 
-      const combinedPlayerCardsMap = cardsToAssignWithQuantity.map(
-        (cardToAssignWithQuantity) => {
-          const existingCard = existingPlayerCardsMap.get(
-            cardToAssignWithQuantity.card.id,
-          );
-
-          if (existingCard) {
-            existingCard.quantity += cardToAssignWithQuantity.quantity;
-            return existingCard;
-          } else {
-            return manager.create(PlayerCard, {
-              ...cardToAssignWithQuantity,
-              player: existingPlayer,
-            });
-          }
-        },
+      const allPlayerCards = await this.assignQuantityCardsToPlayer(
+        existingPlayer,
+        cardsToAssignWithQuantity,
+        manager,
       );
-
-      const allPlayerCards = [
-        ...combinedPlayerCardsMap,
-        ...existingPlayer.playerCards.filter(
-          (playerCard) =>
-            !combinedPlayerCardsMap.some((card) => card.id === playerCard.id),
-        ),
-      ];
-
-      await manager.save(PlayerCard, allPlayerCards);
 
       const acquiredCardCount = cardsToAssignWithQuantity.reduce(
         (acc, card) => acc + card.quantity,
@@ -382,6 +365,107 @@ export class PlayerService {
     });
   }
 
+  async assignQuantityCardsToPlayer(
+    player: Player,
+    quantityCards: QuantityCard[],
+    manager: EntityManager,
+  ): Promise<PlayerCard[]> {
+    const existingPlayerCardsMap = new Map<number, PlayerCard>(
+      player.playerCards.map((playerCard: PlayerCard) => [
+        playerCard.card.id,
+        playerCard,
+      ]),
+    );
+
+    const combinedPlayerCardsMap = quantityCards.map((quantityCard) => {
+      const existingCard = existingPlayerCardsMap.get(quantityCard.card.id);
+
+      if (existingCard) {
+        existingCard.quantity += quantityCard.quantity;
+        return existingCard;
+      } else {
+        return manager.create(PlayerCard, {
+          ...quantityCard,
+          player,
+        });
+      }
+    });
+
+    const allPlayerCards: PlayerCard[] = [
+      ...combinedPlayerCardsMap,
+      ...player.playerCards.filter(
+        (playerCard: PlayerCard) =>
+          !combinedPlayerCardsMap.some((card) => card.id === playerCard.id),
+      ),
+    ];
+
+    await manager.save(PlayerCard, allPlayerCards);
+
+    return allPlayerCards;
+  }
+
+  async assignCharacterRandomCardsToPlayer(
+    player: Player,
+    manager: EntityManager,
+  ): Promise<PlayerCard[]> {
+    const allCards = await manager.find(Card, {
+      relations: ['translations'],
+    });
+    const characterEquipment = player.character.equipment.random;
+
+    const randomCards = {
+      common_items:
+        ArrayHelper.randomElements(
+          allCards.filter((card) => card.type === CardType.COMMON_ITEM),
+          characterEquipment.common_items,
+        ) || [],
+      unique_items:
+        ArrayHelper.randomElements(
+          allCards.filter((card) => card.type === CardType.UNIQUE_ITEM),
+          characterEquipment.unique_items,
+        ) || [],
+      spells:
+        ArrayHelper.randomElements(
+          allCards.filter((card) => card.type === CardType.SPELL),
+          characterEquipment.spells,
+        ) || [],
+      abilities:
+        ArrayHelper.randomElements(
+          allCards.filter((card) => card.type === CardType.ABILITY),
+          characterEquipment.abilities,
+        ) || [],
+      allies:
+        ArrayHelper.randomElements(
+          allCards.filter((card) => card.type === CardType.ALLY),
+          characterEquipment.allies,
+        ) || [],
+    };
+
+    const quantityCards = this.generateQuantityCards(
+      Object.values(randomCards).flat(),
+    );
+
+    return await this.assignQuantityCardsToPlayer(
+      player,
+      quantityCards,
+      manager,
+    );
+  }
+
+  generateQuantityCards(cards: Card[]): QuantityCard[] {
+    const cardMap: Map<number, QuantityCard> = new Map();
+
+    cards.forEach((card) => {
+      if (cardMap.has(card.id)) {
+        cardMap.get(card.id)!.quantity += 1;
+      } else {
+        cardMap.set(card.id, { card, quantity: 1 });
+      }
+    });
+
+    return Array.from(cardMap.values());
+  }
+
   async generatePlayerObject(
     gameSession: GameSession,
     isHost: boolean = true,
@@ -428,21 +512,36 @@ export class PlayerService {
       user,
     );
 
-    const newPlayer = await manager.save(
-      Player,
-      manager.create(Player, newPlayerObject),
+    const newPlayerToken = (
+      await manager.save(Player, manager.create(Player, newPlayerObject))
+    ).token;
+
+    const newPlayer = await this.getPlayer(
+      newPlayerToken,
+      [
+        ...DEFAULT_PLAYER_RELATIONS,
+        'character.characterCards',
+        'character.characterCards.card',
+      ],
+      manager,
     );
 
-    const playerCards = newPlayer.character.characterCards.map(
-      (characterCard) =>
-        ({
-          player: newPlayer,
-          card: characterCard.card,
-          quantity: characterCard.quantity,
-        }) as PlayerCard,
+    newPlayer.playerCards = await this.assignCharacterRandomCardsToPlayer(
+      newPlayer,
+      manager,
     );
 
-    newPlayer.playerCards = await manager.save(PlayerCard, playerCards);
+    const characterQuantityCards: QuantityCard[] =
+      newPlayer.character.characterCards.map((characterCard) => ({
+        card: characterCard.card,
+        quantity: characterCard.quantity,
+      }));
+
+    newPlayer.playerCards = await this.assignQuantityCardsToPlayer(
+      newPlayer,
+      characterQuantityCards,
+      manager,
+    );
 
     return PlayerDto.fromEntity(newPlayer, {
       user: true,
@@ -533,14 +632,8 @@ export class PlayerService {
 
   private async getPlayer(
     token: string,
-    relations: string[] = [
-      'user',
-      'character',
-      'character.translations',
-      'playerCards',
-      'playerCards.card',
-      'playerCards.card.translations',
-    ],
+    relations: string[] = DEFAULT_PLAYER_RELATIONS,
+    manager?: EntityManager,
   ): Promise<Player> {
     const uuidRegex = this.configService.get<RegexConfig>('regex').uuid;
 
@@ -548,10 +641,15 @@ export class PlayerService {
       throw new PlayerTokenInvalidException();
     }
 
-    const existingPlayer = await this.playerRepository.findOne({
-      where: { token },
-      relations,
-    });
+    const existingPlayer = manager
+      ? await manager.findOne(Player, {
+          where: { token },
+          relations,
+        })
+      : await this.playerRepository.findOne({
+          where: { token },
+          relations,
+        });
 
     if (!existingPlayer) {
       throw new PlayerNotFoundException();

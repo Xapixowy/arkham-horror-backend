@@ -15,6 +15,7 @@ import { CharacterCard } from '@Entities/character-card.entity';
 import { CharacterCardDto } from '@Dtos/character-card.dto';
 import { CardService } from '@Services/card/card.service';
 import { CharacterNotFoundException } from '@Exceptions/character/character-not-found.exception';
+import { CharacterPlayersExistException } from '@Exceptions/character/character-players-exist.exception';
 
 @Injectable()
 export class CharacterService {
@@ -127,7 +128,17 @@ export class CharacterService {
   }
 
   async remove(id: number): Promise<CharacterDto> {
-    const existingCharacter = await this.getCharacter(id);
+    const existingCharacter = await this.getCharacter(id, [
+      'translations',
+      'characterCards',
+      'characterCards.card',
+      'characterCards.card.translations',
+      'players',
+    ]);
+
+    if (existingCharacter.players) {
+      throw new CharacterPlayersExistException();
+    }
 
     return this.dataSource.transaction(async (manager) => {
       return CharacterDto.fromEntity(

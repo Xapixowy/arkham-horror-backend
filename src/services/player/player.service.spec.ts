@@ -284,15 +284,38 @@ describe('PlayerService', () => {
         statistics: {
           characters_played: 0,
         },
+        status: {
+          sanity: 1,
+          endurance: 2,
+        },
+        equipment: {
+          money: 3,
+          clues: 4,
+        },
       } as Player;
 
       service['getGameSession'] = jest.fn().mockResolvedValue({});
       service['getPlayer'] = jest.fn().mockResolvedValue(player);
       service['getTranslatedPlayer'] = jest.fn().mockReturnValue(player);
 
-      jest
-        .spyOn(service['characterRepository'], 'find')
-        .mockResolvedValue([{ id: 2 }] as Character[]);
+      jest.spyOn(service['characterRepository'], 'find').mockResolvedValue([
+        {
+          id: 2,
+          sanity: 3,
+          endurance: 4,
+          equipment: {
+            money: 5,
+            clues: 6,
+            random: {
+              common_items: 7,
+              unique_items: 8,
+              spells: 9,
+              abilities: 10,
+              allies: 11,
+            },
+          },
+        },
+      ] as Character[]);
       jest
         .spyOn(service['playerRepository'], 'findOne')
         .mockResolvedValue(null);
@@ -306,6 +329,7 @@ describe('PlayerService', () => {
                 characters_played: 1,
               },
             }),
+            find: jest.fn().mockResolvedValue([]),
           }),
         );
 
@@ -641,24 +665,30 @@ describe('PlayerService', () => {
 
   describe('addPlayerToGameSession', () => {
     let manager: EntityManager;
+    let player: Player;
 
     beforeEach(() => {
+      player = {
+        id: 1,
+        role: PlayerRole.HOST,
+        character: { characterCards: [] },
+        playerCards: [],
+      } as Player;
+
       manager = {
-        save: jest
-          .fn()
-          .mockResolvedValueOnce({
-            id: 1,
-            role: PlayerRole.HOST,
-            character: { characterCards: [] },
-            playerCards: [],
-          })
-          .mockResolvedValueOnce([]),
+        save: jest.fn().mockResolvedValueOnce(player).mockResolvedValueOnce([]),
         create: jest.fn().mockResolvedValue({
           role: PlayerRole.HOST,
           character: { characterCards: [] },
           playerCards: [],
         }),
       } as unknown as EntityManager;
+
+      service['getPlayer'] = jest.fn().mockResolvedValue(player);
+      service['assignCharacterRandomCardsToPlayer'] = jest
+        .fn()
+        .mockResolvedValue([]);
+      service['assignQuantityCardsToPlayer'] = jest.fn().mockResolvedValue([]);
     });
 
     it('should add a player to a game session and return PlayerDto', async () => {
@@ -668,11 +698,13 @@ describe('PlayerService', () => {
         { card: new Card(), quantity: 1 },
       ] as CharacterCard[];
 
+      player.character = { id: 1, characterCards } as Character;
+
       service['generatePlayerObject'] = jest.fn().mockResolvedValue({
         token: 'uniqueToken',
         user,
         game_session: gameSession,
-        character: { id: 1, characterCards } as Character,
+        character: player.character,
       });
 
       const result = await service.addPlayerToGameSession(
@@ -683,7 +715,12 @@ describe('PlayerService', () => {
       );
 
       expect(result).toBeInstanceOf(PlayerDto);
-      expect(manager.save).toHaveBeenCalledTimes(2);
+      expect(result).toEqual(
+        PlayerDto.fromEntity(player, {
+          character: true,
+          playerCards: true,
+        }),
+      );
     });
 
     it('should assign HOST role to the first player in the session', async () => {
