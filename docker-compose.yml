@@ -14,6 +14,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - default
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - ./public:/usr/src/app/public
+    depends_on:
+      - database
+    networks:
+      - default
 
 volumes:
   postgres_data:
