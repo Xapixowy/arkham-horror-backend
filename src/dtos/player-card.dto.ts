@@ -22,11 +22,12 @@ export class PlayerCardDto {
   static fromEntity(
     playerCard: PlayerCard,
     properties?: { player?: true; card?: true },
+    typeMapping?: DTOTypeMapping,
   ): PlayerCardDto {
     return DtoHelper.populateDtoWithOptionalProperties(
       new PlayerCardDto(playerCard.id, playerCard.quantity),
       playerCard,
-      this.typeMapping,
+      typeMapping ?? this.typeMapping,
       properties,
     );
   }

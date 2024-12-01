@@ -49,6 +49,7 @@ export class PlayerDto {
       playerCards?: true;
       game_session?: true;
     },
+    typeMapping?: DTOTypeMapping,
   ): PlayerDto {
     return DtoHelper.populateDtoWithOptionalProperties(
       new PlayerDto(
@@ -63,7 +64,7 @@ export class PlayerDto {
         player.updated_at,
       ),
       player,
-      this.typeMapping,
+      typeMapping ?? this.typeMapping,
       properties,
     );
   }

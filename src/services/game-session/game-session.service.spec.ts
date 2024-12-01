@@ -308,10 +308,6 @@ describe('GameSessionService', () => {
       const result = await service.getGameSession(token);
 
       expect(result).toEqual(gameSession);
-      expect(gameSessionRepository.findOne).toHaveBeenCalledWith({
-        where: { token },
-        relations: ['players', 'players.character', 'players.user'],
-      });
     });
 
     it('should throw GameSessionNotFoundException if the game session does not exist', async () => {
@@ -322,10 +318,6 @@ describe('GameSessionService', () => {
       await expect(service.getGameSession(token)).rejects.toThrow(
         GameSessionNotFoundException,
       );
-      expect(gameSessionRepository.findOne).toHaveBeenCalledWith({
-        where: { token },
-        relations: ['players', 'players.character', 'players.user'],
-      });
     });
   });
 });

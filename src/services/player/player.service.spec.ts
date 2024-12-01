@@ -608,7 +608,14 @@ describe('PlayerService', () => {
         endurance: 10,
         sanity: 10,
         equipment: { money: 10, clues: 5 },
-        attributes: { speed: [1, 2, 3] },
+        attributes: {
+          speed: [1, 2, 3],
+          sneak: [4, 5, 6],
+          prowess: [7, 8, 9],
+          will: [10, 11, 12],
+          knowledge: [13, 14, 15],
+          luck: [16, 17, 18],
+        },
       };
 
       service['getUnusedToken'] = jest.fn().mockResolvedValue('uniqueToken');

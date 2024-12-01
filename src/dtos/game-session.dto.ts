@@ -28,6 +28,7 @@ export class GameSessionDto {
   static fromEntity(
     gameSession: GameSession,
     properties?: { players?: true },
+    typeMapping?: DTOTypeMapping,
   ): GameSessionDto {
     return DtoHelper.populateDtoWithOptionalProperties(
       new GameSessionDto(
@@ -38,7 +39,7 @@ export class GameSessionDto {
         gameSession.updated_at,
       ),
       gameSession,
-      this.typeMapping,
+      typeMapping ?? this.typeMapping,
       properties,
     );
   }

@@ -69,13 +69,7 @@ export class PlayerService {
 
     return players
       .map((player) => this.getTranslatedPlayer(player, language))
-      .map((player) =>
-        PlayerDto.fromEntity(player, {
-          user: true,
-          character: true,
-          playerCards: true,
-        }),
-      );
+      .map((player) => PlayerService.createPlayerDtoFromEntity(player));
   }
 
   async findOne(
@@ -88,11 +82,7 @@ export class PlayerService {
     const existingPlayer = await this.getPlayer(playerToken);
     const translatedPlayer = this.getTranslatedPlayer(existingPlayer, language);
 
-    return PlayerDto.fromEntity(translatedPlayer, {
-      user: true,
-      character: true,
-      playerCards: true,
-    });
+    return PlayerService.createPlayerDtoFromEntity(translatedPlayer);
   }
 
   async findUserPlayer(
@@ -158,12 +148,7 @@ export class PlayerService {
   }
 
   async remove(playerToken: string): Promise<PlayerDto> {
-    const player = await this.getPlayer(playerToken, [
-      'user',
-      'character',
-      'game_session',
-      'cards',
-    ]);
+    const player = await this.getPlayer(playerToken);
 
     return this.dataSource.transaction(async (manager) => {
       await manager.remove(Player, player);
@@ -177,7 +162,7 @@ export class PlayerService {
     language: Language,
   ): Promise<PlayerDto> {
     const existingGameSession = await this.getGameSession(gameSessionToken);
-    const existingPlayer = await this.getPlayer(playerToken, ['character']);
+    const existingPlayer = await this.getPlayer(playerToken);
 
     return this.dataSource.transaction(async (manager) => {
       existingPlayer.character =
@@ -202,9 +187,7 @@ export class PlayerService {
         language,
       );
 
-      return PlayerDto.fromEntity(translatedPlayer, {
-        character: true,
-      });
+      return PlayerService.createPlayerDtoFromEntity(translatedPlayer);
     });
   }
 
@@ -386,12 +369,12 @@ export class PlayerService {
         }),
       );
 
-      return PlayerDto.fromEntity(
-        this.getTranslatedPlayer(updatedPlayer, language),
-        {
-          character: true,
-        },
+      const translatedPlayer = this.getTranslatedPlayer(
+        updatedPlayer,
+        language,
       );
+
+      return PlayerService.createPlayerDtoFromEntity(translatedPlayer);
     });
   }
 
@@ -419,11 +402,11 @@ export class PlayerService {
       },
       attributes: {
         speed: character.attributes.speed[2],
-        sneak: character.attributes.speed[2],
-        prowess: character.attributes.speed[2],
-        will: character.attributes.speed[2],
-        knowledge: character.attributes.speed[2],
-        luck: character.attributes.speed[2],
+        sneak: character.attributes.sneak[2],
+        prowess: character.attributes.prowess[2],
+        will: character.attributes.will[2],
+        knowledge: character.attributes.knowledge[2],
+        luck: character.attributes.luck[2],
       },
       role: isHost ? PlayerRole.HOST : PlayerRole.PLAYER,
     };
@@ -595,5 +578,24 @@ export class PlayerService {
     }
 
     return existingPlayer;
+  }
+
+  static createPlayerDtoFromEntity(player: Player): PlayerDto {
+    return PlayerDto.fromEntity(
+      player,
+      {
+        user: true,
+        character: true,
+        playerCards: true,
+      },
+      {
+        playerCards: (playerCards: PlayerCard[]) =>
+          playerCards.map((playerCard) =>
+            PlayerCardDto.fromEntity(playerCard, {
+              card: true,
+            }),
+          ),
+      },
+    );
   }
 }

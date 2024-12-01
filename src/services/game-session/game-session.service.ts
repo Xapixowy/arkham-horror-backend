@@ -29,15 +29,21 @@ export class GameSessionService {
   async findAll(): Promise<GameSessionDto[]> {
     return this.dataSource.transaction(async (manager) => {
       const gameSessions = await manager.find(GameSession, {
-        relations: ['players', 'players.character', 'players.user'],
+        relations: [
+          'players',
+          'players.user',
+          'players.character',
+          'players.character.translations',
+          'players.playerCards',
+          'players.playerCards.card',
+          'players.playerCards.card.translations',
+        ],
         order: {
           id: 'ASC',
         },
       });
       return gameSessions.map((gameSession) =>
-        GameSessionDto.fromEntity(gameSession, {
-          players: true,
-        }),
+        GameSessionService.createGameSessionDtoFromEntity(gameSession),
       );
     });
   }
@@ -45,9 +51,9 @@ export class GameSessionService {
   async findOne(token: string): Promise<GameSessionDto> {
     const existingGameSession = await this.getGameSession(token);
 
-    return GameSessionDto.fromEntity(existingGameSession, {
-      players: true,
-    });
+    return GameSessionService.createGameSessionDtoFromEntity(
+      existingGameSession,
+    );
   }
 
   async add(user: User | null): Promise<GameSessionDto> {
@@ -86,6 +92,7 @@ export class GameSessionService {
       if (!existingGameSession) {
         throw new GameSessionNotFoundException();
       }
+
       return GameSessionDto.fromEntity(
         await manager.remove(GameSession, existingGameSession),
       );
@@ -112,10 +119,7 @@ export class GameSessionService {
   }
 
   async nextPhase(token: string): Promise<GameSessionDto> {
-    const gameSession = await this.getGameSession(token, [
-      'players',
-      'players.character',
-    ]);
+    const gameSession = await this.getGameSession(token);
 
     return this.dataSource.transaction(async (manager) => {
       const phases = EnumHelper.getValues(GameSessionPhase) as number[];
@@ -188,7 +192,15 @@ export class GameSessionService {
 
   async getGameSession(
     token: string,
-    relations: string[] = ['players', 'players.character', 'players.user'],
+    relations: string[] = [
+      'players',
+      'players.user',
+      'players.character',
+      'players.character.translations',
+      'players.playerCards',
+      'players.playerCards.card',
+      'players.playerCards.card.translations',
+    ],
   ): Promise<GameSession> {
     const existingGameSession = await this.gameSessionRepository.findOne({
       where: { token },
@@ -221,5 +233,22 @@ export class GameSessionService {
     }
 
     return token;
+  }
+
+  static createGameSessionDtoFromEntity(
+    gameSession: GameSession,
+  ): GameSessionDto {
+    return GameSessionDto.fromEntity(
+      gameSession,
+      {
+        players: true,
+      },
+      {
+        players: (players: Player[]) =>
+          players.map((player) =>
+            PlayerService.createPlayerDtoFromEntity(player),
+          ),
+      },
+    );
   }
 }
