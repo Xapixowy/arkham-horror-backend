@@ -78,6 +78,24 @@ export class PlayerController {
     );
   }
 
+  @Put(':playerToken')
+  @Public()
+  async updatePlayer(
+    @Param('gameSessionToken') gameSessionToken: string,
+    @Param('playerToken') playerToken: string,
+    @RequestLanguage() language: Language,
+    @Body() updatePlayerRequest: UpdatePlayerRequest,
+  ): Promise<DataResponse<PlayerDto>> {
+    return ResponseHelper.buildResponse(
+      await this.playerService.updatePlayer(
+        gameSessionToken,
+        playerToken,
+        language,
+        updatePlayerRequest,
+      ),
+    );
+  }
+
   @Put(':playerToken/renew-character')
   @Public()
   @PlayerOwner()
@@ -129,24 +147,6 @@ export class PlayerController {
         playerToken,
         language,
         removePlayerCardsRequest.card_ids,
-      ),
-    );
-  }
-
-  @Put(':playerToken/update-player')
-  @Public()
-  async updatePlayer(
-    @Param('gameSessionToken') gameSessionToken: string,
-    @Param('playerToken') playerToken: string,
-    @RequestLanguage() language: Language,
-    @Body() updatePlayerRequest: UpdatePlayerRequest,
-  ): Promise<DataResponse<PlayerDto>> {
-    return ResponseHelper.buildResponse(
-      await this.playerService.updatePlayer(
-        gameSessionToken,
-        playerToken,
-        language,
-        updatePlayerRequest,
       ),
     );
   }

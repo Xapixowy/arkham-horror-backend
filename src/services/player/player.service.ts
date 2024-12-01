@@ -167,6 +167,10 @@ export class PlayerService {
     return this.dataSource.transaction(async (manager) => {
       existingPlayer.character =
         await this.getUnusedCharacterInGameSession(existingGameSession);
+      existingPlayer.status.sanity = existingPlayer.character.sanity;
+      existingPlayer.status.endurance = existingPlayer.character.endurance;
+      existingPlayer.equipment.money = existingPlayer.character.equipment.money;
+      existingPlayer.equipment.clues = existingPlayer.character.equipment.clues;
 
       const updatedPlayer = await manager.save(Player, {
         ...existingPlayer,
