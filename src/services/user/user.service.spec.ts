@@ -11,6 +11,8 @@ import { UserDto } from '@Dtos/user.dto';
 import { StatisticsService } from '@Services/statistics/statistics.service';
 import { Statistics } from '@Types/user/statistics.type';
 import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
+import { GameSessionService } from '@Services/game-session/game-session.service';
+import { GameSessionDto } from '@Dtos/game-session.dto';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -66,6 +68,98 @@ describe('UserService', () => {
       await expect(userService.findOne(1)).rejects.toThrow(
         UserNotFoundException,
       );
+    });
+  });
+
+  describe('getUserGameSessions', () => {
+    it('should return a list of GameSessionDto if user has players and game sessions', async () => {
+      const gameSession = {
+        id: 1,
+        players: [
+          {
+            id: 1,
+            user: { id: 1, email: 'test@example.com' },
+            character: { id: 1, translations: [] },
+            playerCards: [
+              {
+                card: { id: 1, translations: [] },
+              },
+            ],
+          },
+        ],
+      };
+      const user = {
+        id: 1,
+        players: [
+          {
+            game_session: gameSession,
+          },
+        ],
+      };
+
+      userService['getUser'] = jest.fn().mockResolvedValue(user);
+      jest
+        .spyOn(GameSessionService, 'createGameSessionDtoFromEntity')
+        .mockImplementation((session) => session as GameSessionDto);
+
+      const result = await userService.getUserGameSessions(1);
+
+      expect(result).toEqual([gameSession]);
+      expect(userService['getUser']).toHaveBeenCalledWith(1, [
+        'players',
+        'players.game_session',
+        'players.game_session.players',
+        'players.game_session.players.user',
+        'players.game_session.players.character',
+        'players.game_session.players.character.translations',
+        'players.game_session.players.playerCards',
+        'players.game_session.players.playerCards.card',
+        'players.game_session.players.playerCards.card.translations',
+      ]);
+      expect(
+        GameSessionService.createGameSessionDtoFromEntity,
+      ).toHaveBeenCalledWith(gameSession);
+    });
+
+    it('should return an empty array if user has no players', async () => {
+      const user = { id: 1, players: [] };
+      userService['getUser'] = jest.fn().mockResolvedValue(user);
+
+      const result = await userService.getUserGameSessions(1);
+
+      expect(result).toEqual([]);
+      expect(userService['getUser']).toHaveBeenCalledWith(1, [
+        'players',
+        'players.game_session',
+        'players.game_session.players',
+        'players.game_session.players.user',
+        'players.game_session.players.character',
+        'players.game_session.players.character.translations',
+        'players.game_session.players.playerCards',
+        'players.game_session.players.playerCards.card',
+        'players.game_session.players.playerCards.card.translations',
+      ]);
+    });
+
+    it('should throw UserNotFoundException if user is not found', async () => {
+      userService['getUser'] = jest
+        .fn()
+        .mockRejectedValue(new UserNotFoundException());
+
+      await expect(userService.getUserGameSessions(1)).rejects.toThrow(
+        UserNotFoundException,
+      );
+      expect(userService['getUser']).toHaveBeenCalledWith(1, [
+        'players',
+        'players.game_session',
+        'players.game_session.players',
+        'players.game_session.players.user',
+        'players.game_session.players.character',
+        'players.game_session.players.character.translations',
+        'players.game_session.players.playerCards',
+        'players.game_session.players.playerCards.card',
+        'players.game_session.players.playerCards.card.translations',
+      ]);
     });
   });
 

@@ -38,7 +38,7 @@ export class CardDto {
     public back_image_path: string,
     public locale: Language,
     public created_at: Date,
-    public update_at: Date,
+    public updated_at: Date,
     public translations?: CardTranslationDto[],
     public characterCards?: CharacterCardDto[],
     public playerCards?: PlayerCardDto[],

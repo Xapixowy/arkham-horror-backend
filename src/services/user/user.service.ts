@@ -10,6 +10,8 @@ import { UserDto } from '@Dtos/user.dto';
 import { Statistics } from '@Types/user/statistics.type';
 import { StatisticsService } from '@Services/statistics/statistics.service';
 import { UserNotFoundException } from '@Exceptions/user/user-not-found.exception';
+import { GameSessionDto } from '@Dtos/game-session.dto';
+import { GameSessionService } from '@Services/game-session/game-session.service';
 
 @Injectable()
 export class UserService {
@@ -24,6 +26,26 @@ export class UserService {
     const user = await this.getUser(userId);
 
     return UserDto.fromEntity(user);
+  }
+
+  async getUserGameSessions(userId: number): Promise<GameSessionDto[]> {
+    const user = await this.getUser(userId, [
+      'players',
+      'players.game_session',
+      'players.game_session.players',
+      'players.game_session.players.user',
+      'players.game_session.players.character',
+      'players.game_session.players.character.translations',
+      'players.game_session.players.playerCards',
+      'players.game_session.players.playerCards.card',
+      'players.game_session.players.playerCards.card.translations',
+    ]);
+
+    const gameSessions = user.players.map((player) => player.game_session);
+
+    return gameSessions.map((gameSession) =>
+      GameSessionService.createGameSessionDtoFromEntity(gameSession),
+    );
   }
 
   async getUserStatistics(userId: number): Promise<Statistics | null> {
