@@ -609,7 +609,10 @@ export class PlayerService {
     const randomCharacter = ArrayHelper.randomElement(characters);
 
     const isCharacterAlreadyUsed = !!(await this.playerRepository.findOne({
-      where: { character: { id: randomCharacter.id } },
+      where: {
+        character: { id: randomCharacter.id },
+        game_session: { id: gameSession.id },
+      },
     }));
 
     if (isCharacterAlreadyUsed) {
