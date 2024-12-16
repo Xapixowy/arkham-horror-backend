@@ -19,6 +19,8 @@ import { RequestUser } from '@Decorators/param/request-user.decorator';
 import { User } from '@Entities/user.entity';
 import { PlayerRole } from '@Enums/player/player-role.enum';
 import { PlayerRoles } from '@Decorators/player-roles.decorator';
+import { RequestPlayer } from '@Decorators/param/request-player.decorator';
+import { Player } from '@Entities/player.entity';
 
 @Controller('game-sessions')
 export class GameSessionController {
@@ -60,6 +62,19 @@ export class GameSessionController {
   ): Promise<DataResponse<GameSessionDto>> {
     return ResponseHelper.buildResponse(
       await this.gameSessionService.remove(token),
+    );
+  }
+
+  @Post(':gameSessionToken/join')
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  async join(
+    @Param('gameSessionToken') token: string,
+    @RequestPlayer() player: Player,
+    @RequestUser() user: User,
+  ): Promise<DataResponse<GameSessionDto>> {
+    return ResponseHelper.buildResponse(
+      await this.gameSessionService.join(token, player, user),
     );
   }
 

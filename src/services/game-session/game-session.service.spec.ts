@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
+import { Player } from '@Entities/player.entity';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -26,7 +27,10 @@ describe('GameSessionService', () => {
         { provide: DataSource, useValue: { transaction: jest.fn() } },
         {
           provide: PlayerService,
-          useValue: { addPlayerToGameSession: jest.fn() },
+          useValue: {
+            add: jest.fn(),
+            addPlayerToGameSession: jest.fn(),
+          },
         },
         { provide: ConfigService, useValue: { get: jest.fn() } },
         {
@@ -171,6 +175,85 @@ describe('GameSessionService', () => {
         );
 
       await expect(service.remove('invalidToken')).rejects.toThrow(
+        GameSessionNotFoundException,
+      );
+    });
+  });
+
+  describe('join', () => {
+    let token: string;
+    let user: User;
+    let player: Player;
+    let gameSession: GameSession;
+
+    beforeEach(() => {
+      token = 'testToken';
+      user = { id: 1 } as User;
+      player = { token: 'playerToken', user } as Player;
+      gameSession = {
+        token,
+        players: [
+          { token: 'playerToken', user: { id: 1 } },
+          { token: 'anotherToken', user: { id: 2 } },
+        ],
+      } as GameSession;
+    });
+
+    it('should return an existing game session DTO if the user is already in the session', async () => {
+      jest
+        .spyOn(service, 'getGameSession')
+        .mockResolvedValue(gameSession as any);
+
+      const result = await service.join(token, null, user);
+
+      expect(result).toEqual(
+        GameSessionService.createGameSessionDtoFromEntity(gameSession),
+      );
+    });
+
+    it('should return an existing game session DTO if the player is already in the session', async () => {
+      jest
+        .spyOn(service, 'getGameSession')
+        .mockResolvedValue(gameSession as any);
+
+      const result = await service.join(token, player, null);
+
+      expect(result).toEqual(
+        GameSessionService.createGameSessionDtoFromEntity(gameSession),
+      );
+    });
+
+    it('should add a new player if neither user nor player is already in the session', async () => {
+      jest.spyOn(service, 'getGameSession').mockResolvedValueOnce(gameSession);
+      jest.spyOn(playerService, 'add').mockResolvedValue(undefined);
+
+      const updatedGameSession = {
+        ...gameSession,
+        players: [
+          ...gameSession.players,
+          { token: 'newPlayerToken', user } as Player,
+        ],
+      };
+
+      jest
+        .spyOn(service, 'getGameSession')
+        .mockResolvedValueOnce(updatedGameSession);
+
+      const result = await service.join(token, null, null);
+
+      // Oczekiwania
+      expect(result.players.length).toBe(3);
+      expect(result.players).toContainEqual(
+        expect.objectContaining({ token: 'newPlayerToken', user }),
+      );
+    });
+
+    it('should throw an error if the game session does not exist', async () => {
+      jest
+        .spyOn(service, 'getGameSession')
+        .mockRejectedValue(new GameSessionNotFoundException());
+
+      await expect(service.join(token, null, user)).rejects.toThrow(
         GameSessionNotFoundException,
       );
     });

@@ -99,6 +99,42 @@ export class GameSessionService {
     });
   }
 
+  async join(
+    token: string,
+    player: Player | null,
+    user: User | null,
+  ): Promise<GameSessionDto> {
+    const existingGameSession = await this.getGameSession(token);
+
+    let userPlayer: Player | null = null;
+
+    if (user) {
+      userPlayer = existingGameSession.players.find(
+        (existingPlayer) => existingPlayer.user?.id === user!.id,
+      );
+    }
+
+    if (!userPlayer && player) {
+      userPlayer = existingGameSession.players.find(
+        (existingPlayer) => existingPlayer.token === player!.token,
+      );
+    }
+
+    if (userPlayer) {
+      return GameSessionService.createGameSessionDtoFromEntity(
+        existingGameSession,
+      );
+    }
+
+    await this.playerService.add(existingGameSession.token, user);
+
+    const updatedGameSession = await this.getGameSession(token);
+
+    return GameSessionService.createGameSessionDtoFromEntity(
+      updatedGameSession,
+    );
+  }
+
   async resetPhase(token: string): Promise<GameSessionDto> {
     const gameSessionConfig =
       this.configService.get<GameSessionsConfig>('gameSessions');
