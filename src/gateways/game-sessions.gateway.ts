@@ -14,6 +14,7 @@ import { PlayerDto } from '@Dtos/player.dto';
 
 @WebSocketGateway({
   namespace: new RegExp(WebSocketNamespace.GAME_SESSION),
+  cors: true,
 })
 export class GameSessionsGateway implements OnGatewayConnection {
   @WebSocketServer() server: Server;

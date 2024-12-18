@@ -21,6 +21,7 @@ import { PlayerRole } from '@Enums/player/player-role.enum';
 import { PlayerRoles } from '@Decorators/player-roles.decorator';
 import { RequestPlayer } from '@Decorators/param/request-player.decorator';
 import { Player } from '@Entities/player.entity';
+import { GameSessionJoinResponse } from '@Responses/game-session/game-session.join.response';
 
 @Controller('game-sessions')
 export class GameSessionController {
@@ -72,7 +73,7 @@ export class GameSessionController {
     @Param('gameSessionToken') token: string,
     @RequestPlayer() player: Player,
     @RequestUser() user: User,
-  ): Promise<DataResponse<GameSessionDto>> {
+  ): Promise<DataResponse<GameSessionJoinResponse>> {
     return ResponseHelper.buildResponse(
       await this.gameSessionService.join(token, player, user),
     );

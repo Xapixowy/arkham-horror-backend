@@ -74,6 +74,9 @@
       ],
       "@Gateways/*": [
         "./src/gateways/*"
+      ],
+      "@Responses/*": [
+        "./src/responses/*"
       ]
     }
   }

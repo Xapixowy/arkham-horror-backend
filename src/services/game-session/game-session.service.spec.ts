@@ -10,6 +10,7 @@ import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 import { Player } from '@Entities/player.entity';
+import { PlayerDto } from '@Dtos/player.dto';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -199,40 +200,43 @@ describe('GameSessionService', () => {
       } as GameSession;
     });
 
-    it('should return an existing game session DTO if the user is already in the session', async () => {
-      jest
-        .spyOn(service, 'getGameSession')
-        .mockResolvedValue(gameSession as any);
+    it('should return an existing game session DTO and player DTO if the user is already in the session', async () => {
+      jest.spyOn(service, 'getGameSession').mockResolvedValue(gameSession);
 
       const result = await service.join(token, null, user);
 
-      expect(result).toEqual(
-        GameSessionService.createGameSessionDtoFromEntity(gameSession),
-      );
+      expect(result).toEqual({
+        game_session:
+          GameSessionService.createGameSessionDtoFromEntity(gameSession),
+        player: PlayerService.createPlayerDtoFromEntity(
+          gameSession.players.find((p) => p.user?.id === user.id),
+        ),
+      });
     });
 
-    it('should return an existing game session DTO if the player is already in the session', async () => {
-      jest
-        .spyOn(service, 'getGameSession')
-        .mockResolvedValue(gameSession as any);
+    it('should return an existing game session DTO and player DTO if the player is already in the session', async () => {
+      jest.spyOn(service, 'getGameSession').mockResolvedValue(gameSession);
 
       const result = await service.join(token, player, null);
 
-      expect(result).toEqual(
-        GameSessionService.createGameSessionDtoFromEntity(gameSession),
-      );
+      expect(result).toEqual({
+        game_session:
+          GameSessionService.createGameSessionDtoFromEntity(gameSession),
+        player: PlayerService.createPlayerDtoFromEntity(
+          gameSession.players.find((p) => p.token === player.token),
+        ),
+      });
     });
 
-    it('should add a new player if neither user nor player is already in the session', async () => {
+    it('should add a new player and return updated game session DTO and new player DTO if neither user nor player is in the session', async () => {
       jest.spyOn(service, 'getGameSession').mockResolvedValueOnce(gameSession);
-      jest.spyOn(playerService, 'add').mockResolvedValue(undefined);
+      jest
+        .spyOn(playerService, 'add')
+        .mockResolvedValue(player as unknown as PlayerDto);
 
       const updatedGameSession = {
         ...gameSession,
-        players: [
-          ...gameSession.players,
-          { token: 'newPlayerToken', user } as Player,
-        ],
+        players: [...gameSession.players, player],
       };
 
       jest
@@ -241,10 +245,15 @@ describe('GameSessionService', () => {
 
       const result = await service.join(token, null, null);
 
-      // Oczekiwania
-      expect(result.players.length).toBe(3);
-      expect(result.players).toContainEqual(
-        expect.objectContaining({ token: 'newPlayerToken', user }),
+      expect(result).toEqual({
+        game_session:
+          GameSessionService.createGameSessionDtoFromEntity(updatedGameSession),
+        player,
+      });
+
+      expect(result.game_session.players.length).toBe(3);
+      expect(result.game_session.players).toContainEqual(
+        expect.objectContaining(player),
       );
     });
 

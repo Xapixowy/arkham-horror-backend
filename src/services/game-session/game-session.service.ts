@@ -14,6 +14,7 @@ import { Player } from '@Entities/player.entity';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
 import { PlayerDto } from '@Dtos/player.dto';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
+import { GameSessionJoinResponse } from '@Responses/game-session/game-session.join.response';
 
 @Injectable()
 export class GameSessionService {
@@ -103,7 +104,7 @@ export class GameSessionService {
     token: string,
     player: Player | null,
     user: User | null,
-  ): Promise<GameSessionDto> {
+  ): Promise<GameSessionJoinResponse> {
     const existingGameSession = await this.getGameSession(token);
 
     let userPlayer: Player | null = null;
@@ -121,18 +122,27 @@ export class GameSessionService {
     }
 
     if (userPlayer) {
-      return GameSessionService.createGameSessionDtoFromEntity(
-        existingGameSession,
-      );
+      return {
+        game_session:
+          GameSessionService.createGameSessionDtoFromEntity(
+            existingGameSession,
+          ),
+        player: PlayerService.createPlayerDtoFromEntity(userPlayer),
+      };
     }
 
-    await this.playerService.add(existingGameSession.token, user);
+    const newPlayer = await this.playerService.add(
+      existingGameSession.token,
+      user,
+    );
 
     const updatedGameSession = await this.getGameSession(token);
 
-    return GameSessionService.createGameSessionDtoFromEntity(
-      updatedGameSession,
-    );
+    return {
+      game_session:
+        GameSessionService.createGameSessionDtoFromEntity(updatedGameSession),
+      player: newPlayer,
+    };
   }
 
   async resetPhase(token: string): Promise<GameSessionDto> {

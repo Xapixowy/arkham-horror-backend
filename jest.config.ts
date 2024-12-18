@@ -19,6 +19,7 @@ module.exports = {
     '^@Templates/(.*)$': '<rootDir>/templates/$1',
     '^@Middlewares/(.*)$': '<rootDir>/middlewares/$1',
     '^@Gateways/(.*)$': '<rootDir>/gateways/$1',
+    '^@Responses/(.*)$': '<rootDir>/responses/$1',
   },
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
