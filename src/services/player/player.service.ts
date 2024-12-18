@@ -41,6 +41,8 @@ const DEFAULT_PLAYER_RELATIONS: string[] = [
   'playerCards.card.translations',
 ];
 
+const DEFAULT_GAME_SESSION_RELATIONS: string[] = ['players'];
+
 @Injectable()
 export class PlayerService {
   constructor(
@@ -169,35 +171,52 @@ export class PlayerService {
     const existingPlayer = await this.getPlayer(playerToken);
 
     return this.dataSource.transaction(async (manager) => {
-      existingPlayer.character =
+      const newCharacter =
         await this.getUnusedCharacterInGameSession(existingGameSession);
-      existingPlayer.status.sanity = existingPlayer.character.sanity;
-      existingPlayer.status.endurance = existingPlayer.character.endurance;
-      existingPlayer.equipment.money = existingPlayer.character.equipment.money;
-      existingPlayer.equipment.clues = existingPlayer.character.equipment.clues;
-      existingPlayer.playerCards = [];
 
-      const updatedPlayer = await manager.save(Player, {
-        ...existingPlayer,
-        playerCards: await this.assignCharacterRandomCardsToPlayer(
-          existingPlayer,
-          manager,
-        ),
+      const playerToUpdate = manager.merge(Player, existingPlayer, {
+        character: newCharacter,
+        status: {
+          sanity: newCharacter.sanity,
+          endurance: newCharacter.endurance,
+        },
+        equipment: {
+          money: newCharacter.equipment.money,
+          clues: newCharacter.equipment.clues,
+        },
+        attributes: {
+          speed: newCharacter.attributes.speed[0],
+          sneak: newCharacter.attributes.sneak[0],
+          prowess: newCharacter.attributes.prowess[0],
+          will: newCharacter.attributes.will[0],
+          knowledge: newCharacter.attributes.knowledge[0],
+          luck: newCharacter.attributes.luck[0],
+        },
+        playerCards: [],
+        updated_at: new Date(),
         statistics: {
           ...existingPlayer.statistics,
           characters_played: existingPlayer.statistics.characters_played + 1,
         },
-        updated_at: new Date(),
+      });
+
+      const updatedPlayer = await manager.save(Player, playerToUpdate);
+
+      const updatedPlayerWithCards = manager.merge(Player, updatedPlayer, {
+        playerCards: await this.assignCharacterRandomCardsToPlayer(
+          updatedPlayer,
+          manager,
+        ),
       });
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
-        PlayerDto.fromEntity(updatedPlayer, {
+        PlayerDto.fromEntity(updatedPlayerWithCards, {
           character: true,
         }),
       );
 
       const translatedPlayer = this.getTranslatedPlayer(
-        updatedPlayer,
+        updatedPlayerWithCards,
         language,
       );
 
@@ -624,12 +643,18 @@ export class PlayerService {
 
   private async getGameSession(
     token: string,
-    relations: string[] = ['players'],
+    relations: string[] = DEFAULT_GAME_SESSION_RELATIONS,
+    manager?: EntityManager,
   ): Promise<GameSession> {
-    const existingGameSession = await this.gameSessionRepository.findOne({
-      where: { token },
-      relations,
-    });
+    const existingGameSession = manager
+      ? await manager.findOne(GameSession, {
+          where: { token },
+          relations,
+        })
+      : await this.gameSessionRepository.findOne({
+          where: { token },
+          relations,
+        });
 
     if (!existingGameSession) {
       throw new GameSessionNotFoundException();

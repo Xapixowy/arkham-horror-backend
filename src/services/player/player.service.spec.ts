@@ -282,60 +282,73 @@ describe('PlayerService', () => {
       const gameSessionToken = 'sessionToken';
       const playerToken = 'playerToken';
       const language = Language.POLISH;
-      const player = {
+
+      const existingGameSession = { id: 1 } as GameSession;
+      const existingPlayer = {
         id: 1,
         character: { id: 1 },
-        statistics: {
-          characters_played: 0,
-        },
-        status: {
-          sanity: 1,
-          endurance: 2,
-        },
-        equipment: {
-          money: 3,
-          clues: 4,
-        },
+        statistics: { characters_played: 0 },
+        playerCards: [],
       } as Player;
 
-      service['getGameSession'] = jest.fn().mockResolvedValue({});
-      service['getPlayer'] = jest.fn().mockResolvedValue(player);
-      service['getTranslatedPlayer'] = jest.fn().mockReturnValue(player);
-
-      jest.spyOn(service['characterRepository'], 'find').mockResolvedValue([
-        {
-          id: 2,
-          sanity: 3,
-          endurance: 4,
-          equipment: {
-            money: 5,
-            clues: 6,
-            random: {
-              common_items: 7,
-              unique_items: 8,
-              spells: 9,
-              abilities: 10,
-              allies: 11,
-            },
-          },
+      const newCharacter = {
+        id: 2,
+        sanity: 5,
+        endurance: 4,
+        equipment: { money: 10, clues: 2 },
+        attributes: {
+          speed: [2],
+          sneak: [3],
+          prowess: [4],
+          will: [5],
+          knowledge: [6],
+          luck: [7],
         },
-      ] as Character[]);
+      } as unknown as Character;
+
+      const updatedPlayer = {
+        ...existingPlayer,
+        character: newCharacter,
+        status: { sanity: 5, endurance: 4 },
+        equipment: { money: 10, clues: 2 },
+        attributes: {
+          speed: 2,
+          sneak: 3,
+          prowess: 4,
+          will: 5,
+          knowledge: 6,
+          luck: 7,
+        },
+        statistics: { characters_played: 1 },
+      } as Player;
+
+      const playerWithUpdatedCards = {
+        ...updatedPlayer,
+        playerCards: [{ id: 1, card: { id: 101 }, quantity: 1 } as PlayerCard],
+      } as Player;
+
+      service['getGameSession'] = jest
+        .fn()
+        .mockResolvedValue(existingGameSession);
+      service['getPlayer'] = jest.fn().mockResolvedValue(existingPlayer);
+      service['getUnusedCharacterInGameSession'] = jest
+        .fn()
+        .mockResolvedValue(newCharacter);
       jest
-        .spyOn(service['playerRepository'], 'findOne')
-        .mockResolvedValue(null);
+        .spyOn(service, 'assignCharacterRandomCardsToPlayer')
+        .mockResolvedValue(playerWithUpdatedCards.playerCards);
+      service['getTranslatedPlayer'] = jest
+        .fn()
+        .mockReturnValue(playerWithUpdatedCards);
+
       jest
         .spyOn(dataSource, 'transaction')
-        .mockImplementation(async (cb: any) =>
-          cb({
-            save: jest.fn().mockResolvedValue({
-              ...player,
-              statistics: {
-                characters_played: 1,
-              },
-            }),
-            find: jest.fn().mockResolvedValue([]),
-          }),
-        );
+        .mockImplementation(async (cb: any) => {
+          return cb({
+            save: jest.fn().mockResolvedValue(updatedPlayer),
+            merge: jest.fn().mockReturnValue(playerWithUpdatedCards),
+          });
+        });
 
       const result = await service.renewCharacter(
         gameSessionToken,
@@ -344,7 +357,11 @@ describe('PlayerService', () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.character.id).toBe(2);
+      expect(result).toBeInstanceOf(PlayerDto);
+      expect(result.character.id).toBe(newCharacter.id);
+      expect(result.statistics.characters_played).toBe(1);
+      expect(service['getGameSession']).toHaveBeenCalledWith(gameSessionToken);
+      expect(service['getPlayer']).toHaveBeenCalledWith(playerToken);
     });
 
     it('should throw PlayerNotFoundException if player does not exist', async () => {
@@ -363,17 +380,12 @@ describe('PlayerService', () => {
     });
 
     it('should throw GameSessionNotFoundException if game session does not exist', async () => {
-      service['getGameSession'] = jest.fn().mockResolvedValue({});
-      service['getPlayer'] = jest
+      service['getGameSession'] = jest
         .fn()
         .mockRejectedValue(new GameSessionNotFoundException());
 
       await expect(
-        service.renewCharacter(
-          'sessionToken',
-          'invalidPlayerToken',
-          Language.POLISH,
-        ),
+        service.renewCharacter('invalidToken', 'playerToken', Language.POLISH),
       ).rejects.toThrow(GameSessionNotFoundException);
     });
   });
