@@ -258,19 +258,26 @@ export class PlayerService {
         0,
       );
 
-      const updatedPlayer = await manager.findOneBy(Player, {
+      const playerToUpdate = await manager.findOneBy(Player, {
         id: existingPlayer.id,
       });
 
-      await manager.save(Player, {
-        ...updatedPlayer,
+      const updatedPlayer = await manager.save(Player, {
+        ...playerToUpdate,
         updated_at: new Date(),
         statistics: {
-          ...updatedPlayer.statistics,
+          ...playerToUpdate.statistics,
           cards_acquired:
-            updatedPlayer.statistics.cards_acquired + acquiredCardCount,
+            playerToUpdate.statistics.cards_acquired + acquiredCardCount,
         },
       });
+
+      this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        gameSessionToken,
+        PlayerDto.fromEntity(updatedPlayer, {
+          character: true,
+        }),
+      );
 
       return allPlayerCards.map((playerCard) =>
         PlayerCardDto.fromEntity(
@@ -320,18 +327,25 @@ export class PlayerService {
         }
       }
 
-      const updatedPlayer = await manager.findOneBy(Player, {
+      const playerToUpdate = await manager.findOneBy(Player, {
         id: existingPlayer.id,
       });
 
-      await manager.save(Player, {
-        ...updatedPlayer,
+      const updatedPlayer = await manager.save(Player, {
+        ...playerToUpdate,
         updated_at: new Date(),
         statistics: {
-          ...updatedPlayer.statistics,
-          cards_lost: updatedPlayer.statistics.cards_lost + lostCardCount,
+          ...playerToUpdate.statistics,
+          cards_lost: playerToUpdate.statistics.cards_lost + lostCardCount,
         },
       });
+
+      this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        gameSessionToken,
+        PlayerDto.fromEntity(updatedPlayer, {
+          character: true,
+        }),
+      );
 
       const remainingPlayerCards = Array.from(existingPlayerCardsMap.values());
 
