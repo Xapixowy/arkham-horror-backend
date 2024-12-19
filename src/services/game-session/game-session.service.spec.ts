@@ -39,6 +39,7 @@ describe('GameSessionService', () => {
           useValue: {
             emitPhaseChangedEvent: jest.fn(),
             emitPlayerUpdatedEvent: jest.fn(),
+            emitGameSessionPlayerJoinedEvent: jest.fn(),
           },
         },
       ],
@@ -255,6 +256,9 @@ describe('GameSessionService', () => {
       expect(result.game_session.players).toContainEqual(
         expect.objectContaining(player),
       );
+      expect(
+        gameSessionsGateway.emitGameSessionPlayerJoinedEvent,
+      ).toHaveBeenCalledWith(token, expect.objectContaining(player));
     });
 
     it('should throw an error if the game session does not exist', async () => {
@@ -285,7 +289,10 @@ describe('GameSessionService', () => {
       const result = await service.resetPhase(token);
 
       expect(result.phase).toBe(0);
-      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(0);
+      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(
+        token,
+        0,
+      );
     });
 
     it('should throw GameSessionNotFoundException if game session does not exist', async () => {
@@ -344,7 +351,10 @@ describe('GameSessionService', () => {
       const result = await service.nextPhase(token);
 
       expect(result.phase).toBe(2);
-      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(2);
+      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(
+        token,
+        2,
+      );
     });
 
     it('should throw GameSessionNotFoundException if game session does not exist', async () => {
@@ -374,7 +384,10 @@ describe('GameSessionService', () => {
       const result = await service.previousPhase(token);
 
       expect(result.phase).toBe(1);
-      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(1);
+      expect(gameSessionsGateway.emitPhaseChangedEvent).toHaveBeenCalledWith(
+        token,
+        1,
+      );
     });
 
     it('should throw GameSessionNotFoundException if game session does not exist', async () => {

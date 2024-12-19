@@ -35,14 +35,28 @@ export class GameSessionsGateway implements OnGatewayConnection {
     }
   }
 
-  emitPhaseChangedEvent(phase: GameSessionPhase): void {
+  emitPhaseChangedEvent(
+    gameSessionToken: string,
+    phase: GameSessionPhase,
+  ): void {
     this.emitEvent(WebSocketEvent.GAME_SESSION_PHASE_UPDATED, {
+      game_session_token: gameSessionToken,
       phase,
     });
   }
 
   emitPlayerUpdatedEvent(playerDto: PlayerDto): void {
     this.emitEvent(WebSocketEvent.PLAYER_UPDATED, {
+      player: playerDto,
+    });
+  }
+
+  emitGameSessionPlayerJoinedEvent(
+    gameSessionToken: string,
+    playerDto: PlayerDto,
+  ): void {
+    this.emitEvent(WebSocketEvent.GAME_SESSION_PLAYER_JOINED, {
+      game_session_token: gameSessionToken,
       player: playerDto,
     });
   }

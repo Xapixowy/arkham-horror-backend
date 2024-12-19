@@ -136,6 +136,11 @@ export class GameSessionService {
       user,
     );
 
+    this.gameSessionsGateway.emitGameSessionPlayerJoinedEvent(
+      existingGameSession.token,
+      newPlayer,
+    );
+
     const updatedGameSession = await this.getGameSession(token);
 
     return {
@@ -156,7 +161,10 @@ export class GameSessionService {
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
-      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+      this.gameSessionsGateway.emitPhaseChangedEvent(
+        updatedGameSession.token,
+        updatedGameSession.phase,
+      );
 
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,
@@ -181,7 +189,10 @@ export class GameSessionService {
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
-      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+      this.gameSessionsGateway.emitPhaseChangedEvent(
+        updatedGameSession.token,
+        updatedGameSession.phase,
+      );
 
       const updatedPlayers: Player[] = gameSession.players.map((player) => ({
         ...player,
@@ -228,7 +239,10 @@ export class GameSessionService {
 
       const updatedGameSession = await manager.save(GameSession, gameSession);
 
-      this.gameSessionsGateway.emitPhaseChangedEvent(updatedGameSession.phase);
+      this.gameSessionsGateway.emitPhaseChangedEvent(
+        updatedGameSession.token,
+        updatedGameSession.phase,
+      );
 
       return GameSessionDto.fromEntity(updatedGameSession, {
         players: true,
