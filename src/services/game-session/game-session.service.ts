@@ -210,6 +210,7 @@ export class GameSessionService {
 
       updatedPlayerEntities.forEach((player) =>
         this.gameSessionsGateway.emitPlayerUpdatedEvent(
+          token,
           PlayerDto.fromEntity(player, {
             character: true,
           }),

@@ -210,6 +210,7 @@ export class PlayerService {
       });
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        gameSessionToken,
         PlayerDto.fromEntity(updatedPlayerWithCards, {
           character: true,
         }),
@@ -370,6 +371,7 @@ export class PlayerService {
       const updatedPlayer = await manager.save(Player, newPlayer);
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
+        gameSessionToken,
         PlayerDto.fromEntity(updatedPlayer, {
           character: true,
         }),

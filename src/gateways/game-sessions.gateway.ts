@@ -45,8 +45,9 @@ export class GameSessionsGateway implements OnGatewayConnection {
     });
   }
 
-  emitPlayerUpdatedEvent(playerDto: PlayerDto): void {
+  emitPlayerUpdatedEvent(gameSessionToken: string, playerDto: PlayerDto): void {
     this.emitEvent(WebSocketEvent.PLAYER_UPDATED, {
+      game_session_token: gameSessionToken,
       player: playerDto,
     });
   }
