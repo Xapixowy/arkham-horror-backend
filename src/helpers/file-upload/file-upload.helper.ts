@@ -78,6 +78,7 @@ export class FileUploadHelper {
     const projectPath = this.configService
       .get<FileUploadConfig>('fileUpload')
       .uploadsPath.replace('/public', '');
+    console.log('🔥', projectPath);
 
     return `${projectPath}${filePath}`;
   }
