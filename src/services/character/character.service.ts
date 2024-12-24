@@ -182,11 +182,6 @@ export class CharacterService {
 
     return this.dataSource.transaction(async (manager) => {
       if (existingCharacter.image_path) {
-        console.log('1️⃣', existingCharacter.image_path);
-        console.log(
-          '2️⃣',
-          this.fileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
-        );
         const isFileDeleted = this.fileUploadHelper.deleteFile(
           this.fileUploadHelper.remoteToLocalPath(existingCharacter.image_path),
         );
