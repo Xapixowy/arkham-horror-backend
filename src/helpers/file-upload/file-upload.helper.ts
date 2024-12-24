@@ -78,6 +78,7 @@ export class FileUploadHelper {
     const uploadsPathSplitByPublic = this.configService
       .get<FileUploadConfig>('fileUpload')
       .uploadsPath.split('/public');
+    console.log('🔥', uploadsPathSplitByPublic);
     const lastPublicWithPublicRemoved = uploadsPathSplitByPublic[
       uploadsPathSplitByPublic.length - 1
     ].replace('/public', '');
@@ -86,8 +87,6 @@ export class FileUploadHelper {
       lastPublicWithPublicRemoved;
 
     const projectPath = uploadsPathSplitByPublic.join('');
-
-    console.log('🔥', projectPath);
 
     return `${projectPath}${filePath}`;
   }
