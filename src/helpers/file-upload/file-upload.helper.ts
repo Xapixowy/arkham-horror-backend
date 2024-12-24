@@ -75,10 +75,17 @@ export class FileUploadHelper {
     const filePath = remotePath.split(
       this.configService.get<FileUploadConfig>('fileUpload').serverUrl,
     )[1];
-    const projectPath = this.configService
+    const uploadsPathSplitByPublic = this.configService
       .get<FileUploadConfig>('fileUpload')
-      .uploadsPath.replace('/public', '');
-    console.log('🔥', projectPath);
+      .uploadsPath.split('/public');
+    const lastPublicWithPublicRemoved = uploadsPathSplitByPublic[
+      uploadsPathSplitByPublic.length - 1
+    ].replace('/public', '');
+
+    uploadsPathSplitByPublic[uploadsPathSplitByPublic.length - 1] =
+      lastPublicWithPublicRemoved;
+
+    const projectPath = uploadsPathSplitByPublic.join('');
 
     return `${projectPath}${filePath}`;
   }
