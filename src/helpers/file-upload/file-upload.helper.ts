@@ -43,11 +43,12 @@ export class FileUploadHelper {
   }
 
   static localToRelativePath(localPath: string): string {
+    const splitPublic = localPath.split('public');
     console.log(
       '🔥 localToRelativePath',
-      '/public' + localPath.split('public', 2)[1].replace(/\\/g, '/'),
+      '/public' + splitPublic[splitPublic.length - 1].replace(/\\/g, '/'),
     );
-    return '/public' + localPath.split('public', 2)[1].replace(/\\/g, '/');
+    return '/public' + splitPublic[splitPublic.length - 1].replace(/\\/g, '/');
   }
 
   static generateFileName(originalName: string): string {
