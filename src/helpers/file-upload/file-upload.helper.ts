@@ -85,6 +85,7 @@ export class FileUploadHelper {
     createDirectories: boolean = false,
   ): string {
     const destinationPath = `${this.configService.get<FileUploadConfig>('fileUpload').uploadsPath}/${path}`;
+    console.log(destinationPath);
 
     if (createDirectories && !fs.existsSync(destinationPath)) {
       fs.mkdirSync(destinationPath, { recursive: true });
