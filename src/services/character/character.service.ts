@@ -155,6 +155,7 @@ export class CharacterService {
         file,
         this.fileUploadHelper.generateDestinationPath(`characters/${id}`, true),
       );
+      console.log('🔥 setPhoto', savedFilePath);
 
       existingCharacter.image_path =
         this.fileUploadHelper.localToRemotePath(savedFilePath);

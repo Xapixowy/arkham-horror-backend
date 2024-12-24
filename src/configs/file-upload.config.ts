@@ -8,7 +8,7 @@ export type FileUploadConfig = {
 export const fileUploadConfig = registerAs(
   'fileUpload',
   (): FileUploadConfig => {
-    console.log(`${__dirname}/../../../public`);
+    console.log('🔥', `${__dirname}/../../../public`);
     return {
       serverUrl: process.env.APP_URL || 'http://localhost:3000',
       uploadsPath: `${__dirname}/../../../public`,
