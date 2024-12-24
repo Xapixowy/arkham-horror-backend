@@ -87,6 +87,8 @@ export class FileUploadHelper {
 
     const projectPath = uploadsPathSplitByPublic.join('');
 
+    console.log('🔥', projectPath);
+
     return `${projectPath}${filePath}`;
   }
 
