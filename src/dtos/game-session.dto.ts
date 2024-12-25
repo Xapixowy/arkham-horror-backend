@@ -6,7 +6,7 @@ import { GameSession } from '@Entities/game-session.entity';
 import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
 
 export class GameSessionDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     players: (players: Player[]) =>
       players.map((player) =>
         PlayerDto.fromEntity(player, {

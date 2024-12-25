@@ -16,7 +16,7 @@ import { PlayerCardDto } from '@Dtos/player-card.dto';
 import { Statistics } from '@Types/player/statistics.type';
 
 export class PlayerDto {
-  private static readonly typeMapping: DTOTypeMapping = {
+  static readonly typeMapping: DTOTypeMapping = {
     user: (user: User) => UserDto.fromEntity(user),
     character: (character: Character) => CharacterDto.fromEntity(character),
     playerCards: (playerCards: PlayerCard[]) =>

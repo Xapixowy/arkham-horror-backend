@@ -1,3 +1,3 @@
 export enum WebSocketNamespace {
-  GAME_SESSION = '^\\/game-sessions\\/[a-zA-Z0-9]+$',
+  GAME_SESSION = 'game-sessions',
 }

@@ -12,7 +12,6 @@ import { GameSessionPhase } from '@Enums/game-session/game-session-phase.enum';
 import { EnumHelper } from '@Helpers/enum/enum.helper';
 import { Player } from '@Entities/player.entity';
 import { GameSessionsGateway } from '@Gateways/game-sessions.gateway';
-import { PlayerDto } from '@Dtos/player.dto';
 import { GameSessionNotFoundException } from '@Exceptions/game-session/game-session-not-found.exception';
 import { GameSessionJoinResponse } from '@Responses/game-session/game-session.join.response';
 
@@ -211,9 +210,7 @@ export class GameSessionService {
       updatedPlayerEntities.forEach((player) =>
         this.gameSessionsGateway.emitPlayerUpdatedEvent(
           token,
-          PlayerDto.fromEntity(player, {
-            character: true,
-          }),
+          PlayerService.createPlayerDtoFromEntity(player),
         ),
       );
 
@@ -305,6 +302,7 @@ export class GameSessionService {
         players: true,
       },
       {
+        ...GameSessionDto.typeMapping,
         players: (players: Player[]) =>
           players.map((player) =>
             PlayerService.createPlayerDtoFromEntity(player),

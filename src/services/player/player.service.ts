@@ -211,9 +211,7 @@ export class PlayerService {
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
         gameSessionToken,
-        PlayerDto.fromEntity(updatedPlayerWithCards, {
-          character: true,
-        }),
+        PlayerService.createPlayerDtoFromEntity(updatedPlayerWithCards),
       );
 
       const translatedPlayer = this.getTranslatedPlayer(
@@ -274,9 +272,7 @@ export class PlayerService {
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
         gameSessionToken,
-        PlayerDto.fromEntity(updatedPlayer, {
-          character: true,
-        }),
+        PlayerService.createPlayerDtoFromEntity(updatedPlayer),
       );
 
       return allPlayerCards.map((playerCard) =>
@@ -342,9 +338,7 @@ export class PlayerService {
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
         gameSessionToken,
-        PlayerDto.fromEntity(updatedPlayer, {
-          character: true,
-        }),
+        PlayerService.createPlayerDtoFromEntity(updatedPlayer),
       );
 
       const remainingPlayerCards = Array.from(existingPlayerCardsMap.values());
@@ -386,9 +380,7 @@ export class PlayerService {
 
       this.gameSessionsGateway.emitPlayerUpdatedEvent(
         gameSessionToken,
-        PlayerDto.fromEntity(updatedPlayer, {
-          character: true,
-        }),
+        PlayerService.createPlayerDtoFromEntity(updatedPlayer),
       );
 
       const translatedPlayer = this.getTranslatedPlayer(
@@ -583,11 +575,7 @@ export class PlayerService {
       manager,
     );
 
-    return PlayerDto.fromEntity(newPlayer, {
-      user: true,
-      character: true,
-      playerCards: true,
-    });
+    return PlayerService.createPlayerDtoFromEntity(newPlayer);
   }
 
   getTranslatedPlayer(player: Player, language: Language): Player {
@@ -643,12 +631,15 @@ export class PlayerService {
 
     const randomCharacter = ArrayHelper.randomElement(characters);
 
-    const isCharacterAlreadyUsed = !!(await this.playerRepository.findOne({
+    const playerWithRandomCharacter = await this.playerRepository.findOne({
       where: {
         character: { id: randomCharacter.id },
         game_session: { id: gameSession.id },
       },
-    }));
+      relations: ['character', 'game_session'],
+    });
+
+    const isCharacterAlreadyUsed = !!playerWithRandomCharacter;
 
     if (isCharacterAlreadyUsed) {
       return this.getUnusedCharacterInGameSession(gameSession);
@@ -740,6 +731,7 @@ export class PlayerService {
         playerCards: true,
       },
       {
+        ...PlayerDto.typeMapping,
         playerCards: (playerCards: PlayerCard[]) =>
           playerCards.map((playerCard) =>
             PlayerCardDto.fromEntity(playerCard, {
