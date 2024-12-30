@@ -597,20 +597,13 @@ export class PlayerService {
       manager,
     );
 
-    newPlayer.playerCards = await this.assignCharacterRandomCardsToPlayer(
+    newPlayer.playerCards = await this.assignCharacterCardsToPlayer(
       newPlayer,
       manager,
     );
 
-    const characterQuantityCards: QuantityCard[] =
-      newPlayer.character.characterCards.map((characterCard) => ({
-        card: characterCard.card,
-        quantity: characterCard.quantity,
-      }));
-
-    newPlayer.playerCards = await this.assignQuantityCardsToPlayer(
+    newPlayer.playerCards = await this.assignCharacterRandomCardsToPlayer(
       newPlayer,
-      characterQuantityCards,
       manager,
     );
 
