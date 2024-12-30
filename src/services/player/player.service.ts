@@ -174,6 +174,10 @@ export class PlayerService {
       const newCharacter =
         await this.getUnusedCharacterInGameSession(existingGameSession);
 
+      for (const playerCard of existingPlayer.playerCards) {
+        await manager.remove(PlayerCard, playerCard);
+      }
+
       const playerToUpdate = manager.merge(Player, existingPlayer, {
         character: newCharacter,
         status: {
@@ -192,19 +196,30 @@ export class PlayerService {
           knowledge: newCharacter.attributes.knowledge[0],
           luck: newCharacter.attributes.luck[0],
         },
-        playerCards: [],
         updated_at: new Date(),
         statistics: {
           ...existingPlayer.statistics,
           characters_played: existingPlayer.statistics.characters_played + 1,
         },
       });
+      playerToUpdate.playerCards = [];
 
       const updatedPlayer = await manager.save(Player, playerToUpdate);
 
+      const updatedPlayerWithCharacterCards = manager.merge(
+        Player,
+        updatedPlayer,
+        {
+          playerCards: await this.assignCharacterCardsToPlayer(
+            updatedPlayer,
+            manager,
+          ),
+        },
+      );
+
       const updatedPlayerWithCards = manager.merge(Player, updatedPlayer, {
         playerCards: await this.assignCharacterRandomCardsToPlayer(
-          updatedPlayer,
+          updatedPlayerWithCharacterCards,
           manager,
         ),
       });
@@ -476,6 +491,30 @@ export class PlayerService {
     if (quantityCards.length === 0) {
       return [];
     }
+
+    return await this.assignQuantityCardsToPlayer(
+      player,
+      quantityCards,
+      manager,
+    );
+  }
+
+  async assignCharacterCardsToPlayer(
+    player: Player,
+    manager: EntityManager,
+  ): Promise<PlayerCard[]> {
+    const characterCards = player.character.characterCards || [];
+
+    if (characterCards.length === 0) {
+      return player.playerCards || [];
+    }
+
+    const quantityCards: QuantityCard[] = characterCards.map(
+      (characterCard) => ({
+        card: characterCard.card,
+        quantity: characterCard.quantity,
+      }),
+    );
 
     return await this.assignQuantityCardsToPlayer(
       player,
