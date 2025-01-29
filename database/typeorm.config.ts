@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 
 config();
@@ -14,4 +14,6 @@ export default new DataSource({
   logging: process.env.APP_ENV === 'development',
   entities: [__dirname + '/../src/entities/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/**/*.ts'],
-});
+  seeds: [__dirname + '/../../database/seeds/**/*.ts'],
+  factories: [__dirname + '/../../database/factories/**/*.ts'],
+} as DataSourceOptions & { seeds: string[]; factories: string[] });

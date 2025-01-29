@@ -25,6 +25,6 @@ export const databaseConfig = registerAs(
     synchronize: process.env.APP_ENV === 'development',
     logging: process.env.APP_ENV === 'development',
     entities: [__dirname + '/../entities/**/*.entity{.ts,.js}'],
-    migrations: [__dirname + '/../../database/Migrations/**/*.ts'],
+    migrations: [__dirname + '/../../database/migrations/**/*.ts'],
   }),
 );

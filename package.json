@@ -28,6 +28,7 @@
     "mjml": "mjml -r mjml/**/*.mjml -o mjml"
   },
   "dependencies": {
+    "@jorgebodega/typeorm-seeding": "^7.1.0",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
