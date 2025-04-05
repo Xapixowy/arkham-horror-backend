@@ -13,9 +13,9 @@
   <li><a href="#tech-stack">Tech Stack</a>
     <ul>
       <li><a href="#nestjs">NestJS</a></li>
-      <li><a href="#priemng">PrimeNg</a></li>
-      <li><a href="#ngrx">NgRx</a></li>
+      <li><a href="#postgresql">PostgreSQL</a></li>
       <li><a href="#socketio">Socket.IO</a></li>
+      <li><a href="#docker">Docker</a></li>
     </ul>
   </li>
   <li><a href="#installation">Installation</a>
@@ -59,7 +59,7 @@
 
 <h2 id="installation">Installation</h2>
 <p>To simplify the installation process, the project uses a Docker.</p>
-<p>Remember, this application is tightly linked to the <a href="https://github.com/Xapixowy/arkham-horror-backend">backend</a>, and you should also set up <a href="https://github.com/Xapixowy/arkham-horror-backend">that project</a> to get the full functionality.</p>
+<p>Remember, this application is tightly linked to the <a href="https://github.com/Xapixowy/arkham-horror-frontend">frontend</a>, and you should also set up <a href="https://github.com/Xapixowy/arkham-horror-frontend">that project</a> to get the full functionality.</p>
 
 <h3 id="prerequisites">Prerequisites</h3>
 <ul>
@@ -69,9 +69,19 @@
 <h3 id="steps">Steps</h3>
 <h4>1. Environment variables</h4>
 
-Copy `.env.example` file to `.env`. You don't need to make any changes there.
+Copy `.env.example` file to `.env` and edit the file. These are the variables you need to fill with descriptions:
+
+- **POSTGRES_DB**: Database name (ex. `arkham_horror_db`)
+- **POSTGRES_PASSWORD**: Database user password (ex. `TheStrongestPassword123!@$`)
+- **JWT_SECRET**: Private key to sign and verify JWT. Just go to [JwtSecret.com](https://jwtsecret.com/generate), click generate and copy whole key there.
+- **MAIL_HOST**: The SMTP server address used for sending emails (in this case, [Mailtrap](https://mailtrap.io/)).
+- **MAIL_PORT**: The port number for the SMTP server (in this case, `465`).
+- **MAIL_SECURE**: A flag indicating if the connection should be encrypted (in this case, `false`).
+- **MAIL_USER**: The email address or username used for authentication with the SMTP server.
+- **MAIL_SECURE**: The password associated with the email account for authentication.
 ```bash
 cp .env.example .env
+nano .env
 ```
 <h4>2. Build Docker container</h4>
 
