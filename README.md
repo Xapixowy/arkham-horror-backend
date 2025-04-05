@@ -1,73 +1,83 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <img src="https://raw.githubusercontent.com/Xapixowy/arkham-horror-backend/refs/heads/main/public/assets/images/email/banner.webp" alt="logo" width="500"/>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<h1 align="center">Arkham Horror</h1>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
+<p align="center">Application to make Arkham Horror games easier.</p>
+<p align="center">This repository is closely linked to <a href="https://github.com/Xapixowy/arkham-horror-frontend">another one</a>, which handles the <a href="https://github.com/Xapixowy/arkham-horror-frontend">frontend</a>, while this one is the <b><u>backend</b></u>.</p>
+
+<h2>Table of contents</h2>
+<ul>
+  <li><a href="#description">Description</a></li>
+  <li><a href="#tech-stack">Tech Stack</a>
+    <ul>
+      <li><a href="#nestjs">NestJS</a></li>
+      <li><a href="#priemng">PrimeNg</a></li>
+      <li><a href="#ngrx">NgRx</a></li>
+      <li><a href="#socketio">Socket.IO</a></li>
+    </ul>
+  </li>
+  <li><a href="#installation">Installation</a>
+    <ul>
+      <li><a href="#prerequisites">Prerequisites</a></li>
+      <li><a href="#steps">Steps</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="description">Description</h2>
+<p>The application was designed to simplify managing characters and game elements during Arkham Horror board game sessions. It provides real-time updates on the game phase and allows easy management of items, spells, companions, and other resources directly through the interface.</p>
+
+<h2 id="tech-stack">Tech Stack</h2>
+<p align="center">
+  <img src="https://nestjs.com/logo-small-gradient.d792062c.svg" alt="logo" width="130"/>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<h3 align="center" id="nestjs"><a href="https://nestjs.com/">NestJS</a></h3>
+<p>NestJS is a progressive, open-source Node.js framework for building efficient and scalable server-side applications using TypeScript. It leverages modern JavaScript features and is built with a modular architecture, making it ideal for building enterprise-level applications.</p>
 
-## Description
+<p align="center">
+  <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="logo" width="100"/>
+</p>
+<h3 align="center" id="postgresql"><a href="https://www.postgresql.org/">PostgreSQL</a></h3>
+<p>PostgreSQL is an open-source, reliable, and scalable relational database system known for its support of advanced SQL features and ability to handle large volumes of data.</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<p align="center">
+  <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://socket.io/images/logo-dark.svg">
+  <img src="https://socket.io/images/logo.svg" alt="logo" width="100"/>
+  </picture>
+</p>
+<h3 align="center" id="socketio"><a href="https://socket.io">Socket.IO</a></h3>
+<p>Socket.IO client is a JavaScript library for real-time, bidirectional communication between web clients and servers, allowing the frontend to easily connect to a Socket.IO server for features like chat, live updates, and real-time notifications.</p>
 
-## Installation
+<p align="center">
+  <img src="https://logos-world.net/wp-content/uploads/2021/02/Docker-Logo-700x394.png" alt="logo" width="200"/>
+</p>
+<h3 align="center" id="docker"><a href="https://www.docker.com/">Docker</a></h3>
+<p>Docker is an open-source platform that automates the deployment and management of applications using containers, allowing for consistent environments across different systems.</p>
 
+<h2 id="installation">Installation</h2>
+<p>To simplify the installation process, the project uses a Docker.</p>
+<p>Remember, this application is tightly linked to the <a href="https://github.com/Xapixowy/arkham-horror-backend">backend</a>, and you should also set up <a href="https://github.com/Xapixowy/arkham-horror-backend">that project</a> to get the full functionality.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+  <li><a href="https://www.docker.com/">Docker</a></li>
+</ul>
+
+<h3 id="steps">Steps</h3>
+<h4>1. Environment variables</h4>
+
+Copy `.env.example` file to `.env`. You don't need to make any changes there.
 ```bash
-$ npm install
+cp .env.example .env
+```
+<h4>2. Build Docker container</h4>
+
+Just run the command to build the container and wait.
+```bash
+docker-compose up -d
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+<h4>3. Enjoy :)</h4>

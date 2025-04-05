@@ -1,11 +1,11 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 config();
 
 export default new DataSource({
   type: 'postgres',
-  host: process.env.POSTGRES_HOST || 'localhost',
+  host: process.env.APP_DOCKERIZED === 'true' ? 'database' : process.env.POSTGRES_HOST || 'localhost',
   port: parseInt(process.env.POSTGRES_PORT) || 5432,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,

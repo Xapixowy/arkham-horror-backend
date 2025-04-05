@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
-import { FileUploadConfig } from '@Configs/file-upload.config';
 import { AppConfig } from '@Configs/app.config';
+import { FileUploadConfig } from '@Configs/file-upload.config';
 import { User } from '@Entities/user.entity';
-import { I18nService } from 'nestjs-i18n';
 import { Language } from '@Enums/language';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class EmailService {
